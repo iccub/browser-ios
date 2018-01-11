@@ -31,7 +31,7 @@ class HiddenSetting: Setting {
 class DeleteExportedDataSetting: HiddenSetting {
     override var title: NSAttributedString? {
         // Not localized for now.
-        return NSAttributedString(string: "Debug: delete exported databases", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "Debug: delete exported databases", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -53,7 +53,7 @@ class DeleteExportedDataSetting: HiddenSetting {
 class ExportBrowserDataSetting: HiddenSetting {
     override var title: NSAttributedString? {
         // Not localized for now.
-        return NSAttributedString(string: "Debug: copy databases to app container", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "Debug: copy databases to app container", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -87,7 +87,7 @@ class ShowIntroductionSetting: Setting {
 
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
-        super.init(title: NSAttributedString(string: Strings.ShowTour, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: Strings.ShowTour, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -111,7 +111,7 @@ class SearchSetting: Setting {
 
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
-        super.init(title: NSAttributedString(string: Strings.DefaultSearchEngine, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: Strings.DefaultSearchEngine, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -134,7 +134,7 @@ class LoginsSetting: Setting {
         self.navigationController = settings.navigationController
 
         let loginsTitle = Strings.Logins
-        super.init(title: NSAttributedString(string: loginsTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]),
+        super.init(title: NSAttributedString(string: loginsTitle, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]),
                    delegate: delegate)
     }
 
@@ -156,7 +156,7 @@ class SyncDevicesSetting: Setting {
         self.profile = settings.profile
         
         let clearTitle = Strings.Sync
-        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
@@ -189,7 +189,7 @@ class SyncDeviceSetting: Setting {
     init(profile: Profile, device: Device) {
         self.profile = profile
         self.device = device
-        super.init(title: NSAttributedString(string: device.name ?? "", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: device.name ?? "", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
@@ -208,7 +208,7 @@ class ClearPrivateDataSetting: Setting {
         self.profile = settings.profile
 
         let clearTitle = Strings.ClearPrivateData
-        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -220,7 +220,7 @@ class ClearPrivateDataSetting: Setting {
 
 class PrivacyPolicySetting: Setting {
     override var title: NSAttributedString? {
-        return NSAttributedString(string: Strings.Privacy_Policy, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: Strings.Privacy_Policy, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override var url: URL? {
@@ -243,7 +243,7 @@ class ChangePinSetting: Setting {
         self.profile = settings.profile
         
         let clearTitle = Strings.Change_Pin
-        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
     
     override func onClick(_ navigationController: UINavigationController?) {

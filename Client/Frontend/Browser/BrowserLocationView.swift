@@ -58,16 +58,16 @@ class BrowserLocationView: UIView {
     var tapRecognizer: UITapGestureRecognizer!
 
     // Variable colors should be overwritten by theme
-    dynamic var baseURLFontColor: UIColor = BrowserLocationViewUX.BaseURLFontColor {
+    @objc dynamic var baseURLFontColor: UIColor = BrowserLocationViewUX.BaseURLFontColor {
         didSet { updateTextWithURL() }
     }
 
-    dynamic var hostFontColor: UIColor = BrowserLocationViewUX.HostFontColor {
+    @objc dynamic var hostFontColor: UIColor = BrowserLocationViewUX.HostFontColor {
         didSet { updateTextWithURL() }
     }
     
     // The color of the URL after it has loaded
-    dynamic var fullURLFontColor: UIColor = BraveUX.LocationBarTextColor {
+    @objc dynamic var fullURLFontColor: UIColor = BraveUX.LocationBarTextColor {
         didSet {
             updateTextWithURL()
             // Reset placeholder text, which will auto-adjust based on this new color
@@ -115,7 +115,7 @@ class BrowserLocationView: UIView {
     /// Returns constant placeholder text with current URL color
     var placeholder: NSAttributedString {
         let placeholderText = Strings.Search_or_enter_address
-        return NSAttributedString(string: placeholderText, attributes: [NSForegroundColorAttributeName: self.fullURLFontColor.withAlphaComponent(0.5)])
+        return NSAttributedString(string: placeholderText, attributes: [NSAttributedStringKey.foregroundColor: self.fullURLFontColor.withAlphaComponent(0.5)])
     }
 
     lazy var urlTextField: UITextField = {
@@ -161,7 +161,7 @@ class BrowserLocationView: UIView {
         stopReloadButton.accessibilityLabel = isLoading ? Strings.Stop : Strings.Reload
     }
 
-    func didClickStopReload() {
+    @objc func didClickStopReload() {
         if stopReloadButton.accessibilityLabel == Strings.Stop {
             delegate?.browserLocationViewDidTapStop(self)
         } else {
@@ -254,27 +254,27 @@ class BrowserLocationView: UIView {
         super.updateConstraints()
     }
 
-    func SELtapReaderModeButton() {
+    @objc func SELtapReaderModeButton() {
         delegate?.browserLocationViewDidTapReaderMode(self)
     }
 
-    func SELlongPressReaderModeButton(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func SELlongPressReaderModeButton(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             delegate?.browserLocationViewDidLongPressReaderMode(self)
         }
     }
 
-    func SELlongPressLocation(_ recognizer: UITapGestureRecognizer) {
+    @objc func SELlongPressLocation(_ recognizer: UITapGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.began {
             delegate?.browserLocationViewDidLongPressLocation(self)
         }
     }
 
-    func SELtapLocation(_ recognizer: UITapGestureRecognizer) {
+    @objc func SELtapLocation(_ recognizer: UITapGestureRecognizer) {
         delegate?.browserLocationViewDidTapLocation(self)
     }
 
-    func SELreaderModeCustomAction() -> Bool {
+    @objc func SELreaderModeCustomAction() -> Bool {
         return delegate?.browserLocationViewDidLongPressReaderMode(self) ?? false
     }
 
@@ -295,9 +295,9 @@ class BrowserLocationView: UIView {
             // color url path
             let attributedString = NSMutableAttributedString(string: urlString)
             let nsRange = NSMakeRange(0, urlString.count)
-            attributedString.addAttribute(NSForegroundColorAttributeName, value: baseURLFontColor, range: nsRange)
+            attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: baseURLFontColor, range: nsRange)
             attributedString.colorSubstring(baseDomain, withColor: hostFontColor)
-            attributedString.addAttribute(UIAccessibilitySpeechAttributePitch, value: NSNumber(value: BrowserLocationViewUX.BaseURLPitch), range: nsRange)
+            attributedString.addAttribute(NSAttributedStringKey(rawValue: UIAccessibilitySpeechAttributePitch), value: NSNumber(value: BrowserLocationViewUX.BaseURLPitch), range: nsRange)
             attributedString.pitchSubstring(baseDomain, withPitch: BrowserLocationViewUX.HostPitch)
             urlTextField.attributedText = attributedString
         } else {

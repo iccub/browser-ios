@@ -53,7 +53,7 @@ class SnackButton : UIButton {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func onClick() {
+    @objc func onClick() {
         callback(bar)
     }
 
@@ -82,9 +82,9 @@ class SnackBar: UIView {
     var bottom: Constraint?
 
     convenience init(text: String, img: UIImage?, buttons: [SnackButton]?) {
-        var attributes = [String: AnyObject]()
-        attributes[NSFontAttributeName] = DynamicFontHelper.defaultHelper.DefaultMediumFont
-        attributes[NSBackgroundColorAttributeName] = UIColor.clear
+        var attributes = [NSAttributedStringKey: AnyObject]()
+        attributes[NSAttributedStringKey.font] = DynamicFontHelper.defaultHelper.DefaultMediumFont
+        attributes[NSAttributedStringKey.backgroundColor] = UIColor.clear
         let attrText = NSAttributedString(string: text, attributes: attributes)
         self.init(attrText: attrText, img: img, buttons: buttons)
     }

@@ -90,6 +90,6 @@ extension UIImageView {
 
     public func moz_getImageFromCache(_ key: String, cache: SDImageCache, completed: @escaping CompletionBlock) {
         // This cache is filled outside of here. If we don't find the key in it, nothing to do here.
-        runBlockIfNotInCache(key, cache: cache, completed: completed) { _ in return nil}
+        runBlockIfNotInCache(key, cache: cache, completed: completed) { return nil}
     }
 }

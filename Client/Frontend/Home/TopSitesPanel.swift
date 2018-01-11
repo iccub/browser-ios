@@ -306,7 +306,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         }
     }
     
-    func updateIphoneConstraints() {
+    @objc func updateIphoneConstraints() {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return
         }

@@ -218,7 +218,7 @@ class SearchSettingsTableViewController: UITableViewController {
         return proposedDestinationIndexPath
     }
 
-    func SELdidToggleEngine(_ toggle: UISwitch) {
+    @objc func SELdidToggleEngine(_ toggle: UISwitch) {
         let engine = model.orderedEngines[toggle.tag] // The tag is 1-based.
         if toggle.isOn {
             model.enableEngine(engine)
@@ -227,7 +227,7 @@ class SearchSettingsTableViewController: UITableViewController {
         }
     }
 
-    func SELdidToggleSearchSuggestions(_ toggle: UISwitch) {
+    @objc func SELdidToggleSearchSuggestions(_ toggle: UISwitch) {
         // Setting the value in settings dismisses any opt-in.
         model.shouldShowSearchSuggestionsOptIn = false
         model.shouldShowSearchSuggestions = toggle.isOn
@@ -237,7 +237,7 @@ class SearchSettingsTableViewController: UITableViewController {
         navigationController?.popViewController(animated: true)
     }
 
-    func SELDismiss() {
+    @objc func SELDismiss() {
         self.dismiss(animated: true, completion: nil)
     }
 }

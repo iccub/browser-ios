@@ -284,7 +284,7 @@ class TabTrayController: UIViewController {
         let button = UIButton()
         button.setTitle(Strings.Private, for: .normal)
         button.setTitleColor(BraveUX.GreyI, for: .normal)
-        button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFontWeightMedium)
+        button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFont.Weight.medium)
         button.contentEdgeInsets = UIEdgeInsetsMake(0, 4 /* left */, 0, 4 /* right */)
         button.layer.cornerRadius = 4.0
         button.addTarget(self, action: #selector(TabTrayController.SELdidTogglePrivateMode), for: .touchUpInside)
@@ -299,7 +299,7 @@ class TabTrayController: UIViewController {
         let button = UIButton()
         button.setTitle(Strings.Done, for: .normal)
         button.setTitleColor(BraveUX.GreyI, for: .normal)
-        button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFontWeightRegular)
+        button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFont.Weight.regular)
         button.contentEdgeInsets = UIEdgeInsetsMake(0, 4 /* left */, 0, 4 /* right */)
         button.layer.cornerRadius = 4.0
         button.addTarget(self, action: #selector(TabTrayController.SELdidTapDoneButton), for: .touchUpInside)
@@ -359,7 +359,7 @@ class TabTrayController: UIViewController {
         self.tabManager.removeDelegate(self)
     }
 
-    func SELDynamicFontChanged(_ notification: Notification) {
+    @objc func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
 
         self.collectionView.reloadData()
@@ -437,7 +437,7 @@ class TabTrayController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(TabTrayController.SELDynamicFontChanged(_:)), name: NotificationDynamicFontChanged, object: nil)
     }
     
-    func handleLongGesture(gesture: UILongPressGestureRecognizer) {
+    @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
         switch(gesture.state) {
         case UIGestureRecognizerState.began:
             guard let selectedIndexPath = self.collectionView.indexPathForItem(at: gesture.location(in: self.collectionView)) else {
@@ -555,15 +555,15 @@ class TabTrayController: UIViewController {
 
 // MARK: Selectors
     
-    func SELdidTapDoneButton() {
+    @objc func SELdidTapDoneButton() {
         self.dismiss(animated: true, completion: nil)
     }
 
-    func SELdidClickAddTab() {
+    @objc func SELdidClickAddTab() {
         openNewTab()
     }
     
-    func SELdidTogglePrivateMode() {
+    @objc func SELdidTogglePrivateMode() {
         let fromView: UIView
         if privateTabsAreEmpty() {
             fromView = emptyPrivateTabsView
@@ -637,7 +637,7 @@ class TabTrayController: UIViewController {
         
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
-        self.collectionView.performBatchUpdates({ _ in
+        self.collectionView.performBatchUpdates({
             // TODO: This logic seems kind of finicky
             var tab: Browser?
             let id = TabMO.freshTab().syncUUID
@@ -653,13 +653,13 @@ class TabTrayController: UIViewController {
 
 // MARK: - App Notifications
 extension TabTrayController {
-    func SELappWillResignActiveNotification() {
+    @objc func SELappWillResignActiveNotification() {
         if privateMode {
             collectionView.alpha = 0
         }
     }
 
-    func SELappDidBecomeActiveNotification() {
+    @objc func SELappDidBecomeActiveNotification() {
         // Re-show any components that might have been hidden because they were being displayed
         // as part of a private mode tab
         UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions(), animations: {
@@ -696,7 +696,7 @@ extension TabTrayController: TabManagerDelegate {
 
         tabDataSource.updateData()
 
-        self.collectionView?.performBatchUpdates({ _ in
+        self.collectionView?.performBatchUpdates({
             self.collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
         }, completion: { finished in
             if finished {
@@ -1055,10 +1055,10 @@ fileprivate class TabTrayCollectionViewLayout: UICollectionViewFlowLayout {
 
 struct EmptyPrivateTabsViewUX {
     static let TitleColor = UIColor.white
-    static let TitleFont = UIFont.systemFont(ofSize: 22, weight: UIFontWeightMedium)
+    static let TitleFont = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.medium)
     static let DescriptionColor = UIColor.white
     static let DescriptionFont = UIFont.systemFont(ofSize: 17)
-    static let LearnMoreFont = UIFont.systemFont(ofSize: 15, weight: UIFontWeightMedium)
+    static let LearnMoreFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.medium)
     static let TextMargin: CGFloat = 18
     static let LearnMoreMargin: CGFloat = 30
     static let MaxDescriptionWidth: CGFloat = 250

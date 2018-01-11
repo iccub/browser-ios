@@ -144,6 +144,8 @@ class TabsButton: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // fix swift4 
+    /*
     override func clone() -> UIView {
         let button = TabsButton()
         
@@ -175,8 +177,9 @@ class TabsButton: UIControl {
 
         return button
     }
+    */
     
-    func tabsButtonHold() {
+    @objc func tabsButtonHold() {
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         let closeAllTitle = String(format: Strings.CloseAllTabsTitle, getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count)
         let closeAllTabsAction =  UIAlertAction(title: closeAllTitle, style: UIAlertActionStyle.destructive) { (action: UIAlertAction) in
@@ -239,7 +242,7 @@ extension TabsButton: Themeable {
 // MARK: UIAppearance
 extension TabsButton {
     
-    dynamic var borderColor: UIColor {
+    @objc dynamic var borderColor: UIColor {
         get { return borderView.color }
         set {
             borderView.color = newValue
@@ -247,27 +250,27 @@ extension TabsButton {
         }
     }
 
-    dynamic var borderWidth: CGFloat {
+    @objc dynamic var borderWidth: CGFloat {
         get { return borderView.strokeWidth }
         set { borderView.strokeWidth = newValue }
     }
 
-    dynamic var textColor: UIColor? {
+    @objc dynamic var textColor: UIColor? {
         get { return titleLabel.textColor }
         set { titleLabel.textColor = newValue }
     }
 
-    dynamic var titleFont: UIFont? {
+    @objc dynamic var titleFont: UIFont? {
         get { return titleLabel.font }
         set { titleLabel.font = newValue }
     }
 
-    dynamic var titleBackgroundColor: UIColor? {
+    @objc dynamic var titleBackgroundColor: UIColor? {
         get { return labelBackground.backgroundColor }
         set { labelBackground.backgroundColor = newValue }
     }
 
-    dynamic var insets : UIEdgeInsets {
+    @objc dynamic var insets : UIEdgeInsets {
         get { return buttonInsets }
         set {
             buttonInsets = newValue

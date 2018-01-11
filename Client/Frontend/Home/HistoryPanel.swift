@@ -46,7 +46,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         NotificationCenter.default.removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
     }
 
-    func notificationReceived(_ notification: Notification) {
+    @objc func notificationReceived(_ notification: Notification) {
         switch notification.name {
         case NotificationDynamicFontChanged:
             if emptyStateOverlayView.superview != nil {
@@ -136,7 +136,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         }
     }
 
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    @objc func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
         let site = frc?.object(at: indexPath) as! History
 
         if let u = site.url, let url = URL(string: u) {

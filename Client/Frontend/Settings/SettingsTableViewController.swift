@@ -136,9 +136,9 @@ class BoolSetting: Setting {
     convenience init(prefs: Prefs, prefKey: String, defaultValue: Bool, titleText: String, statusText: String? = nil, settingDidChange: ((Bool) -> Void)? = nil) {
         var statusTextAttributedString: NSAttributedString?
         if let statusTextString = statusText {
-            statusTextAttributedString = NSAttributedString(string: statusTextString, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewHeaderTextColor])
+            statusTextAttributedString = NSAttributedString(string: statusTextString, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewHeaderTextColor])
         }
-        self.init(prefs: prefs, prefKey: prefKey, defaultValue: defaultValue, attributedTitleText: NSAttributedString(string: titleText, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]), attributedStatusText: statusTextAttributedString, settingDidChange: settingDidChange)
+        self.init(prefs: prefs, prefKey: prefKey, defaultValue: defaultValue, attributedTitleText: NSAttributedString(string: titleText, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]), attributedStatusText: statusTextAttributedString, settingDidChange: settingDidChange)
     }
 
     override var status: NSAttributedString? {
@@ -324,7 +324,7 @@ class SettingsTableViewController: UITableViewController {
         guard let text = text else { return 0 }
 
         let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-        let attrs = [NSFontAttributeName: label.font]
+        let attrs = [NSAttributedStringKey.font: label.font]
         let boundingRect = NSString(string: text).boundingRect(with: size,
                                                                        options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: attrs, context: nil)
         return boundingRect.height
@@ -397,7 +397,7 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
     lazy var titleLabel: UILabel = {
         var headerLabel = UILabel()
         headerLabel.textColor = UIConstants.TableViewHeaderTextColor
-        headerLabel.font = UIFont.systemFont(ofSize: 12.0, weight: UIFontWeightRegular)
+        headerLabel.font = UIFont.systemFont(ofSize: 12.0, weight: UIFont.Weight.regular)
         headerLabel.numberOfLines = 0
         return headerLabel
     }()

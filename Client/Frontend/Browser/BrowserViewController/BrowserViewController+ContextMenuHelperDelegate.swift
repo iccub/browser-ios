@@ -174,7 +174,8 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let changeCount = pasteboard.changeCount
             let application = UIApplication.shared
             var taskId: UIBackgroundTaskIdentifier = 0
-            taskId = application.beginBackgroundTask (expirationHandler: { _ in
+
+            taskId = application.beginBackgroundTask (expirationHandler: {
                 application.endBackgroundTask(taskId)
             })
             
