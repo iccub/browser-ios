@@ -145,12 +145,12 @@ class SyncAddDeviceViewController: SyncViewController {
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
         titleLabel.textColor = BraveUX.GreyJ
         titleDescriptionStackView.addArrangedSubview(titleLabel)
 
         descriptionLabel = UILabel()
-        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
         descriptionLabel.textColor = BraveUX.GreyH
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .byTruncatingTail
@@ -184,7 +184,7 @@ class SyncAddDeviceViewController: SyncViewController {
         doneButton = RoundInterfaceButton(type: .roundedRect)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.setTitle(Strings.Done, for: .normal)
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
         doneButton.setTitleColor(UIColor.white, for: .normal)
         doneButton.backgroundColor = BraveUX.BraveOrange
         doneButton.addTarget(self, action: #selector(SEL_done), for: .touchUpInside)
@@ -194,7 +194,7 @@ class SyncAddDeviceViewController: SyncViewController {
         enterWordsButton = RoundInterfaceButton(type: .roundedRect)
         enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.ShowCodeWords, for: .normal)
-        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
+        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         enterWordsButton.setTitleColor(BraveUX.GreyH, for: .normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_showCodewords), for: .touchUpInside)
 
@@ -254,13 +254,13 @@ class SyncAddDeviceViewController: SyncViewController {
         }
     }
     
-    func SEL_showCodewords() {
+    @objc func SEL_showCodewords() {
         modeControl.selectedSegmentIndex = 1
         enterWordsButton.isHidden = true
         SEL_changeMode()
     }
     
-    func SEL_copy() {
+    @objc func SEL_copy() {
         UIPasteboard.general.string = self.codewordsView.text
         didCopy = true
 
@@ -268,7 +268,7 @@ class SyncAddDeviceViewController: SyncViewController {
         clipboardClearTimer = UIPasteboard.general.clear(after: 30)
     }
     
-    func SEL_changeMode() {
+    @objc func SEL_changeMode() {
         let isFirstIndex = modeControl.selectedSegmentIndex == 0
         
         qrCodeView?.isHidden = !isFirstIndex
@@ -278,7 +278,7 @@ class SyncAddDeviceViewController: SyncViewController {
         updateLabels()
     }
     
-    func SEL_done() {
+    @objc func SEL_done() {
         doneHandler?()
     }
 }

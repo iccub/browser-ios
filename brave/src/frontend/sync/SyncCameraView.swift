@@ -78,7 +78,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         cameraOverlayView.frame = bounds
     }
     
-    func SEL_cameraAccess() {
+    @objc func SEL_cameraAccess() {
         startCapture()
     }
 
@@ -87,7 +87,10 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
     }
     
     func startCapture() {
-        let captureDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
+        guard let captureDevice = AVCaptureDevice.default(for: AVMediaType.video) else {
+            print("Capture device is nil")
+            return
+        }
         
         let input: AVCaptureDeviceInput?
         do {
@@ -99,23 +102,29 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         }
         
         captureSession = AVCaptureSession()
-        captureSession?.addInput(input! as AVCaptureInput)
+
+        guard let captureSession = captureSession else {
+            print("Capture session is nil")
+            return
+        }
+
+        captureSession.addInput(input! as AVCaptureInput)
         
         let captureMetadataOutput = AVCaptureMetadataOutput()
-        captureSession?.addOutput(captureMetadataOutput)
+        captureSession.addOutput(captureMetadataOutput)
         
         captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-        captureMetadataOutput.metadataObjectTypes = [AVMetadataObjectTypeQRCode]
+        captureMetadataOutput.metadataObjectTypes = [AVMetadataObject.ObjectType.qr]
         
         videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        videoPreviewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
+        videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
         videoPreviewLayer?.frame = layer.bounds
         layer.addSublayer(videoPreviewLayer!)
         
-        captureSession?.startRunning()
+        captureSession.startRunning()
         bringSubview(toFront: cameraOverlayView)
 
-        AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { (granted :Bool) -> Void in
+        AVCaptureDevice.requestAccess(forMediaType: AVMediaType.video, completionHandler: { (granted :Bool) -> Void in
             postAsyncToMain {
                 self.cameraAccessButton.isHidden = true
                 if granted {
@@ -136,9 +145,11 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         }
         
         let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
-        if metadataObj.type == AVMetadataObjectTypeQRCode {
+        if metadataObj.type == AVMetadataObject.ObjectType.qr {
             if let callback = scanCallback {
-                callback(metadataObj.stringValue)
+                if let stringValue = metadataObj.stringValue {
+                    callback(stringValue)
+                }
             }
         }
     }
@@ -157,7 +168,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         perform(#selector(cameraOverlayNormal), with: self, afterDelay: 1.0)
     }
     
-    func cameraOverlayNormal() {
+    @objc func cameraOverlayNormal() {
         cameraOverlayView.tintColor = UIColor.white
     }
 }

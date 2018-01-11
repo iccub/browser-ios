@@ -159,8 +159,8 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
             buttonWidth = rint(buttonWidth)
             
             var buttonFrame: CGRect = CGRect(x: kPopupDialogButtonPadding, y: 0, width: buttonWidth, height: kPopupDialogButtonHeight)
-            let defaultButtonFont: UIFont = UIFont.systemFont(ofSize: 17, weight: UIFontWeightSemibold)
-            let normalButtonFont: UIFont = UIFont.systemFont(ofSize: 17, weight: UIFontWeightSemibold)
+            let defaultButtonFont: UIFont = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.semibold)
+            let normalButtonFont: UIFont = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.semibold)
             
             for buttonData in dialogButtons {
                 var button: UIButton? = buttonData.button
@@ -514,7 +514,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
     
     // MARK: Actions
     
-    func dialogButtonTapped(button: UIButton) {
+    @objc func dialogButtonTapped(button: UIButton) {
         var dismissType = defaultDismissType
         
         for buttonData in dialogButtons {
@@ -538,7 +538,7 @@ class PopupView: UIView, UIGestureRecognizerDelegate {
         return dialogView.point(inside: point, with: nil) == false
     }
     
-    func backgroundTapped(recognizer: AnyObject?) {
+    @objc func backgroundTapped(recognizer: AnyObject?) {
         if overlayDismisses == false {
             return
         }

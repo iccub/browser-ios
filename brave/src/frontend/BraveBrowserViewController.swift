@@ -235,7 +235,7 @@ extension BraveBrowserViewController: BraveTermsViewControllerDelegate {
 
 weak var _firstResponder:UIResponder?
 extension UIResponder {
-    func findFirstResponder() {
+    @objc func findFirstResponder() {
         _firstResponder = self
     }
 

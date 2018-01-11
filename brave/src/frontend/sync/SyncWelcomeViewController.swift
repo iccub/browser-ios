@@ -125,7 +125,7 @@ class SyncWelcomeViewController: SyncViewController {
         mainStackView.addArrangedSubview(buttonsStackView)
     }
     
-    func newToSyncAction() {
+    @objc func newToSyncAction() {
         let addDevice = SyncSelectDeviceTypeViewController()
         addDevice.syncInitHandler = { (title, type) in
             weak var weakSelf = self
@@ -158,7 +158,7 @@ class SyncWelcomeViewController: SyncViewController {
         navigationController?.pushViewController(addDevice, animated: true)
     }
     
-    func existingUserAction() {
+    @objc func existingUserAction() {
         let pairCamera = SyncPairCameraViewController()
         
         pairCamera.syncHandler = { bytes in

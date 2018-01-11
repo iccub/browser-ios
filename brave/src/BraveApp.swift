@@ -140,7 +140,7 @@ class BraveApp {
     // Be aware: the Prefs object has not been created yet
     class func willFinishLaunching_begin() {
         BraveApp.setupCacheDefaults()
-        Foundation.URLProtocol.registerClass(URLProtocol);
+        Foundation.URLProtocol.registerClass(URLProtocol.self)
 
         NotificationCenter.default.addObserver(BraveApp.singleton,
              selector: #selector(BraveApp.didEnterBackground(_:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)

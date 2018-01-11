@@ -28,7 +28,7 @@ protocol WebPageStateDelegate : class {
 
 
 @objc class HandleJsWindowOpen : NSObject {
-    static func open(_ url: String) {
+    @objc static open func open(_ url: String) {
         postAsyncToMain(0) { // we now know JS callbacks can be off main
             guard let wv = BraveApp.getCurrentWebView() else { return }
             let current = wv.URL
@@ -299,7 +299,7 @@ class BraveWebView: UIWebView {
         NotificationCenter.default.addObserver(self, selector: #selector(firstLayoutPerformed), name: NSNotification.Name(rawValue: swizzledFirstLayoutNotification), object: nil)
     }
 
-    func firstLayoutPerformed() {
+    @objc func firstLayoutPerformed() {
         updateLocationFromHtml()
     }
 
@@ -320,7 +320,7 @@ class BraveWebView: UIWebView {
         }
     }
 
-    func internalProgressNotification(_ notification: Notification) {
+    @objc func internalProgressNotification(_ notification: Notification) {
         if let prog = notification.userInfo?["WebProgressEstimatedProgressKey"] as? Double {
             progress?.setProgress(prog)
             if prog > 0.99 {
@@ -619,18 +619,18 @@ class BraveWebView: UIWebView {
             recentlyBlocked = RecentlyBlocked()
         case .httpseIncrement:
             shieldStats.httpse += increment
-            BraveGlobalShieldStats.singleton.httpse += increment
+            BraveGlobalShieldStats.singleton.httpse.advanced(by: increment)
         case .abIncrement:
             shieldStats.abAndTp += increment
-            BraveGlobalShieldStats.singleton.adblock += increment
+            BraveGlobalShieldStats.singleton.adblock.advanced(by: increment)
         case .tpIncrement:
             shieldStats.abAndTp += increment
-            BraveGlobalShieldStats.singleton.trackingProtection += increment
+            BraveGlobalShieldStats.singleton.trackingProtection.advanced(by: increment)
         case .jsSetValue:
             shieldStats.js = increment
         case .fpIncrement:
             shieldStats.fp += increment
-            BraveGlobalShieldStats.singleton.fpProtection += increment
+            BraveGlobalShieldStats.singleton.fpProtection.advanced(by: increment)
         }
 
         postAsyncToMain(0.2) { [weak self] in

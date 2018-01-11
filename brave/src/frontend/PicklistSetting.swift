@@ -94,12 +94,12 @@ class PicklistSettingMainItem<T>: Setting, PicklistSettingOptionsViewDelegate {
     override var status: NSAttributedString {
         let currentId = getCurrent()
         let option = lookupOptionById(Int(currentId))
-        return NSAttributedString(string: option?.item().displayName ?? "", attributes: [ NSFontAttributeName: UIFont.systemFont(ofSize: 13)])
+        return NSAttributedString(string: option?.item(()).displayName ?? "", attributes: [ NSAttributedStringKey.font: UIFont.systemFont(ofSize: 13)])
     }
 
     func lookupOptionById(_ id: Int) -> Choice<T>? {
         for option in options {
-            if option.item().optionId == id {
+            if option.item(()).optionId == id {
                 return option
             }
         }
@@ -115,12 +115,12 @@ class PicklistSettingMainItem<T>: Setting, PicklistSettingOptionsViewDelegate {
         self.displayName = displayName
         self.prefName = prefName
         self.options = options
-        super.init(title: NSAttributedString(string: displayName, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        super.init(title: NSAttributedString(string: displayName, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor]))
     }
 
     var picklist: PicklistSettingOptionsView? // on iOS8 there is a crash, seems like it requires this to be retained
     override func onClick(_ navigationController: UINavigationController?) {
-        picklist = PicklistSettingOptionsView(options: options.map { ($0.item().displayName,  $0.item().optionId) }, title: displayName, current: getCurrent(), footerMessage: picklistFooterMessage)
+        picklist = PicklistSettingOptionsView(options: options.map { ($0.item(()).displayName,  $0.item(()).optionId) }, title: displayName, current: getCurrent(), footerMessage: picklistFooterMessage)
         navigationController?.pushViewController(picklist!, animated: true)
         picklist!.delegate = self
     }

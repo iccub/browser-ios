@@ -332,7 +332,7 @@ class Sync: JSInjector {
     
     // Required since fetch is wrapped in extension and timer hates that.
     // This can be removed and fetch called directly via scheduledTimerBlock
-    func fetchWrapper() {
+    @objc func fetchWrapper() {
         self.fetch(type: .bookmark)
         self.fetch(type: .devices)
     }
@@ -422,7 +422,8 @@ extension Sync {
         if recordType == .prefs, let data = fetchedRecords as? [SyncDevice] {
             // Devices have really bad data filtering, so need to manually process more of it
             // Sort to not rely on API - Reverse sort, so unique pulls the `latest` not just the `first`
-            fetchedRecords = data.sorted { $0.0.syncTimestamp ?? -1 > $0.1.syncTimestamp ?? -1 }.unique { $0.objectId ?? [] == $1.objectId ?? [] }
+            fetchedRecords = data.sorted { device1, device2 in
+                device1.syncTimestamp ?? -1 > device2.syncTimestamp ?? -1 }.unique { $0.objectId ?? [] == $1.objectId ?? [] }
         }
         
         let context = DataController.shared.workerContext

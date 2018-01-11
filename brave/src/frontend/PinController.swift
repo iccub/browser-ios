@@ -109,7 +109,7 @@ class ConfirmPinViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: Strings.Cancel, style: .plain, target: self, action: #selector(SEL_cancel))
     }
     
-    func SEL_cancel() {
+    @objc func SEL_cancel() {
         navigationController?.popToRootViewController(animated: true)
         delegate?.pinViewController(false)
     }
@@ -224,7 +224,7 @@ class PinLockView: UIView {
         
         messageLabel = UILabel()
         messageLabel.text = message
-        messageLabel.font = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
+        messageLabel.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
         messageLabel.textColor = PinUX.DefaultForegroundColor
         messageLabel.sizeToFit()
         addSubview(messageLabel)
@@ -244,7 +244,7 @@ class PinLockView: UIView {
         }
         
         deleteButton = UIButton()
-        deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
+        deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
         deleteButton.setTitle(Strings.Delete, for: .normal)
         deleteButton.setTitleColor(PinUX.DefaultForegroundColor, for: .normal)
         deleteButton.setTitleColor(BraveUX.GreyJ, for: .highlighted)
@@ -318,7 +318,7 @@ class PinLockView: UIView {
         bounds = CGRect(x: 0, y: 0, width: w, height: h)
     }
     
-    func SEL_pinButton(_ sender: UIButton) {
+    @objc func SEL_pinButton(_ sender: UIButton) {
         if pin.characters.count < 4 {
             let value = sender.tag == 10 ? 0 : sender.tag
             pin = pin + "\(value)"
@@ -331,14 +331,14 @@ class PinLockView: UIView {
         }
     }
     
-    func SEL_delete(_ sender: UIButton) {
+    @objc func SEL_delete(_ sender: UIButton) {
         if pin.characters.count > 0 {
             pin = pin.substring(to: pin.characters.index(pin.endIndex, offsetBy: -1))
             pinIndicatorView.index(pin.characters.count)
         }
     }
     
-    func reset() {
+    @objc func reset() {
         pinIndicatorView.index(0)
         pin = ""
     }
@@ -452,7 +452,7 @@ class PinButton: UIControl {
         titleLabel = UILabel(frame: frame)
         titleLabel.isUserInteractionEnabled = false
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.systemFont(ofSize: 30, weight: UIFontWeightMedium)
+        titleLabel.font = UIFont.systemFont(ofSize: 30, weight: UIFont.Weight.medium)
         titleLabel.textColor = PinUX.DefaultForegroundColor
         titleLabel.backgroundColor = UIColor.clear
         addSubview(titleLabel)

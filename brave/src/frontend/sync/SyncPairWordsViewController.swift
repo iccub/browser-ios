@@ -119,7 +119,7 @@ class SyncPairWordsViewController: SyncViewController {
         }
     }
     
-    func SEL_done() {
+    @objc func SEL_done() {
         checkCodes()
     }
     

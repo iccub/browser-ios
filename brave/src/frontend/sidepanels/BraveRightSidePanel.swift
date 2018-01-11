@@ -247,7 +247,7 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
             
             heading.text = Strings.Site_shield_settings
             heading.textColor = BraveUX.GreyJ
-            heading.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightMedium)
+            heading.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.medium)
             
             heading.snp.makeConstraints { (make) in
                 make.right.equalTo(heading.superview!)
@@ -299,7 +299,7 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
         setupShieldsOverviewSection()
         
         func setupSiteNameSection() {
-            siteName.font = UIFont.systemFont(ofSize: 21, weight: UIFontWeightMedium)
+            siteName.font = UIFont.systemFont(ofSize: 21, weight: UIFont.Weight.medium)
             siteName.lineBreakMode = NSLineBreakMode.byTruncatingMiddle
             siteName.minimumScaleFactor = 0.75
 
