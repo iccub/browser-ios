@@ -96,6 +96,10 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         guard let devices = Device.deviceSettings(profile: profile), editingStyle == .delete else { return }
             
         devices[indexPath.row].device.remove(save: true)
+
+        // To refresh device list, we need to repopulate all settings sections.
+        settings = []
+        _ = generateSettings()
         tableView.reloadData()
     }
 
