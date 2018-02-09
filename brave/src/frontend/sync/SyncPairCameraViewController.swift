@@ -85,11 +85,9 @@ class SyncPairCameraViewController: SyncViewController {
         }
         
         cameraView.authorizedCallback = { authorized in
-            if authorized {
-                postAsyncToMain(0) {
-                    self.prefs.setBool(true, forKey: self.prefKey)
+                postAsyncToMain {
+                    self.prefs.setBool(authorized, forKey: self.prefKey)
                 }
-            }
         }
 
         stackView.addArrangedSubview(cameraView)
