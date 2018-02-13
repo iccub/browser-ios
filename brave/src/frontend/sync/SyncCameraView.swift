@@ -30,18 +30,13 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         openSettingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
         addSubview(openSettingsButton)
 
-        cameraAccessButton.snp.makeConstraints { make in
-            make.centerX.equalTo(cameraOverlayView)
-            make.centerY.equalTo(cameraOverlayView)
-            make.width.equalTo(150)
-            make.height.equalTo(40)
-        }
-
-        openSettingsButton.snp.makeConstraints { make in
-            make.centerX.equalTo(cameraOverlayView)
-            make.centerY.equalTo(cameraOverlayView)
-            make.width.equalTo(150)
-            make.height.equalTo(40)
+        [cameraAccessButton, openSettingsButton].forEach { button in
+            button?.snp.makeConstraints { make in
+                make.centerX.equalTo(cameraOverlayView)
+                make.centerY.equalTo(cameraOverlayView)
+                make.width.equalTo(150)
+                make.height.equalTo(40)
+            }
         }
 
         switch AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) {
