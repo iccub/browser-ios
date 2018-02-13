@@ -11,8 +11,6 @@ class SyncPairCameraViewController: SyncViewController {
     var enterWordsButton: RoundInterfaceButton!
     
     fileprivate let prefs: Prefs = getApp().profile!.prefs
-    fileprivate let prefKey: String = "CameraPermissionsSetting"
-    
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
@@ -83,12 +81,6 @@ class SyncPairCameraViewController: SyncViewController {
                 self.cameraView.cameraOverlayError()
             }
         }
-        
-        cameraView.authorizedCallback = { authorized in
-                postAsyncToMain {
-                    self.prefs.setBool(authorized, forKey: self.prefKey)
-                }
-        }
 
         stackView.addArrangedSubview(cameraView)
 
@@ -154,10 +146,6 @@ class SyncPairCameraViewController: SyncViewController {
         
         loadingSpinner.snp.makeConstraints { make in
             make.center.equalTo(loadingSpinner.superview!)
-        }
-        
-        if prefs.boolForKey(prefKey) == true {
-            cameraView.startCapture()
         }
     }
     

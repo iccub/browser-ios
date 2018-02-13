@@ -11,7 +11,6 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
     var openSettingsButton: RoundInterfaceButton!
     
     var scanCallback: ((_ data: String) -> Void)?
-    var authorizedCallback: ((_ authorized: Bool) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,25 +20,14 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         cameraOverlayView.tintColor = UIColor.white
         addSubview(cameraOverlayView)
         
-        cameraAccessButton = RoundInterfaceButton(type: .roundedRect)
+        cameraAccessButton = cameraButton
         cameraAccessButton.setTitle(Strings.GrantCameraAccess, for: .normal)
-        cameraAccessButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold)
-        cameraAccessButton.setTitleColor(UIColor.white, for: .normal)
-        cameraAccessButton.backgroundColor = UIColor.clear
         cameraAccessButton.addTarget(self, action: #selector(SEL_cameraAccess), for: .touchUpInside)
-        cameraAccessButton.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
-        cameraAccessButton.layer.borderWidth = 1.5
         addSubview(cameraAccessButton)
 
-        openSettingsButton = RoundInterfaceButton(type: .roundedRect)
-        openSettingsButton.setTitle("Open settings", for: .normal)
-        openSettingsButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold)
-        openSettingsButton.setTitleColor(UIColor.white, for: .normal)
-        openSettingsButton.backgroundColor = UIColor.clear
+        openSettingsButton = cameraButton
+        openSettingsButton.setTitle(Strings.Open_Settings, for: .normal)
         openSettingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
-        openSettingsButton.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
-        openSettingsButton.layer.borderWidth = 1.5
-        openSettingsButton.isHidden = true
         addSubview(openSettingsButton)
 
         cameraAccessButton.snp.makeConstraints { make in
@@ -55,6 +43,33 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
             make.width.equalTo(150)
             make.height.equalTo(40)
         }
+
+        switch AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) {
+        case .authorized:
+            cameraAccessButton.isHidden = true
+            openSettingsButton.isHidden = true
+            startCapture()
+            break
+        case .denied:
+            cameraAccessButton.isHidden = true
+            openSettingsButton.isHidden = false
+            break
+        default:
+            cameraAccessButton.isHidden = false
+            openSettingsButton.isHidden = true
+            break
+        }
+    }
+
+    var cameraButton: RoundInterfaceButton {
+        let button = RoundInterfaceButton(type: .roundedRect)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold)
+        button.setTitleColor(UIColor.white, for: .normal)
+        button.backgroundColor = UIColor.clear
+        button.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
+        button.layer.borderWidth = 1.5
+
+        return button
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -104,33 +119,18 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         
         captureSession?.startRunning()
         bringSubview(toFront: cameraOverlayView)
-        
-        if AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) ==  AVAuthorizationStatus.authorized {
-            if let callback = authorizedCallback {
-                cameraAccessButton.isHidden = true
-                openSettingsButton.isHidden = true
-                callback(true)
-            }
-        }
-        else {
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { (granted :Bool) -> Void in
-                if let callback = self.authorizedCallback {
 
-                    postAsyncToMain {
-                        if granted {
-                            self.cameraAccessButton.isHidden = true
-                            self.openSettingsButton.isHidden = true
-                        } else {
-                            self.cameraAccessButton.isHidden = true
-                            self.openSettingsButton.isHidden = false
-                            self.bringSubview(toFront: self.openSettingsButton)
-                        }
-                    }
-
-                    callback(granted)
+        AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { (granted :Bool) -> Void in
+            postAsyncToMain {
+                self.cameraAccessButton.isHidden = true
+                if granted {
+                    self.openSettingsButton.isHidden = true
+                } else {
+                    self.openSettingsButton.isHidden = false
+                    self.bringSubview(toFront: self.openSettingsButton)
                 }
-            });
-        }
+            }
+        })
     }
     
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
