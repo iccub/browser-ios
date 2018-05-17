@@ -86,6 +86,7 @@ class Sync: JSInjector {
     }
     
     fileprivate var fetchTimer: Timer?
+    fileprivate var baseSyncOrder: String?
 
     // TODO: Move to a better place
     fileprivate let prefNameId = "device-id-js-array"
@@ -144,20 +145,21 @@ class Sync: JSInjector {
     func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
         
         
-        #if NO_SYNC
-        if syncSeed == nil { return }
-        
-        leaveSyncGroup()
-    
-        let msg = """
-            Sync has been disabled, as it will not be included in the next couple of production builds.
-            Your iOS device has been auto-removed from any sync groups.
-        """
-        
-        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
-        #endif
+        // FIXME: Uncomment after sync work.
+//        #if NO_SYNC
+//        if syncSeed == nil { return }
+//        
+//        leaveSyncGroup()
+//    
+//        let msg = """
+//            Sync has been disabled, as it will not be included in the next couple of production builds.
+//            Your iOS device has been auto-removed from any sync groups.
+//        """
+//        
+//        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
+//        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+//        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
+//        #endif
         
         if let joinedSeed = seed, joinedSeed.count == Sync.SeedByteLength {
             // Always attempt seed write, setter prevents bad overwrites
@@ -353,6 +355,13 @@ extension Sync {
         }
         
         if !isInSyncGroup {
+            completion?(nil)
+            return
+        }
+        
+        // FIXME: This isn't probably enough, we need to have base sync order and set syncOrder of all bookmarks before 
+        // syncing them.
+        if baseSyncOrder == nil {
             completion?(nil)
             return
         }
@@ -571,7 +580,21 @@ extension Sync {
         } else if Device.currentDevice()?.deviceId == nil {
             print("Device Id expected!")
         }
+        
 
+
+    }
+    
+    fileprivate func getBaseBookmarkOrder() {
+        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
+        let script = "callbackList['get-bookmarks-base-order'](null, '\(deviceId)', 'ios')"
+        
+        webView.evaluateJavaScript(script)
+    }
+    
+    fileprivate func saveBaseBookmarkOrder(_ data: Any) {
+        guard let stringData = data as? String else { return }
+        baseSyncOrder = JSON(parseJSON: stringData)["arg1"].string
     }
 
 }
@@ -609,6 +632,7 @@ extension Sync: WKScriptMessageHandler {
             print("---- Sync Debug: \(data)")
         case "sync-ready":
             self.isSyncFullyInitialized.syncReady = true
+            getBaseBookmarkOrder()
         case "fetch-sync-records":
             self.isSyncFullyInitialized.fetchReady = true
         case "send-sync-records":
@@ -623,6 +647,10 @@ extension Sync: WKScriptMessageHandler {
             self.isSyncFullyInitialized.deleteSiteSettingsReady = true
         case "delete-sync-category":
             self.isSyncFullyInitialized.deleteCategoryReady = true
+        case "get-bookmarks-base-order":
+            break
+        case "save-bookmarks-base-order":
+            saveBaseBookmarkOrder(message.body)
         default:
             print("\(messageName) not handled yet")
         }
