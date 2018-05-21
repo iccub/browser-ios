@@ -75,8 +75,7 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
     }
 
     override func setupContainerViewSize() {
-        let h = max(UIScreen.main.bounds.height, UIScreen.main.bounds.width)
-        containerView.frame = CGRect(x: 0, y: 0, width: CGFloat(BraveUX.WidthOfSlideOut), height: h)
+        containerView.frame = CGRect(x: 0, y: 0, width: CGFloat(BraveUX.WidthOfSlideOut), height: view.frame.size.height)
         setupContainerViewContentSize()
     }
     

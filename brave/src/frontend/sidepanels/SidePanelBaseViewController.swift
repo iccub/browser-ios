@@ -51,6 +51,14 @@ class SidePanelBaseViewController : UIViewController {
         super.viewWillTransition(to: size, with: coordinator)
     }
 
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        if containerView.frame.height != self.view.frame.height {
+            setupContainerViewSize()
+        }
+    }
+
     override func viewDidLoad() {
         viewAsScrollView().isScrollEnabled = false
 
