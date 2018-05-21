@@ -73,7 +73,9 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Websites you visit may request your location.</string>
 	<key>NSCameraUsageDescription</key>
-        <string>Scan barcode for Brave sync.</string>
+  <string>Scan barcode for Brave sync.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Enabling FaceID allows you to quickly and securely unlock Brave.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
     <string>$(CUSTOM_BUNDLE_ID).browsing</string>
