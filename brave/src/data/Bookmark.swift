@@ -80,9 +80,8 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         fetchRequest.fetchBatchSize = 20
 
         let orderSort = NSSortDescriptor(key:"order", ascending: true)
-        let folderSort = NSSortDescriptor(key:"isFolder", ascending: false)
         let createdSort = NSSortDescriptor(key:"created", ascending: true)
-        fetchRequest.sortDescriptors = [orderSort, folderSort, createdSort]
+        fetchRequest.sortDescriptors = [orderSort, createdSort]
 
         if let parentFolder = parentFolder {
             fetchRequest.predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parentFolder)
@@ -338,10 +337,9 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         }
         
         let orderSort = NSSortDescriptor(key:"order", ascending: true)
-        let folderSort = NSSortDescriptor(key:"isFolder", ascending: false)
         let createdSort = NSSortDescriptor(key:"created", ascending: false)
         
-        let sort = [orderSort, folderSort, createdSort]
+        let sort = [orderSort, createdSort]
         
         let context = DataController.shared.workerContext
         guard let allBookmarks = get(predicate: predicate, sortDescriptors: sort,  context: context) as? [Bookmark] else {
