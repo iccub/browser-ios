@@ -241,6 +241,7 @@ class Sync: JSInjector {
             }
             
             Device.deleteAll {}
+            Bookmark.removeSyncOrders()
             
             lastFetchedRecordTimestamp = 0
             lastSuccessfulSync = 0

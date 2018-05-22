@@ -376,6 +376,21 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         
     }
     
+    class func removeSyncOrders() {
+        let context = DataController.shared.workerContext
+        
+        // FIXME: Use something better than hardocded strings
+        let updateRequest = NSBatchUpdateRequest(entityName: "Bookmark")
+        updateRequest.predicate = NSPredicate(format: "isFavorite == NO")
+        updateRequest.propertiesToUpdate = ["syncOrder": NSExpression(forConstantValue: nil)]
+        
+        do {
+            try context.execute(updateRequest)
+        } catch {
+            log.error("Failed to remove syncOrder")
+        }
+    }
+    
 }
 
 // TODO: Document well
@@ -444,7 +459,6 @@ extension Bookmark {
         return get(predicate: predicate, context: context) ?? [Bookmark]()
     }
     
-    // TODO: Remove
     static func getAllBookmarks(context: NSManagedObjectContext) -> [Bookmark] {
         return get(predicate: NSPredicate(format: "isFavorite == NO"), context: context) ?? [Bookmark]()
     }
