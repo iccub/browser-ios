@@ -86,9 +86,9 @@
 		0A59F2CC207406D900B0779F /* GlobalSign_r1.cer in Resources */ = {isa = PBXBuildFile; fileRef = 0A59F2CA207406D900B0779F /* GlobalSign_r1.cer */; };
 		0A59F2E620740AEB00B0779F /* DigiCertHighAssurance.cer in Resources */ = {isa = PBXBuildFile; fileRef = 0A59F2E520740AEB00B0779F /* DigiCertHighAssurance.cer */; };
 		0A5B1B5CA22425374E4B314C /* arena.h in Headers */ = {isa = PBXBuildFile; fileRef = C38C829D7A278B0AE23070C8 /* arena.h */; };
-		0A7D73992076BAAD00BD66E3 /* CustomHeaderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7D73982076BAAD00BD66E3 /* CustomHeaderData.swift */; };
 		0A6365D92012011700371C27 /* FavoritesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6365D82012011700371C27 /* FavoritesHelper.swift */; };
 		0A7C92BE201F3FDA0070BF98 /* SyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7C92BD201F3FDA0070BF98 /* SyncViewController.swift */; };
+		0A7D73992076BAAD00BD66E3 /* CustomHeaderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7D73982076BAAD00BD66E3 /* CustomHeaderData.swift */; };
 		0A7F5B77B9A8F11B77C97932 /* SiteTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4EC7836B7D80B31285DCC6 /* SiteTableViewController.swift */; };
 		0A8053961FC59D82008D6822 /* DAU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8053951FC59D82008D6822 /* DAU.swift */; };
 		0A8053981FC59D93008D6822 /* DauTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8053971FC59D93008D6822 /* DauTest.swift */; };
@@ -1025,6 +1025,7 @@
 		0A0F5DA0200E2B3C006EB7F1 /* PreloadedFavorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreloadedFavorites.swift; sourceTree = "<group>"; };
 		0A159C921FD017DB005A79BF /* DeviceDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetector.swift; sourceTree = "<group>"; };
 		0A3316501FFD4C6B00BFC542 /* Model6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model6.xcdatamodel; sourceTree = "<group>"; };
+		0A3A537A20ADF821001D5935 /* Model8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model8.xcdatamodel; sourceTree = "<group>"; };
 		0A3AA90B1FFF8C3100855082 /* FavoritesDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesDataSource.swift; sourceTree = "<group>"; };
 		0A3D9E64207FBC290034D5F0 /* crypto.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = crypto.js; path = Carthage/Checkouts/crypto/browser/crypto.js; sourceTree = SOURCE_ROOT; };
 		0A4932882019FC4800EB7DB8 /* ViewUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtil.swift; sourceTree = "<group>"; };
@@ -5920,6 +5921,7 @@
 		5D3892531E98108F00F959E6 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				0A3A537A20ADF821001D5935 /* Model8.xcdatamodel */,
 				5C94D93020A0E8D300414AC1 /* Model7.xcdatamodel */,
 				0A3316501FFD4C6B00BFC542 /* Model6.xcdatamodel */,
 				5C062FD91F76583900D51BC7 /* Model5.xcdatamodel */,
@@ -5928,7 +5930,7 @@
 				5D3892561E9810B400F959E6 /* Model2.xcdatamodel */,
 				5D3892541E98108F00F959E6 /* Model.xcdatamodel */,
 			);
-			currentVersion = 5C94D93020A0E8D300414AC1 /* Model7.xcdatamodel */;
+			currentVersion = 0A3A537A20ADF821001D5935 /* Model8.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = brave/src/data/Model.xcdatamodeld;
 			sourceTree = "<group>";

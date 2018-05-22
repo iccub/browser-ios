@@ -86,7 +86,7 @@ class Sync: JSInjector {
     }
     
     fileprivate var fetchTimer: Timer?
-    fileprivate var baseSyncOrder: String?
+    fileprivate(set) var baseSyncOrder: String?
 
     // TODO: Move to a better place
     fileprivate let prefNameId = "device-id-js-array"
@@ -651,6 +651,8 @@ extension Sync: WKScriptMessageHandler {
             break
         case "save-bookmarks-base-order":
             saveBaseBookmarkOrder(message.body)
+            // add syncOrder to all current bookmarks
+            Bookmark.setSyncOrderForAll(parentFolder: nil)
         default:
             print("\(messageName) not handled yet")
         }

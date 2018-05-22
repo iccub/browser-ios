@@ -23,6 +23,7 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
     @NSManaged var color: String?
+    @NSManaged var syncOrder: String?
     
     /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
     /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
@@ -321,6 +322,62 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         }
 
     }
+    
+    // MARK: - Sync reordering
+    
+    /// Sets proper order for all bookmarks. Needed after user joins sync group for a first time.
+    class func setSyncOrderForAll(parentFolder: Bookmark? = nil) {
+        var predicate: NSPredicate?
+        
+        guard let baseSyncOrder = Sync.shared.baseSyncOrder else { return }
+        
+        if let parentFolder = parentFolder {
+            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parentFolder)
+        } else {
+            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
+        }
+        
+        let orderSort = NSSortDescriptor(key:"order", ascending: true)
+        let folderSort = NSSortDescriptor(key:"isFolder", ascending: false)
+        let createdSort = NSSortDescriptor(key:"created", ascending: false)
+        
+        let sort = [orderSort, folderSort, createdSort]
+        
+        let context = DataController.shared.workerContext
+        guard let allBookmarks = get(predicate: predicate, sortDescriptors: sort,  context: context) as? [Bookmark] else {
+            return
+        }
+        
+        var counter = 0
+        
+        for bookmark in allBookmarks {
+            if bookmark.syncOrder != nil { continue }
+            
+            // set order
+            if let parent = parentFolder, let syncOrder = parent.syncOrder {
+                let order = syncOrder + ".\(counter)"
+                bookmark.syncOrder = order
+            } else {
+                let order = baseSyncOrder + "\(counter)"
+                bookmark.syncOrder = order
+            }
+            
+            counter += 1
+            
+            // Calling this method recursively to get ordering for nested bookmarks
+            if bookmark.isFolder {
+                setSyncOrderForAll(parentFolder: bookmark)
+            }
+        }
+        
+        DataController.saveContext(context: context)
+    }
+    
+    
+    func setSyncOrder() {
+        
+    }
+    
 }
 
 // TODO: Document well
