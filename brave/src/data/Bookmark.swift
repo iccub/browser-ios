@@ -186,6 +186,14 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             }
         }
         
+        if !bk.isFavorite {
+            if let maxOrder = setBookmarkOrder(parent: parentFolder, context: context) { 
+                bk.order = maxOrder + 1
+            } else {
+                bk.order = 0
+            }
+        }
+        
         if save {
             DataController.saveContext(context: context)
         }
@@ -196,6 +204,26 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         }
         
         return bk
+    }
+    
+    private class func setBookmarkOrder(parent: Bookmark?, context: NSManagedObjectContext) -> Int16? {
+        var predicate: NSPredicate?
+        
+        if let parent = parent {
+            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parent)
+        } else {
+            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
+        }
+        
+        guard let allBookmarks = Bookmark.get(predicate: predicate, context: context) as? [Bookmark] else {
+            return nil
+        }
+        
+        // First bookmark is created with order 0
+        // We don't check for empty bookmarks array because the new bookmark is already added into context.
+        if allBookmarks.count < 2 { return nil }
+        
+        return allBookmarks.map { $0.order }.max()
     }
     
     // TODO: DELETE
