@@ -187,11 +187,13 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         }
         
         if !bk.isFavorite {
-            if let maxOrder = setBookmarkOrder(parent: parentFolder, context: context) { 
+            if let maxOrder = maxBookmarkOrder(parent: parentFolder, context: context) { 
                 bk.order = maxOrder + 1
             } else {
                 bk.order = 0
             }
+            
+            bk.setSyncOrder(context: context)
         }
         
         if save {
@@ -206,7 +208,7 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         return bk
     }
     
-    private class func setBookmarkOrder(parent: Bookmark?, context: NSManagedObjectContext) -> Int16? {
+    private class func maxBookmarkOrder(parent: Bookmark?, context: NSManagedObjectContext) -> Int16? {
         var predicate: NSPredicate?
         
         if let parent = parent {
@@ -400,8 +402,45 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     }
     
     
-    func setSyncOrder() {
+    private func setSyncOrder(context: NSManagedObjectContext) {
+        var predicate: NSPredicate?
         
+        guard let baseSyncOrder = Sync.shared.baseSyncOrder else { return }
+        
+        if let parent = parentFolder {
+            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parent)
+        } else {
+            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
+        }
+        
+        guard let allBookmarks = Bookmark.get(predicate: predicate, context: context) as? [Bookmark] else {
+            return
+        }
+        
+        // There are 3 cases to consider while initializing a sync order for new bookmarks:
+        // 1. Root level, no other bookmarks added - we're setting sync base order + 0
+        // 2. Nested folder, no other bookmarks added - taking parent folder sync ordder and adding .0
+        // 3. At least 1 bookmark is present at given level, taking the highest sync order out of all bookmarks of a level
+        // and incrementing last bit by 1.
+        if parentFolder == nil && allBookmarks.count < 2 {
+            syncOrder = "\(baseSyncOrder)0"
+        } else if let parent = parentFolder, let parentSyncOrder = parent.syncOrder, allBookmarks.count < 2 {
+            syncOrder = "\(parentSyncOrder).0"
+        } else {
+            // First bookmark is created with order 0
+            // We don't check for empty bookmarks array because the new bookmark is already added into context.
+            
+            guard var maxSyncOrder = (allBookmarks.map { $0.syncOrder ?? "" }.max()) else { return }
+            guard let lastNumber = maxSyncOrder.split(separator: ".").last else { return }
+            
+            guard let number = Int(lastNumber) else { return }
+            
+            maxSyncOrder.replaceSubrange(lastNumber.startIndex..<lastNumber.endIndex, with: "\(number + 1)")
+            
+            syncOrder = maxSyncOrder
+        }
+        
+        DataController.saveContext(context: context)
     }
     
     class func removeSyncOrders() {
