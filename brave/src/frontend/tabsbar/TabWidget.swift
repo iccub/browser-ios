@@ -77,13 +77,13 @@ class TabWidget : UIView {
         close.addTarget(self, action: #selector(clicked), for: .touchUpInside)
         title.addTarget(self, action: #selector(selected), for: .touchUpInside)
         
-        if let tab = TabMO.getByID(browser.tabID) {
+        if let tab = TabMO.get(byId: browser.tabID, context: .mainThreadContext) {
             title.setTitle(tab.title, for: .normal)
         }
         
         [close, title, separatorLine].forEach { addSubview($0) }
 
-        close.setImage(UIImage(named: "stop")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        close.setImage(UIImage(named: "close")?.withRenderingMode(.alwaysTemplate), for: .normal)
         close.snp.makeConstraints({ (make) in
             make.top.bottom.equalTo(self)
             make.left.equalTo(self).inset(4)

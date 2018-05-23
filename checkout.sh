@@ -2,5 +2,5 @@
 
 ./carthage.sh
 
-carthage checkout --no-use-binaries
+carthage checkout
 carthage build --platform ios

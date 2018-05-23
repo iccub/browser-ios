@@ -2,44 +2,37 @@
 
 import UIKit
 import Shared
+import AVFoundation
 
-class SyncPairCameraViewController: UIViewController {
+class SyncPairCameraViewController: SyncViewController {
     
-    var scrollView: UIScrollView!
+    var syncHandler: (([Int]?) -> ())?
     var cameraView: SyncCameraView!
     var titleLabel: UILabel!
     var descriptionLabel: UILabel!
-    var cameraAccessButton: UIButton!
-    var enterWordsButton: UIButton!
-    
-    // Kind of an odd mechanism for passing this info
-    var deviceName: String?
+    var enterWordsButton: RoundInterfaceButton!
     
     fileprivate let prefs: Prefs = getApp().profile!.prefs
-    fileprivate let prefKey: String = "CameraPermissionsSetting"
-    
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Strings.Pair
-        view.backgroundColor = SyncBackgroundColor
-        
-        // Start observing, this will handle child vc popping too for successful sync (e.g. pair words)
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady), object: nil, queue: OperationQueue.main, using: {
-            notification in
-            self.navigationController?.popToRootViewController(animated: true)
-        })
-        
-        scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(scrollView)
+        title = Strings.ScanSyncCode
+
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .center
+        stackView.spacing = 4
+        view.addSubview(stackView)
+
+        stackView.snp.makeConstraints { make in
+            make.top.equalTo(self.topLayoutGuide.snp.bottom).offset(16)
+            make.left.right.equalTo(self.view).inset(16)
+            make.bottom.equalTo(self.view.safeArea.bottom).inset(16)
+        }
         
         cameraView = SyncCameraView()
         cameraView.translatesAutoresizingMaskIntoConstraints = false
@@ -48,12 +41,11 @@ class SyncPairCameraViewController: UIViewController {
         cameraView.layer.masksToBounds = true
         cameraView.scanCallback = { data in
             
-            
             // TODO: Check data against sync api
 
             // TODO: Functional, but needs some cleanup
             struct Scanner { static var Lock = false }
-            if let bytes = Niceware.shared.splitBytes(fromJoinedBytes: data) {
+            if let bytes = SyncCrypto.shared.splitBytes(fromJoinedBytes: data) {
                 if (Scanner.Lock) {
                     // Have internal, so camera error does not show
                     return
@@ -62,73 +54,62 @@ class SyncPairCameraViewController: UIViewController {
                 Scanner.Lock = true
                 self.cameraView.cameraOverlaySucess()
                 
-                // Will be removed on pop
-                self.loadingView.isHidden = false
-                
+                // Vibrate.
+                AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))  
+
                 // Forced timeout
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(25.0) * Int64(NSEC_PER_SEC)) / Double(NSEC_PER_SEC), execute: {
                     Scanner.Lock = false
-                    self.loadingView.isHidden = true
                     self.cameraView.cameraOverlayError()
                 })
                 
                 // If multiple calls get in here due to race conditions it isn't a big deal
                 
-                // Block Sync
-                // Sync.shared.initializeSync(seed: bytes, deviceName: self.deviceName)
+                self.syncHandler?(bytes)
 
             } else {
                 self.cameraView.cameraOverlayError()
             }
         }
-        
-        cameraView.authorizedCallback = { authorized in
-            if authorized {
-                postAsyncToMain(0) {
-                    self.cameraAccessButton.isHidden = true
-                    self.prefs.setBool(true, forKey: self.prefKey)
-                }
-            }
-            else {
-                // TODO: Show alert.
-            }
-        }
-        scrollView.addSubview(cameraView)
+
+        stackView.addArrangedSubview(cameraView)
+
+        let titleDescriptionStackView = UIStackView()
+        titleDescriptionStackView.axis = .vertical
+        titleDescriptionStackView.spacing = 4
+        titleDescriptionStackView.alignment = .center
+        titleDescriptionStackView.setContentCompressionResistancePriority(250, for: .vertical)
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
-        titleLabel.textColor = UIColor.black
+        titleLabel.textColor = BraveUX.GreyJ
         titleLabel.text = Strings.SyncToDevice
-        scrollView.addSubview(titleLabel)
-        
+        titleDescriptionStackView.addArrangedSubview(titleLabel)
+
         descriptionLabel = UILabel()
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
-        descriptionLabel.textColor = UIColor(rgb: 0x696969)
+        descriptionLabel.textColor = BraveUX.GreyH
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .byWordWrapping
         descriptionLabel.textAlignment = .center
         descriptionLabel.text = Strings.SyncToDeviceDescription
-        scrollView.addSubview(descriptionLabel)
-        
-        cameraAccessButton = UIButton(type: .roundedRect)
-        cameraAccessButton.translatesAutoresizingMaskIntoConstraints = false
-        cameraAccessButton.setTitle(Strings.GrantCameraAccess, for: .normal)
-        cameraAccessButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
-        cameraAccessButton.setTitleColor(UIColor.white, for: .normal)
-        cameraAccessButton.backgroundColor = BraveUX.DefaultBlue
-        cameraAccessButton.layer.cornerRadius = 8
-        cameraAccessButton.addTarget(self, action: #selector(SEL_cameraAccess), for: .touchUpInside)
-        scrollView.addSubview(cameraAccessButton)
-        
-        enterWordsButton = UIButton(type: .roundedRect)
+        titleDescriptionStackView.addArrangedSubview(descriptionLabel)
+
+        let textStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 16),
+                                                           titleDescriptionStackView,
+                                                           UIView.spacer(.horizontal, amount: 16)])
+
+        stackView.addArrangedSubview(textStackView)
+
+        enterWordsButton = RoundInterfaceButton(type: .roundedRect)
         enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.EnterCodeWords, for: .normal)
         enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
-        enterWordsButton.setTitleColor(UIColor(rgb: 0x696969), for: .normal)
+        enterWordsButton.setTitleColor(BraveUX.GreyH, for: .normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), for: .touchUpInside)
-        scrollView.addSubview(enterWordsButton)
+        stackView.addArrangedSubview(enterWordsButton)
         
         loadingSpinner.startAnimating()
         
@@ -137,67 +118,73 @@ class SyncPairCameraViewController: UIViewController {
         loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
         loadingView.isHidden = true
         loadingView.addSubview(loadingSpinner)
-        scrollView.addSubview(loadingView)
+        cameraView.addSubview(loadingView)
         
         edgesForExtendedLayout = UIRectEdge()
-        
-        scrollView.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.view)
-        }
-        
+
         cameraView.snp.makeConstraints { (make) in
-            make.top.equalTo(self.scrollView).offset(24)
-            make.size.equalTo(300)
-            make.centerX.equalTo(self.scrollView)
+            if DeviceDetector.isIpad {
+                make.size.equalTo(400)
+            } else {
+                make.size.equalTo(self.view.snp.width).multipliedBy(0.9)
+            }
         }
-        
-        titleLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(self.cameraView.snp.bottom).offset(30)
-            make.centerX.equalTo(self.scrollView)
-        }
-        
-        descriptionLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(self.titleLabel.snp.bottom).offset(7)
-            make.leftMargin.equalTo(30)
-            make.rightMargin.equalTo(-30)
-        }
-        
-        cameraAccessButton.snp.makeConstraints { (make) in
-            make.top.equalTo(self.descriptionLabel.snp.bottom).offset(30)
-            make.centerX.equalTo(self.scrollView)
-            make.left.equalTo(16)
-            make.right.equalTo(-16)
-            make.height.equalTo(50)
-        }
-        
-        enterWordsButton.snp.makeConstraints { (make) in
-            make.top.equalTo(self.cameraAccessButton.snp.bottom).offset(8)
-            make.centerX.equalTo(self.scrollView)
-            make.bottom.equalTo(-10)
-        }
-        
+
         loadingView.snp.makeConstraints { make in
-            make.margins.equalTo(cameraView.snp.margins)
+            make.left.right.top.bottom.equalTo(cameraView)
         }
         
         loadingSpinner.snp.makeConstraints { make in
             make.center.equalTo(loadingSpinner.superview!)
         }
-        
-        if prefs.boolForKey(prefKey) == true {
-            cameraView.startCapture()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.cameraView.videoPreviewLayer?.connection.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
         }
     }
     
-    func SEL_cameraAccess() {
-        // TODO: check if already has access before requiring button tap.
-        cameraView.startCapture()
-    }
-    
     func SEL_enterWords() {
-        let pairWords = SyncPairWordsViewController()
-        pairWords.deviceName = self.deviceName
-        navigationController?.pushViewController(pairWords, animated: true)
+        let wordsVC = SyncPairWordsViewController()
+        wordsVC.syncHandler = self.syncHandler
+        navigationController?.pushViewController(wordsVC, animated: true)
     }
 }
 
+extension SyncPairCameraViewController: NavigationPrevention {
+    func enableNavigationPrevention() {
+        loadingView.isHidden = false
+        navigationItem.hidesBackButton = true
+        enterWordsButton.isEnabled = false
+    }
+
+    func disableNavigationPrevention() {
+        loadingView.isHidden = true
+        navigationItem.hidesBackButton = false
+        enterWordsButton.isEnabled = true
+    }
+}
+
+extension AVCaptureVideoOrientation {
+    var uiInterfaceOrientation: UIInterfaceOrientation {
+        get {
+            switch self {
+            case .landscapeLeft:        return .landscapeLeft
+            case .landscapeRight:       return .landscapeRight
+            case .portrait:             return .portrait
+            case .portraitUpsideDown:   return .portraitUpsideDown
+            }
+        }
+    }
+
+    init(ui:UIInterfaceOrientation) {
+        switch ui {
+        case .landscapeRight:       self = .landscapeRight
+        case .landscapeLeft:        self = .landscapeLeft
+        case .portrait:             self = .portrait
+        case .portraitUpsideDown:   self = .portraitUpsideDown
+        default:                    self = .portrait
+        }
+    }
+}

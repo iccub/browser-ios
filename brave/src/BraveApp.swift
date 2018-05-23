@@ -109,7 +109,7 @@ class BraveApp {
             }
        #endif
         
-        UINavigationBar.appearance().tintColor = BraveUX.DefaultBlue
+        UINavigationBar.appearance().tintColor = BraveUX.BraveOrange
     }
     
     private class func checkMixpanelGUID() {
@@ -270,7 +270,7 @@ class BraveApp {
         }
         return 20
     }
-
+    
     static var isPasswordManagerInstalled: Bool?
 
     static func is3rdPartyPasswordManagerInstalled(_ refreshLookup: Bool) -> Deferred<Bool> {

@@ -184,7 +184,7 @@ class TabManager : NSObject {
         context.perform {
             for i in 0..<self.tabs.internalTabList.count {
                 let tab = self.tabs.internalTabList[i]
-                guard let managedObject = TabMO.getByID(tab.tabID, context: context) else { print("Error: Tab missing managed object"); continue }
+                guard let managedObject = TabMO.get(byId: tab.tabID, context: context) else { print("Error: Tab missing managed object"); continue }
                 managedObject.order = Int16(i)
             }
             DataController.saveContext(context: context)
@@ -392,11 +392,12 @@ class TabManager : NSObject {
     
     func restoreTab(_ tab: Browser) {
         // Tab was created with no active webview or session data. Restore tab data from CD and configure.
-        guard let savedTab = TabMO.getByID(tab.tabID) else { return }
+        guard let savedTab = TabMO.get(byId: tab.tabID, context: .mainThreadContext) else { return }
         
         if let history = savedTab.urlHistorySnapshot as? [String], let tabUUID = savedTab.syncUUID, let url = savedTab.url {
             let data = SavedTab(id: tabUUID, title: savedTab.title ?? "", url: url, isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
             if let webView = tab.webView {
+                tab.navigationDelegate = navDelegate
                 tab.restore(webView, restorationData: data)
             }
         }
@@ -503,7 +504,7 @@ class TabManager : NSObject {
  
         // Ignore on restore.
         if !zombie && !PrivateBrowsing.singleton.isOn {
-            TabMO.preserveTab(tab: tab)
+            TabMO.preserve(tab: tab)
             saveTabOrder()
         }
     }
@@ -525,7 +526,9 @@ class TabManager : NSObject {
 
         if let selected = selectedTab, selectedTab === tab {
             if let idx = tabs.displayedTabsForCurrentPrivateMode.index(of: selected) {
-                if idx - 1 >= 0 {
+                if idx + 1 < tabs.displayedTabsForCurrentPrivateMode.count {
+                    selectTab(tabs.displayedTabsForCurrentPrivateMode[idx + 1])
+                } else if idx - 1 >= 0 {
                     selectTab(tabs.displayedTabsForCurrentPrivateMode[idx - 1])
                 } else if tabs.displayedTabsForCurrentPrivateMode.last !== tab {
                     selectTab(tabs.displayedTabsForCurrentPrivateMode.last)
@@ -534,8 +537,9 @@ class TabManager : NSObject {
         }
         tabs.removeTab(tab)
 
-        if let tab = TabMO.getByID(tab.tabID) {
-            DataController.remove(object: tab)
+        let context = DataController.shared.mainThreadContext
+        if let tab = TabMO.get(byId: tab.tabID, context: context) {
+            DataController.remove(object: tab, context: context)
         }
         
         // There's still some time between this and the webView being destroyed.
@@ -666,7 +670,7 @@ extension TabManager : WKCompatNavigationDelegate {
         if let tab = tabForWebView(webView), let url = tabForWebView(webView)?.url {
             if !ErrorPageHelper.isErrorPageURL(url) {
                 postAsyncToMain(0.25) {
-                    TabMO.preserveTab(tab: tab)
+                    TabMO.preserve(tab: tab)
                 }
             }
         }

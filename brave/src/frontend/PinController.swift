@@ -33,6 +33,11 @@ class PinViewController: UIViewController, PinViewControllerDelegate {
     var delegate: PinViewControllerDelegate?
     var pinView: PinLockView!
     
+    static var isBrowserLockEnabled: Bool {
+        let profile = getApp().profile
+        return profile?.prefs.boolForKey(kPrefKeySetBrowserLock) == true || profile?.prefs.boolForKey(kPrefKeyPopupForBrowserLock) == true
+    }
+    
     override func loadView() {
         super.loadView()
         
@@ -242,7 +247,7 @@ class PinLockView: UIView {
         deleteButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
         deleteButton.setTitle(Strings.Delete, for: .normal)
         deleteButton.setTitleColor(PinUX.DefaultForegroundColor, for: .normal)
-        deleteButton.setTitleColor(UIColor.black, for: .highlighted)
+        deleteButton.setTitleColor(BraveUX.GreyJ, for: .highlighted)
         deleteButton.addTarget(self, action: #selector(SEL_delete(_:)), for: .touchUpInside)
         deleteButton.sizeToFit()
         addSubview(deleteButton)

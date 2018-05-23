@@ -50,11 +50,11 @@ class ButtonWithUnderlayView : UIButton {
         starView.isHidden = !hide
     }
 
-    func setStarImageBookmarked(_ on: Bool) {
-        let starName = on ? "listpanel_bookmarked_star" : "listpanel_notbookmarked_star"
-        let templateMode: UIImageRenderingMode = on ? .alwaysOriginal : .alwaysTemplate
-        starView.image = UIImage(named: starName)!.withRenderingMode(templateMode)
-    }
+//    func setStarImageBookmarked(_ on: Bool) {
+//        let starName = on ? "listpanel_bookmarked_star" : "listpanel_notbookmarked_star"
+//        let templateMode: UIImageRenderingMode = on ? .alwaysOriginal : .alwaysTemplate
+//        starView.image = UIImage(named: starName)!.withRenderingMode(templateMode)
+//    }
 }
 
 class BraveURLBarView : URLBarView {
@@ -78,6 +78,7 @@ class BraveURLBarView : URLBarView {
     override func commonInit() {
         BraveURLBarView.currentInstance = self
         locationContainer.layer.cornerRadius = BraveUX.TextFieldCornerRadius
+        locationContainer.layer.borderWidth = 0.5
 
         addSubview(leftSidePanelButton.underlay)
         addSubview(leftSidePanelButton)
@@ -86,9 +87,9 @@ class BraveURLBarView : URLBarView {
 
         leftSidePanelButton.addTarget(self, action: #selector(onClickLeftSlideOut), for: UIControlEvents.touchUpInside)
         leftSidePanelButton.setImage(UIImage(named: "listpanel")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        leftSidePanelButton.setImage(UIImage(named: "listpanel_down")?.withRenderingMode(.alwaysTemplate), for: .selected)
+//        leftSidePanelButton.setImage(UIImage(named: "listpanel_down")?.withRenderingMode(.alwaysTemplate), for: .selected)
         leftSidePanelButton.accessibilityLabel = Strings.Bookmarks_and_History_Panel
-        leftSidePanelButton.setStarImageBookmarked(false)
+//        leftSidePanelButton.setStarImageBookmarked(false)
 
         braveButton.addTarget(self, action: #selector(onClickBraveButton) , for: UIControlEvents.touchUpInside)
         braveButton.setImage(UIImage(named: "bravePanelButton"), for: .normal)
@@ -150,8 +151,10 @@ class BraveURLBarView : URLBarView {
         switch(themeName) {
         case Theme.NormalMode:
             backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
+            locationContainer.layer.borderColor = BraveUX.GreyD.cgColor
         case Theme.PrivateMode:
             backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
+            locationContainer.layer.borderColor = BraveUX.GreyI.cgColor
         default:
             break
         }
@@ -475,7 +478,7 @@ class BraveURLBarView : URLBarView {
 
     override func updateBookmarkStatus(_ isBookmarked: Bool) {
         getApp().braveTopViewController.updateBookmarkStatus(isBookmarked)
-        leftSidePanelButton.setStarImageBookmarked(isBookmarked)
+        //leftSidePanelButton.setStarImageBookmarked(isBookmarked)
     }
 
     func setBraveButtonState(shieldsEnabled: Bool, animated: Bool) {

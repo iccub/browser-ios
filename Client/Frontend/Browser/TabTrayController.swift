@@ -27,7 +27,7 @@ struct TabTrayControllerUX {
 }
 
 struct LightTabCellUX {
-    static let TabTitleTextColor = UIColor.black
+    static let TabTitleTextColor = BraveUX.GreyJ
 }
 
 struct DarkTabCellUX {
@@ -85,8 +85,8 @@ class TabCell: UICollectionViewCell {
         titleLbl.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
 
         closeButton = UIButton()
-        closeButton.setImage(UIImage(named: "stop"), for: .normal)
-        closeButton.tintColor = .black
+        closeButton.setImage(UIImage(named: "close"), for: .normal)
+        closeButton.tintColor = BraveUX.GreyG
         
         titleWrapperBackground.backgroundColor = UIColor.white
 
@@ -267,7 +267,7 @@ class TabTrayController: UIViewController {
                 togglePrivateMode.accessibilityValue = PrivateModeStrings.toggleAccessibilityValueOff
                 togglePrivateMode.backgroundColor = .clear
                 
-                addTabButton.tintColor = UIColor.black
+                addTabButton.tintColor = BraveUX.GreyI
                 
                 blurBackdropView.effect = UIBlurEffect(style: .light)
             }
@@ -283,7 +283,7 @@ class TabTrayController: UIViewController {
     lazy var togglePrivateMode: UIButton = {
         let button = UIButton()
         button.setTitle(Strings.Private, for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BraveUX.GreyI, for: .normal)
         button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFontWeightMedium)
         button.contentEdgeInsets = UIEdgeInsetsMake(0, 4 /* left */, 0, 4 /* right */)
         button.layer.cornerRadius = 4.0
@@ -298,7 +298,7 @@ class TabTrayController: UIViewController {
     lazy var doneButton: UIButton = {
         let button = UIButton()
         button.setTitle(Strings.Done, for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(BraveUX.GreyI, for: .normal)
         button.titleLabel!.font = UIFont.systemFont(ofSize: button.titleLabel!.font.pointSize + 1, weight: UIFontWeightRegular)
         button.contentEdgeInsets = UIEdgeInsetsMake(0, 4 /* left */, 0, 4 /* right */)
         button.layer.cornerRadius = 4.0
@@ -430,7 +430,7 @@ class TabTrayController: UIViewController {
         // privateMode setter to setup final visuals
         let selectedTabIsPrivate = tabManager.selectedTab?.isPrivate ?? false
         privateMode = PrivateBrowsing.singleton.isOn || selectedTabIsPrivate
-        doneButton.setTitleColor(privateMode ? UIColor.white : UIColor.black, for: .normal)
+        doneButton.setTitleColor(privateMode ? BraveUX.GreyG : BraveUX.GreyG, for: .normal)
 
         NotificationCenter.default.addObserver(self, selector: #selector(TabTrayController.SELappWillResignActiveNotification), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(TabTrayController.SELappDidBecomeActiveNotification), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
@@ -549,7 +549,7 @@ class TabTrayController: UIViewController {
     // View we display when there are no private tabs created
     fileprivate func newEmptyPrivateTabsView() -> UIView {
         let emptyView = UIView()
-        emptyView.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        emptyView.backgroundColor = BraveUX.GreyI
         return emptyView
     }
 
@@ -576,7 +576,7 @@ class TabTrayController: UIViewController {
 
         privateMode = !privateMode
         
-        doneButton.setTitleColor(privateMode ? UIColor.white : UIColor.black, for: .normal)
+        doneButton.setTitleColor(privateMode ? BraveUX.GreyG : BraveUX.GreyG, for: .normal)
         
         if privateMode {
             PrivateBrowsing.singleton.enter()
@@ -649,7 +649,10 @@ class TabTrayController: UIViewController {
             }
         }, completion: { finished in
             if finished {
-                self.dismiss(animated: true, completion: nil)
+                self.dismiss(animated: true, completion: {
+                    let app = UIApplication.shared.delegate as! AppDelegate
+                    app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
+                })
             }
         })
     }
@@ -857,28 +860,33 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         
         tabCell.placeholderFavicon.isHidden = tab.isScreenshotSet
         
-        if let tabMO = TabMO.getByID(tab.tabID), let urlString = tabMO.url, let url = URL(string: urlString) {
-            weak var weakSelf = self
-            if ImageCache.shared.hasImage(url, type: .square) {
-                // no relationship - check cache for icon which may have been stored recently for url.
-                ImageCache.shared.image(url, type: .square, callback: { (image) in
-                    postAsyncToMain {
-                        tabCell.favicon.image = image
-                        tabCell.placeholderFavicon.image = image
-                    }
-                })
-            }
-            else {
-                // no relationship - attempt to resolove domain problem
-                let context = DataController.shared.mainThreadContext
-                if let domain = Domain.getOrCreateForUrl(url, context: context), let faviconMO = domain.favicon, let urlString = faviconMO.url, let faviconurl = URL(string: urlString) {
-                    postAsyncToMain {
-                        weakSelf?.setCellImage(tabCell, iconUrl: faviconurl, cacheWithUrl: url)
-                    }
+        if tab.isHomePanel {
+            tabCell.favicon.isHidden = true
+        } else {
+            // Fetching favicon
+            if let tabMO = TabMO.get(byId: tab.tabID, context: .workerThreadContext), let urlString = tabMO.url, let url = URL(string: urlString) {
+                weak var weakSelf = self
+                if ImageCache.shared.hasImage(url, type: .square) {
+                    // no relationship - check cache for icon which may have been stored recently for url.
+                    ImageCache.shared.image(url, type: .square, callback: { (image) in
+                        postAsyncToMain {
+                            tabCell.favicon.image = image
+                            tabCell.placeholderFavicon.image = image
+                        }
+                    })
                 }
                 else {
-                    // last resort - download the icon
-                    downloadFaviconsAndUpdateForUrl(url, collectionView: collectionView, indexPath: indexPath)
+                    // no relationship - attempt to resolove domain problem
+                    let context = DataController.shared.mainThreadContext
+                    if let domain = Domain.getOrCreateForUrl(url, context: context), let faviconMO = domain.favicon, let urlString = faviconMO.url, let faviconurl = URL(string: urlString) {
+                        postAsyncToMain {
+                            weakSelf?.setCellImage(tabCell, iconUrl: faviconurl, cacheWithUrl: url)
+                        }
+                    }
+                    else {
+                        // last resort - download the icon
+                        downloadFaviconsAndUpdateForUrl(url, collectionView: collectionView, indexPath: indexPath)
+                    }
                 }
             }
         }
@@ -886,10 +894,10 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         // TODO: Move most view logic here instead of `init` or `prepareForReuse`
         // If the current tab add heightlighting
         if getApp().tabManager.selectedTab == tab {
-            tabCell.backgroundHolder.layer.borderColor = BraveUX.DefaultBlue.withAlphaComponent(0.75).cgColor
+            tabCell.backgroundHolder.layer.borderColor = BraveUX.LightBlue.withAlphaComponent(0.75).cgColor
             tabCell.backgroundHolder.layer.borderWidth = 1
             tabCell.shadowView.layer.shadowRadius = 5
-            tabCell.shadowView.layer.shadowColor = BraveUX.DefaultBlue.cgColor
+            tabCell.shadowView.layer.shadowColor = BraveUX.LightBlue.cgColor
             tabCell.shadowView.layer.shadowOpacity = 1.0
             tabCell.shadowView.layer.shadowOffset = CGSize(width: 0, height: 0)
             tabCell.shadowView.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.backgroundHolder.layer.cornerRadius).cgPath

@@ -49,7 +49,9 @@ extension Strings {
     public static let SelectLocationBarTitle = NSLocalizedString("Select Location Bar", comment: "")
     public static let NewTabTitle = NSLocalizedString("New Tab", comment: "")
     public static let NewPrivateTabTitle = NSLocalizedString("New Private Tab", comment: "")
-    public static let CloseAllTabsTitle = NSLocalizedString("Close All Tabs", comment: "")
+    public static let SearchNewTabTitle = NSLocalizedString("Search in New Tab", comment: "")
+    public static let SearchNewPrivateTabTitle = NSLocalizedString("Search in New Private Tab", comment: "")
+    public static let CloseAllTabsTitle = NSLocalizedString("Close All %i Tabs", comment: "")
     public static let CloseTabTitle = NSLocalizedString("Close Tab", comment: "")
     public static let ShowNextTabTitle = NSLocalizedString("Show Next Tab", comment: "")
     public static let ShowPreviousTabTitle = NSLocalizedString("Show Previous Tab", comment: "")
@@ -57,6 +59,8 @@ extension Strings {
 
 extension Strings {
 
+    public static let Allow = NSLocalizedString("Allow", comment: "")
+    public static let DontAllow = NSLocalizedString("Don't Allow", comment: "")
     public static let NewFolder = NSLocalizedString("New Folder", comment: "Title for new folder popup")
     public static let EnterFolderName = NSLocalizedString("Enter folder name", comment: "Description for new folder popup")
     public static let Edit = NSLocalizedString("Edit", comment: "")
@@ -64,6 +68,13 @@ extension Strings {
     public static let NewDevice = NSLocalizedString("Device Name", comment: "Title for new device popup")
     public static let DeviceFolderName = NSLocalizedString("Please enter a name for this device", comment: "Description for new device popup")
     
+    public static let FavoritesPopupTitle = NSLocalizedString("Top sites are now favorites.", comment: "Title for convert favorites popup")
+    public static let FavoritesPopupDescription = NSLocalizedString("You can now edit and arrange favorites however you like. Add favorites from the share menu when visiting a website.", comment: "Description for convert favorites popup")
+    public static let Convert = NSLocalizedString("Convert", comment: "Title for convert favorites popup convert button")
+    public static let UseDefaults = NSLocalizedString("Use Defaults", comment: "Title for convert favorites popup use defaults button")
+
+    public static let RequestSwitchAppsTitle = NSLocalizedString("Allow link to switch apps?", comment: "")
+    public static let RequestSwitchAppsMessage = NSLocalizedString("%@ will launch an external application", comment: "")
     public static let SyncUnsuccessful = NSLocalizedString("Unsuccessful", comment: "")
     public static let SyncUnableCreateGroup = NSLocalizedString("Unable to create new sync group.", comment: "Description on popup when setting up a sync group fails")
 
@@ -71,7 +82,9 @@ extension Strings {
     public static let DefaultSearchEngine = NSLocalizedString("Default Search Engine", comment: "Open search section of settings")
     public static let Logins = NSLocalizedString("Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
     public static let Settings = NSLocalizedString("Settings", comment: "")
+    public static let OtherSettings = NSLocalizedString("Other Settings", comment: "Other settings sectiont title")
     public static let Done = NSLocalizedString("Done", comment: "")
+    public static let Confirm = NSLocalizedString("Confirm", comment: "")
     public static let Privacy = NSLocalizedString("Privacy", comment: "Settings privacy section title")
     public static let Security = NSLocalizedString("Security", comment: "Settings security section title")
     public static let BlockPopupWindows = NSLocalizedString("Block Pop-up Windows", comment: "Block pop-up windows setting")
@@ -103,6 +116,7 @@ extension Strings {
     public static let Share = NSLocalizedString("Share", comment: "Accessibility Label for the browser toolbar Share button")
     public static let PasswordManager = NSLocalizedString("Password Manager", comment: "Accessibility Label for the browser toolbar Password Manager button")
     public static let Bookmark = NSLocalizedString("Bookmark", comment: "Accessibility Label for the browser toolbar Bookmark button")
+    public static let FavoritesFolder = NSLocalizedString("Favorites", comment: "Folder for storing favorite bookmarks.")
     public static let New_Tab = NSLocalizedString("New Tab", comment: "New Tab title")
 
     public static let Navigation_Toolbar = NSLocalizedString("Navigation Toolbar", comment: "Accessibility label for the navigation toolbar displayed at the bottom of the screen.")
@@ -216,27 +230,6 @@ extension Strings {
     public static let Dark = NSLocalizedString("Dark", comment: "Dark theme setting in Reading View settings")
     public static let Sepia = NSLocalizedString("Sepia", comment: "Sepia theme setting in Reading View settings")
     public static let General = NSLocalizedString("General", comment: "General settings section title")
-    public static let QRCode = NSLocalizedString("QR Code", comment: "QR Code section title")
-    public static let CodeWords = NSLocalizedString("Code Words", comment: "Code words section title")
-    public static let Sync = NSLocalizedString("Sync", comment: "Sync settings section title")
-    public static let BraveSync = NSLocalizedString("Brave Sync", comment: "Brave sync page title")
-    public static let BraveSyncWelcome = NSLocalizedString("Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started.", comment: "Sync settings welcome")
-    public static let NewSyncCode = NSLocalizedString("Get a new sync code", comment: "New sync code button title")
-    public static let ScanSyncCode = NSLocalizedString("Scan or enter code", comment: "Scan sync code button title")
-    public static let SyncAddDevice = NSLocalizedString("Add Device", comment: "Add device to sync")
-    public static let SyncToDevice = NSLocalizedString("Sync to device", comment: "Sync to existing device")
-    public static let SyncToDeviceDescription = NSLocalizedString("Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code.", comment: "Sync to existing device description")
-    public static let SyncAddDeviceDescription = NSLocalizedString("Using a second device navigate to Brave Settings > Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available.", comment: "Sync add device description")
-    public static let SyncOnDevice = NSLocalizedString("Sync on this device", comment: "Sync device settings section title")
-    public static let EnterCodeWords = NSLocalizedString("Enter code words", comment: "Sync enter code words")
-    public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
-    public static let Devices = NSLocalizedString("Devices", comment: "Sync device settings page title.")
-    public static let EnterCodeWordsBelow = NSLocalizedString("Enter code words below", comment: "Enter sync code words below")
-    public static let SyncRemoveThisDevice = NSLocalizedString("Remove this device", comment: "Sync remove device.")
-    public static let SyncRemoveThisDeviceQuestion = NSLocalizedString("Remove this device?", comment: "Sync remove device?")
-    public static let SyncRemoveThisDeviceQuestionDesc = NSLocalizedString("This device will be disconnected from sync group and no longer receive or send sync data. All existing data will remain on device.", comment: "Sync remove device?")
-    public static let Pair = NSLocalizedString("Pair", comment: "Sync pair device settings section title")
-    public static let SyncDeviceSettingsFooter = NSLocalizedString("Changing settings will only affect data that this device shares with others.", comment: "Sync device settings footer details")
     public static let PinNew = NSLocalizedString("Enter New PIN", comment: "Browser Lock New Pin")
     public static let PinNewRe = NSLocalizedString("Re-Enter New PIN", comment: "Browser Lock Re-Enter New Pin")
     public static let PinSet = NSLocalizedString("Set PIN", comment: "Browser Lock Set Pin")
@@ -246,7 +239,7 @@ extension Strings {
     public static let When_Leaving_Private_Browsing = NSLocalizedString("When Leaving Private Browsing", comment: "Will be displayed in Settings under 'Close Private Tabs'")
     public static let Saved_Logins = NSLocalizedString("Saved Logins", comment: "Settings item for clearing passwords and login data")
     public static let Browsing_History = NSLocalizedString("Browsing History", comment: "Settings item for clearing browsing history")
-    public static let GrantCameraAccess = NSLocalizedString("Grant camera access", comment: "Grand camera access")
+    public static let GrantCameraAccess = NSLocalizedString("Enable Camera", comment: "Grand camera access")
     public static let Cache = NSLocalizedString("Cache", comment: "Settings item for clearing the cache")
     public static let Offline_Website_Data = NSLocalizedString("Offline Website Data", comment: "Settings item for clearing website data")
     public static let Cookies = NSLocalizedString("Cookies", comment: "Settings item for clearing cookies")
@@ -262,6 +255,7 @@ extension Strings {
     public static let Clear = NSLocalizedString("Clear", comment: "Used as a button label in the dialog to Clear private data dialog")
     public static let Find_in_Page = NSLocalizedString("Find in Page", comment: "Share action title")
     public static let Open_Desktop_Site_tab = NSLocalizedString("Open Desktop Site tab", comment: "Share action title")
+    public static let Add_to_favorites = NSLocalizedString("Add to Favorites", comment: "Add to favorites share action.")
     public static let Search_Input_Field = NSLocalizedString("Search Input Field", comment: "Accessibility label for the search input field in the Logins list")
 
     public static let Clear_Search = NSLocalizedString("Clear Search", comment: "")
@@ -271,6 +265,10 @@ extension Strings {
     public static let Show_Bookmarks = NSLocalizedString("Show Bookmarks", comment: "Button to show the bookmarks list")
     public static let Show_History =  NSLocalizedString("Show History", comment: "Button to show the history list")
     public static let Add_Bookmark = NSLocalizedString("Add Bookmark", comment: "Button to add a bookmark")
+    public static let Edit_Bookmark = NSLocalizedString("Edit Bookmark", comment: "Button to edit a bookmark")
+    public static let Remove_Bookmark = NSLocalizedString("Remove Bookmark", comment: "Button to remove a bookmark")
+    public static let Edit_Favorite = NSLocalizedString("Edit Favorite", comment: "Button to edit a favorite")
+    public static let Remove_Favorite = NSLocalizedString("Remove Favorite", comment: "Button to remove a favorite")
 }
 
 extension Strings {
@@ -363,6 +361,58 @@ extension Strings {
     public static let Browser_lock_callout_message = NSLocalizedString("With Browser Lock, you will need to enter a PIN in order to access Brave.", comment: "Browser Lock feature callout message.")
     public static let Browser_lock_callout_not_now = NSLocalizedString("Not Now", comment: "Browser Lock feature callout not now action.")
     public static let Browser_lock_callout_enable = NSLocalizedString("Enable", comment: "Browser Lock feature callout enable action.")
+}
+
+// SYNC.
+extension Strings {
+    public static let QRCode = NSLocalizedString("QR Code", comment: "QR Code section title")
+    public static let CodeWords = NSLocalizedString("Code Words", comment: "Code words section title")
+    public static let Sync = NSLocalizedString("Sync", comment: "Sync settings section title")
+    public static let BraveSync = NSLocalizedString("Brave Sync", comment: "Brave sync page title")
+    public static let BraveSyncWelcome = NSLocalizedString("Brave Sync allows you to sync bookmarks data privately between your Brave Browsers on your various devices. \r\rSimply scan the code from your sync chain that you created on another device. Or start a new sync chain. ", comment: "Sync settings welcome")
+    public static let NewSyncCode = NSLocalizedString("Start a new sync chain", comment: "New sync code button title")
+    public static let ScanSyncCode = NSLocalizedString("Scan or enter sync code", comment: "Scan sync code button title")
+    public static let Scan = NSLocalizedString("Scan", comment: "Scan sync code title")
+    public static let SyncAddDevice = NSLocalizedString("Add Device", comment: "Add device to sync")
+    public static let SyncAddDeviceScan = NSLocalizedString("Scan this sync code", comment: "Add mobile device to sync with scan")
+    public static let SyncAddDeviceWords = NSLocalizedString("Enter the sync code", comment: "Add device to sync with code words")
+    public static let SyncToDevice = NSLocalizedString("Sync to device", comment: "Sync to existing device")
+    public static let SyncToDeviceDescription = NSLocalizedString("Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code.", comment: "Sync to existing device description")
+    
+    public static let SyncAddMobileScanDescription = NSLocalizedString("Using a second phone or tablet, navigate to Brave Settings > Sync > Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.", comment: "Sync add device description")
+    public static let SyncAddMobileWordsDescription = NSLocalizedString("Using a second phone or tablet, navigate to Brave Settings > Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.", comment: "Sync add device description")
+    
+    public static let SyncAddComputerScanDescription = NSLocalizedString("On your computer, navigate to Brave Settings > Sync > Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.", comment: "Sync add device description")
+    public static let SyncAddComputerWordsDescription = NSLocalizedString("On your computer, navigate to Brave Settings > Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.", comment: "Sync add device description")
+    
+    public static let EnterCodeWords = NSLocalizedString("Enter code words", comment: "Sync enter code words")
+    public static let ShowCodeWords = NSLocalizedString("Show code words instead", comment: "Show code words instead")
+    public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
+    public static let Devices = NSLocalizedString("Devices", comment: "Sync device settings page title.")
+    
+    public static let EnterCodeWordsBelow = NSLocalizedString("Enter code words below", comment: "Enter sync code words below")
+    public static let SyncRemoveThisDevice = NSLocalizedString("Remove this device", comment: "Sync remove device.")
+    public static let SyncRemoveThisDeviceQuestion = NSLocalizedString("Remove this device?", comment: "Sync remove device?")
+    public static let SyncRemoveThisDeviceQuestionDesc = NSLocalizedString("This device will be disconnected from sync group and no longer receive or send sync data. All existing data will remain on device.", comment: "Sync remove device?")
+    public static let Pair = NSLocalizedString("Pair", comment: "Sync pair device settings section title")
+    public static let SyncDeviceSettingsFooter = NSLocalizedString("Changing settings will only affect data that this device shares with others.", comment: "Sync device settings footer details")
+    public static let SyncAddAnotherDevice = NSLocalizedString("Add another device", comment: "Add another device cell button.")
+    public static let SyncAddMobileButton = NSLocalizedString("Add a Mobile Device", comment: "Add mobile device button title")
+    public static let SyncAddComputerButton = NSLocalizedString("Add a Computer", comment: "Add mobile device button title")
+    
+    public static let Copied = NSLocalizedString("Copied!", comment: "Copied action complete title")
+    
+    public static let WordCount = NSLocalizedString("Word count: %i", comment: "Word count title")
+    
+    public static let UnableToConnectTitle = NSLocalizedString("Unable to Connect", comment: "Sync Alert")
+    public static let UnableToConnectDescription = NSLocalizedString("Unable to join sync group. Please check the entered words and try again.", comment: "Sync Alert")
+    
+    public static let NotEnoughWordsTitle = NSLocalizedString("Not Enough Words", comment: "Sync Alert")
+    public static let NotEnoughWordsDescription = NSLocalizedString("Please enter all of the words and try again.", comment: "Sync Alert")
+    
+    public static let CodeWordInputHelp = NSLocalizedString("Using existing synced device, open Brave Settings and navigate to Settings > Sync. Choose “Add Device” then “Display code words instead”", comment: "Code words input help")
+    public static let CopyToClipboard = NSLocalizedString("Copy to Clipboard", comment: "Copy codewords title")
+    public static let CopiedToClipboard = NSLocalizedString("Copied to Clipboard!", comment: "Copied codewords title")
 }
 
 

@@ -22,6 +22,10 @@ struct ReaderModeHandlers {
                   let url = URL(string: stringURL) else {
                 return GCDWebServerResponse(statusCode: 500)
             }
+            
+            if !webServer.isRequestAuthenticated(request) { 
+                return GCDWebServerResponse(statusCode: 401)
+            }
 
             let status = readerModeCache.contains(url) ? 200 : 404
             return GCDWebServerResponse(statusCode: status)
@@ -31,6 +35,11 @@ struct ReaderModeHandlers {
         webServer.registerHandlerForMethod("GET", module: "reader-mode", resource: "page") { (request: GCDWebServerRequest!) -> GCDWebServerResponse! in
             if let url = request.query["url"] as? String {
                 if let url = URL(string: url) {
+                    
+                    if !webServer.isRequestAuthenticated(request) { 
+                        return GCDWebServerResponse(statusCode: 401)
+                    }
+                    
                     do {
                         let readabilityResult = try readerModeCache.get(url)
                         // We have this page in our cache, so we can display it. Just grab the correct style from the

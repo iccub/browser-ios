@@ -20,27 +20,27 @@ struct TabsButtonUX {
     static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
-        theme.borderColor = .white
+        theme.borderColor = BraveUX.GreyG
         theme.borderWidth = BorderStrokeWidth
         theme.font = TitleFont
         theme.backgroundColor = .clear
-        theme.textColor = .white
+        theme.textColor = BraveUX.GreyG
         theme.insets = TitleInsets
-        theme.highlightButtonColor = .white
-        theme.highlightTextColor = .black
-        theme.highlightBorderColor = .white
+        theme.highlightButtonColor = BraveUX.GreyA
+        theme.highlightTextColor = BraveUX.GreyA
+        theme.highlightBorderColor = BraveUX.GreyA
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
-        theme.borderColor = .black
+        theme.borderColor = BraveUX.GreyI
         theme.borderWidth = BorderStrokeWidth
         theme.font = TitleFont
         theme.backgroundColor = .clear
-        theme.textColor = .black
+        theme.textColor = BraveUX.GreyI
         theme.insets = TitleInsets
-        theme.highlightButtonColor = .black
-        theme.highlightTextColor = .white
-        theme.highlightBorderColor = .black
+        theme.highlightButtonColor = BraveUX.GreyJ
+        theme.highlightTextColor = BraveUX.GreyJ
+        theme.highlightBorderColor = BraveUX.GreyJ
         themes[Theme.NormalMode] = theme
 
         return themes
@@ -49,6 +49,8 @@ struct TabsButtonUX {
 
 class TabsButton: UIControl {
     fileprivate var theme: Theme = TabsButtonUX.Themes[Theme.NormalMode]!
+    
+    fileprivate var imageView: UIImageView = UIImageView(image: UIImage(named: "tabs")?.withRenderingMode(.alwaysTemplate))
     
     override var isHighlighted: Bool {
         didSet {
@@ -97,9 +99,11 @@ class TabsButton: UIControl {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        insideButton.addSubview(labelBackground)
-        insideButton.addSubview(borderView)
-        insideButton.addSubview(titleLabel)
+        insideButton.addSubview(imageView)
+        
+//        insideButton.addSubview(labelBackground)
+//        insideButton.addSubview(borderView)
+//        insideButton.addSubview(titleLabel)
         addSubview(insideButton)
         isAccessibilityElement = true
         accessibilityTraits |= UIAccessibilityTraitButton
@@ -112,13 +116,17 @@ class TabsButton: UIControl {
     override func updateConstraints() {
         super.updateConstraints()
 
-        labelBackground.snp.remakeConstraints { (make) -> Void in
-            make.edges.equalTo(insideButton)
-        }
-        borderView.snp.remakeConstraints { (make) -> Void in
-            make.edges.equalTo(insideButton)
-        }
-        titleLabel.snp.remakeConstraints { (make) -> Void in
+//        labelBackground.snp.remakeConstraints { (make) -> Void in
+//            make.edges.equalTo(insideButton)
+//        }
+//        borderView.snp.remakeConstraints { (make) -> Void in
+//            make.edges.equalTo(insideButton)
+//        }
+//        titleLabel.snp.remakeConstraints { (make) -> Void in
+//            make.edges.equalTo(insideButton)
+//        }
+        imageView.contentMode = .center
+        imageView.snp.remakeConstraints { (make) -> Void in
             make.edges.equalTo(insideButton)
         }
         insideButton.snp.remakeConstraints { (make) -> Void in
@@ -135,6 +143,8 @@ class TabsButton: UIControl {
 
     override func clone() -> UIView {
         let button = TabsButton()
+        
+        imageView.tintColor = borderView.color
 
         button.accessibilityLabel = accessibilityLabel
         button.titleLabel.text = titleLabel.text
@@ -165,7 +175,8 @@ class TabsButton: UIControl {
     
     func tabsButtonHold() {
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
-        let closeAllTabsAction =  UIAlertAction(title: Strings.CloseAllTabsTitle, style: UIAlertActionStyle.destructive) { (action: UIAlertAction) in
+        let closeAllTitle = String(format: Strings.CloseAllTabsTitle, getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count)
+        let closeAllTabsAction =  UIAlertAction(title: closeAllTitle, style: UIAlertActionStyle.destructive) { (action: UIAlertAction) in
             getApp().tabManager.removeAll(createTabIfNoneLeft: true, restricted: true)
         }
         
@@ -178,26 +189,34 @@ class TabsButton: UIControl {
         let cancelAction = UIAlertAction(title: Strings.Cancel, style: UIAlertActionStyle.cancel, handler: nil)
         actionSheetController.addAction(cancelAction)
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            if !PrivateBrowsing.singleton.isOn {
-                let newPrivateTabAction = UIAlertAction(title: Strings.NewPrivateTabTitle,
-                                                        style: .default,
-                                                        handler: respondToNewPrivateTab(action:))
-                actionSheetController.addAction(newPrivateTabAction)
-            }
-            
-            let newTabAction = UIAlertAction(title: Strings.NewTabTitle,
-                                             style: .default,
-                                             handler: respondToNewTab(action:))
-            actionSheetController.addAction(newTabAction)
-            
-            if let presenter = actionSheetController.popoverPresentationController {
-                presenter.sourceView = self
-                presenter.sourceRect = self.bounds
-            }
+
+        var newPrivateTabAction: UIAlertAction? = nil
+        if !PrivateBrowsing.singleton.isOn {
+            newPrivateTabAction = UIAlertAction(title: Strings.NewPrivateTabTitle,
+                                                    style: .default,
+                                                    handler: respondToNewPrivateTab(action:))
         }
-        actionSheetController.addAction(closeAllTabsAction)
-        actionSheetController.addAction(closeTabAction)
+        
+        let newTabAction = UIAlertAction(title: Strings.NewTabTitle,
+                                         style: .default,
+                                         handler: respondToNewTab(action:))
+    
+        if let presenter = actionSheetController.popoverPresentationController {
+            presenter.sourceView = self
+            presenter.sourceRect = self.bounds
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            actionSheetController.addAction(newTabAction)
+            if newPrivateTabAction != nil { actionSheetController.addAction(newPrivateTabAction!) }
+            actionSheetController.addAction(closeTabAction)
+            actionSheetController.addAction(closeAllTabsAction)
+        } else {
+            actionSheetController.addAction(closeAllTabsAction)
+            actionSheetController.addAction(closeTabAction)
+            if newPrivateTabAction != nil { actionSheetController.addAction(newPrivateTabAction!) }
+            actionSheetController.addAction(newTabAction)
+        }
         
         getApp().browserViewController.present(actionSheetController, animated: true, completion: nil)
     }
@@ -224,9 +243,13 @@ extension TabsButton: Themeable {
 
 // MARK: UIAppearance
 extension TabsButton {
+    
     dynamic var borderColor: UIColor {
         get { return borderView.color }
-        set { borderView.color = newValue }
+        set {
+            borderView.color = newValue
+            imageView.tintColor = newValue
+        }
     }
 
     dynamic var borderWidth: CGFloat {

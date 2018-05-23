@@ -3,17 +3,24 @@
 import Shared
 private let log = Logger.browserLogger
 
+// The list of URI schemes that can be opened in browser
+private let inBrowserURISchemes = ["about", "blob", "data", "file", "ftp", "http", "https", "ws", "wss"]
+
+
+fileprivate extension URL {
+    var isExternal: Bool {
+        let scheme = self.scheme ?? ""
+        return !inBrowserURISchemes.contains(scheme)
+    }
+}
+
 extension BrowserViewController: WKCompatNavigationDelegate {
 
     func webViewDidStartProvisionalNavigation(_ webView: UIWebView, url: URL?) {
-        #if !BRAVE
-            if tabManager.selectedTab?.webView !== webView {
-                return
-            }
-        #else
-            // remove the open in overlay view if it is present
-            removeOpenInView()
-        #endif
+        if tabManager.selectedTab?.webView !== webView {
+            return
+        }
+        
         updateFindInPageVisibility(false)
 
         // If we are going to navigate to a new page, hide the reader mode button. Unless we
@@ -24,6 +31,8 @@ extension BrowserViewController: WKCompatNavigationDelegate {
                 urlBar.updateReaderModeState(ReaderModeState.Unavailable)
             }
 
+            // remove the open in overlay view if it is present
+            removeOpenInView()
         }
     }
 
@@ -125,6 +134,12 @@ extension BrowserViewController: WKCompatNavigationDelegate {
             return
         }
 
+        if url.isExternal {
+            handle(externalURL: url)
+            shouldLoad = false
+            return
+        }
+
         // Default to calling openURL(). What this does depends on the iOS version. On iOS 8, it will just work without
         // prompting. On iOS9, depending on the scheme, iOS will prompt: "Firefox" wants to open "Twitter". It will ask
         // every time. There is no way around this prompt. (TODO Confirm this is true by adding them to the Info.plist)
@@ -172,6 +187,16 @@ extension BrowserViewController: WKCompatNavigationDelegate {
         //history.setTopSitesNeedsInvalidation()
     }
 
+    func handle (externalURL: URL) {
+        let alertController = UIAlertController(title: Strings.RequestSwitchAppsTitle, message: String(format: Strings.RequestSwitchAppsMessage, externalURL.relativeString), preferredStyle: UIAlertControllerStyle.alert)
+        let cancelAction = UIAlertAction(title: Strings.DontAllow, style: UIAlertActionStyle.cancel, handler: nil)
+        let openAction = UIAlertAction(title: Strings.Allow, style: UIAlertActionStyle.default) { result in
+            UIApplication.shared.openURL(externalURL)
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(openAction)
+        self.present(alertController, animated: true)
+    }
 
     func webViewDidFailNavigation(_ webView: UIWebView, withError error: NSError) {
         // Ignore the "Frame load interrupted" error that is triggered when we cancel a request

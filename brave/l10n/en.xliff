@@ -1,46 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
-  <file original="BraveShareTo/BraveShareToInfo.plist" source-language="en" datatype="plaintext">
+  <file original="brave/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="CFBundleDisplayName">
-        <source>CFBundleDisplayName</source>
+        <source>$(MOZ_BUNDLE_DISPLAY_NAME)</source>
+        <note>Bundle display name</note>
       </trans-unit>
       <trans-unit id="CFBundleName">
-        <source>$(PRODUCT_NAME)</source>
+        <source>$(MOZ_PRODUCT_NAME)</source>
+        <note>Bundle name</note>
+      </trans-unit>
+      <trans-unit id="NSCameraUsageDescription">
+        <source>Scan barcode for Brave sync.</source>
+        <note>Privacy - Camera Usage Description</note>
+      </trans-unit>
+      <trans-unit id="NSLocationWhenInUseUsageDescription">
+        <source>Websites you visit may request your location.</source>
+        <note>Privacy - Location When In Use Usage Description</note>
+      </trans-unit>
+      <trans-unit id="NSPhotoLibraryAddUsageDescription">
+        <source>This app requires access to the photo library.</source>
+        <note>Privacy - Photo Library Additions Usage Description</note>
+      </trans-unit>
+      <trans-unit id="NSPhotoLibraryUsageDescription">
+        <source>This app requires access to the photo library.</source>
+        <note>Privacy - Photo Library Usage Description</note>
       </trans-unit>
     </body>
   </file>
-  <file original="ReadingList/Info.plist" source-language="en" datatype="plaintext">
+  <file original="brave/en.lproj/Localizable.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
+    </header>
+    <body>
+      <trans-unit id="Accept &amp; Continue">
+        <source>Accept &amp; Continue</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="By using this application, you agree to Brave’s Terms of Use.">
+        <source>By using this application, you agree to Brave’s Terms of Use.</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Help make Brave better by sending usage statistics and crash reports to us.">
+        <source>Help make Brave better by sending usage statistics and crash reports to us.</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Terms of Use.">
+        <source>Terms of Use.</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="brave/en.lproj/OnePasswordExtension.strings" datatype="plaintext" source-language="en">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
+    </header>
+    <body>
+      <trans-unit id="1Password Extension was cancelled by the user">
+        <source>1Password Extension was cancelled by the user</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="App Extension API is not available in this version of iOS">
+        <source>App Extension API is not available in this version of iOS</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to contact the 1Password Extension">
+        <source>Failed to contact the 1Password Extension</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to execute script that collects web page information">
+        <source>Failed to execute script that collects web page information</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to fill web page because script could not be evaluated">
+        <source>Failed to fill web page because script could not be evaluated</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to fill web page because script is missing">
+        <source>Failed to fill web page because script is missing</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to obtain URL String from web view. The web view must be loaded completely when calling the 1Password Extension">
+        <source>Failed to obtain URL String from web view. The web view must be loaded completely when calling the 1Password Extension</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+      <trans-unit id="Failed to parse information returned by 1Password Extension">
+        <source>Failed to parse information returned by 1Password Extension</source>
+        <note>1Password Extension Error Message</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="brave/tests_src/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="CFBundleName">
         <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
       </trans-unit>
     </body>
   </file>
-  <file original="brave/Info.plist" source-language="en" datatype="plaintext">
+  <file original="BraveShareTo/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
+    </header>
+    <body>
+      <trans-unit id="CFBundleDisplayName">
+        <source>Open in Brave</source>
+        <note>Bundle display name</note>
+      </trans-unit>
+      <trans-unit id="CFBundleName">
+        <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="ReadingList/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="CFBundleName">
         <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
       </trans-unit>
     </body>
   </file>
-  <file original="brave/Localizable.strings" source-language="en" datatype="plaintext">
+  <file original="brave/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
+    </header>
+    <body>
+      <trans-unit id="CFBundleName">
+        <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="brave/en.lproj/Localizable.strings" datatype="plaintext" source-language="en">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="%@ search">
         <source>%@ search</source>
         <note>Label for search engine buttons. The argument corresponds to the name of the search engine.</note>
+      </trans-unit>
+      <trans-unit id="%@ will launch an external application">
+        <source>%@ will launch an external application</source>
+        <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="+">
         <source>+</source>
@@ -70,6 +182,22 @@
         <source>Add Tab</source>
         <note>Accessibility label for the Add Tab button in the Tab Tray.</note>
       </trans-unit>
+      <trans-unit id="Add a Computer">
+        <source>Add a Computer</source>
+        <note>Add mobile device button title</note>
+      </trans-unit>
+      <trans-unit id="Add a Mobile Device">
+        <source>Add a Mobile Device</source>
+        <note>Add mobile device button title</note>
+      </trans-unit>
+      <trans-unit id="Add another device">
+        <source>Add another device</source>
+        <note>Add another device cell button.</note>
+      </trans-unit>
+      <trans-unit id="Add to Favorites">
+        <source>Add to Favorites</source>
+        <note>Add to favorites share action.</note>
+      </trans-unit>
       <trans-unit id="Add to Reading List">
         <source>Add to Reading List</source>
         <note>Accessibility label for action adding current page to reading list.</note>
@@ -83,8 +211,7 @@
         <note>Accessibility label for address and search field, both words (Address, Search) are therefore nouns.</note>
       </trans-unit>
       <trans-unit id="Ads \rBlocked">
-        <source>Ads 
-Blocked</source>
+        <source>Ads \rBlocked</source>
         <note>Shields Ads Stat</note>
       </trans-unit>
       <trans-unit id="Ads and Trackers">
@@ -95,9 +222,17 @@ Blocked</source>
         <source>Advanced</source>
         <note>Label for button to perform advanced actions on the error page</note>
       </trans-unit>
+      <trans-unit id="Allow">
+        <source>Allow</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
       <trans-unit id="Allow %@ to open iTunes?">
         <source>Allow %@ to open iTunes?</source>
         <note>Ask user if site can open iTunes store URL</note>
+      </trans-unit>
+      <trans-unit id="Allow link to switch apps?">
+        <source>Allow link to switch apps?</source>
+        <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="Always show">
         <source>Always show</source>
@@ -195,10 +330,12 @@ Blocked</source>
         <source>Brave Sync</source>
         <note>Brave sync page title</note>
       </trans-unit>
+      <trans-unit id="Brave Sync allows you to sync bookmarks data privately between your Brave Browsers on your various devices. \r\rSimply scan the code from your sync chain that you created on another device. Or start a new sync chain. ">
+        <source>Brave Sync allows you to sync bookmarks data privately between your Brave Browsers on your various devices. \r\rSimply scan the code from your sync chain that you created on another device. Or start a new sync chain. </source>
+        <note>Sync settings welcome</note>
+      </trans-unit>
       <trans-unit id="Brave blocks ads.\nBrave stops trackers.\nBrave is designed for speed and efficiency.">
-        <source>Brave blocks ads.
-Brave stops trackers.
-Brave is designed for speed and efficiency.</source>
+        <source>Brave blocks ads.\nBrave stops trackers.\nBrave is designed for speed and efficiency.</source>
         <note>Shown in intro screens</note>
       </trans-unit>
       <trans-unit id="Brave for iOS Feedback">
@@ -206,8 +343,7 @@ Brave is designed for speed and efficiency.</source>
         <note>email subject</note>
       </trans-unit>
       <trans-unit id="Brave is Faster,\nand here's why...">
-        <source>Brave is Faster,
-and here's why...</source>
+        <source>Brave is Faster,\nand here's why...</source>
         <note>Shown in intro screens</note>
       </trans-unit>
       <trans-unit id="Brave keeps you safe as you browse.">
@@ -278,8 +414,8 @@ and here's why...</source>
         <source>Close</source>
         <note>Accessibility label for action denoting closing a tab in tab list (tray)</note>
       </trans-unit>
-      <trans-unit id="Close All Tabs">
-        <source>Close All Tabs</source>
+      <trans-unit id="Close All %i Tabs">
+        <source>Close All %i Tabs</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="Close Private Tabs">
@@ -298,6 +434,14 @@ and here's why...</source>
         <source>Code Words</source>
         <note>Code words section title</note>
       </trans-unit>
+      <trans-unit id="Confirm">
+        <source>Confirm</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Convert">
+        <source>Convert</source>
+        <note>Title for convert favorites popup convert button</note>
+      </trans-unit>
       <trans-unit id="Cookie Control">
         <source>Cookie Control</source>
         <note>Cookie settings option title</note>
@@ -305,6 +449,14 @@ and here's why...</source>
       <trans-unit id="Cookies">
         <source>Cookies</source>
         <note>Settings item for clearing cookies</note>
+      </trans-unit>
+      <trans-unit id="Copied to Clipboard!">
+        <source>Copied to Clipboard!</source>
+        <note>Copied codewords title</note>
+      </trans-unit>
+      <trans-unit id="Copied!">
+        <source>Copied!</source>
+        <note>Copied action complete title</note>
       </trans-unit>
       <trans-unit id="Copy">
         <source>Copy</source>
@@ -321,6 +473,14 @@ and here's why...</source>
       <trans-unit id="Copy Link">
         <source>Copy Link</source>
         <note>Context menu item for copying a link URL to the clipboard</note>
+      </trans-unit>
+      <trans-unit id="Copy app info to clipboard.">
+        <source>Copy app info to clipboard.</source>
+        <note>Copy app info to clipboard action sheet action.</note>
+      </trans-unit>
+      <trans-unit id="Copy to Clipboard">
+        <source>Copy to Clipboard</source>
+        <note>Copy codewords title</note>
       </trans-unit>
       <trans-unit id="Could not add page to Reading List. Maybe it's already there?">
         <source>Could not add page to Reading List. Maybe it's already there?</source>
@@ -350,6 +510,10 @@ and here's why...</source>
         <source>Desktop Bookmarks</source>
         <note>The folder name for the virtual folder that contains all desktop bookmarks.</note>
       </trans-unit>
+      <trans-unit id="Device %@ (%@)">
+        <source>Device %1$@ (%2$@)</source>
+        <note>Current device model and iOS version copied to clipboard.</note>
+      </trans-unit>
       <trans-unit id="Device Name">
         <source>Device Name</source>
         <note>Title for new device popup</note>
@@ -361,6 +525,10 @@ and here's why...</source>
       <trans-unit id="Devices &amp; Settings">
         <source>Devices &amp; Settings</source>
         <note>Sync you browser settings across devices.</note>
+      </trans-unit>
+      <trans-unit id="Don't Allow">
+        <source>Don't Allow</source>
+        <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="Don't block cookies">
         <source>Don't block cookies</source>
@@ -382,9 +550,21 @@ and here's why...</source>
         <source>Edit</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
+      <trans-unit id="Edit Bookmark">
+        <source>Edit Bookmark</source>
+        <note>Button to edit a bookmark</note>
+      </trans-unit>
+      <trans-unit id="Edit Favorite">
+        <source>Edit Favorite</source>
+        <note>Button to edit a favorite</note>
+      </trans-unit>
       <trans-unit id="Enable">
         <source>Enable</source>
         <note>Browser Lock feature callout enable action.</note>
+      </trans-unit>
+      <trans-unit id="Enable Camera">
+        <source>Enable Camera</source>
+        <note>Grand camera access</note>
       </trans-unit>
       <trans-unit id="Enter New PIN">
         <source>Enter New PIN</source>
@@ -410,21 +590,28 @@ and here's why...</source>
         <source>Enter folder name</source>
         <note>Description for new folder popup</note>
       </trans-unit>
+      <trans-unit id="Enter the sync code">
+        <source>Enter the sync code</source>
+        <note>Add device to sync with code words</note>
+      </trans-unit>
       <trans-unit id="Est. Time \rSaved">
-        <source>Est. Time 
-Saved</source>
+        <source>Est. Time \rSaved</source>
         <note>Shields Time Saved Stat</note>
       </trans-unit>
       <trans-unit id="Even though sites you visit in private tabs are not saved locally, they do not make you anonymous or invisible to your ISP, your employer, or to the sites you are visiting.">
         <source>Even though sites you visit in private tabs are not saved locally, they do not make you anonymous or invisible to your ISP, your employer, or to the sites you are visiting.</source>
         <note>Private tab details</note>
       </trans-unit>
+      <trans-unit id="Favorites">
+        <source>Favorites</source>
+        <note>Folder for storing favorite bookmarks.</note>
+      </trans-unit>
       <trans-unit id="Find">
         <source>Find</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
-      <trans-unit id="Find &quot;%@&quot;">
-        <source>Find "%@"</source>
+      <trans-unit id="Find \&quot;%@\&quot;">
+        <source>Find \"%@\"</source>
         <note>Find text in page.</note>
       </trans-unit>
       <trans-unit id="Find in Page">
@@ -440,8 +627,7 @@ Saved</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="Fingerprinting\nProtection">
-        <source>Fingerprinting
-Protection</source>
+        <source>Fingerprinting\nProtection</source>
         <note>blocking stat title</note>
       </trans-unit>
       <trans-unit id="Folder">
@@ -456,10 +642,6 @@ Protection</source>
         <source>General</source>
         <note>General settings section title</note>
       </trans-unit>
-      <trans-unit id="Get a new sync code">
-        <source>Get a new sync code</source>
-        <note>New sync code button title</note>
-      </trans-unit>
       <trans-unit id="Get ready to experience a Faster, Safer, Better Web.">
         <source>Get ready to experience a Faster, Safer, Better Web.</source>
         <note>Shown in intro screens</note>
@@ -467,10 +649,6 @@ Protection</source>
       <trans-unit id="Go Back">
         <source>Go Back</source>
         <note>Label for button to go back from the error page</note>
-      </trans-unit>
-      <trans-unit id="Grant camera access">
-        <source>Grant camera access</source>
-        <note>Grand camera access</note>
       </trans-unit>
       <trans-unit id="HTTPS Everywhere">
         <source>HTTPS Everywhere</source>
@@ -481,8 +659,7 @@ Protection</source>
         <note>individual blocking statistic title</note>
       </trans-unit>
       <trans-unit id="HTTPS \rUpgrades">
-        <source>HTTPS 
-Upgrades</source>
+        <source>HTTPS \rUpgrades</source>
         <note>Shields Https Stat</note>
       </trans-unit>
       <trans-unit id="Hide">
@@ -617,6 +794,10 @@ Upgrades</source>
         <source>No tabs</source>
         <note>Message spoken by VoiceOver to indicate that there are no tabs in the Tabs Tray</note>
       </trans-unit>
+      <trans-unit id="Not Enough Words">
+        <source>Not Enough Words</source>
+        <note>Sync Alert</note>
+      </trans-unit>
       <trans-unit id="Not Now">
         <source>Not Now</source>
         <note>Browser Lock feature callout not now action.</note>
@@ -640,6 +821,14 @@ Upgrades</source>
       <trans-unit id="On">
         <source>On</source>
         <note>Toggled ON accessibility value</note>
+      </trans-unit>
+      <trans-unit id="On your computer, navigate to Brave Settings &gt; Sync &gt; Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.">
+        <source>On your computer, navigate to Brave Settings &gt; Sync &gt; Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.</source>
+        <note>Sync add device description</note>
+      </trans-unit>
+      <trans-unit id="On your computer, navigate to Brave Settings &gt; Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.">
+        <source>On your computer, navigate to Brave Settings &gt; Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.</source>
+        <note>Sync add device description</note>
       </trans-unit>
       <trans-unit id="Open &amp; Fill">
         <source>Open &amp; Fill</source>
@@ -681,6 +870,10 @@ Upgrades</source>
         <source>Open in…</source>
         <note>String indicating that the file can be opened in another application on the device</note>
       </trans-unit>
+      <trans-unit id="Other Settings">
+        <source>Other Settings</source>
+        <note>Other settings sectiont title</note>
+      </trans-unit>
       <trans-unit id="PIN">
         <source>PIN</source>
         <note>Setting to change browser lock pin</note>
@@ -712,6 +905,10 @@ Upgrades</source>
       <trans-unit id="Please enter a name for this device">
         <source>Please enter a name for this device</source>
         <note>Description for new device popup</note>
+      </trans-unit>
+      <trans-unit id="Please enter all of the words and try again.">
+        <source>Please enter all of the words and try again.</source>
+        <note>Sync Alert</note>
       </trans-unit>
       <trans-unit id="Previous in-page result">
         <source>Previous in-page result</source>
@@ -785,6 +982,14 @@ Upgrades</source>
         <source>Remove</source>
         <note>Action button for deleting_history_entries_in_the_history_panel.</note>
       </trans-unit>
+      <trans-unit id="Remove Bookmark">
+        <source>Remove Bookmark</source>
+        <note>Button to remove a bookmark</note>
+      </trans-unit>
+      <trans-unit id="Remove Favorite">
+        <source>Remove Favorite</source>
+        <note>Button to remove a favorite</note>
+      </trans-unit>
       <trans-unit id="Remove from Reading List">
         <source>Remove from Reading List</source>
         <note>Name for button removing current article from reading list in reader mode</note>
@@ -841,9 +1046,17 @@ Upgrades</source>
         <source>Saved Logins</source>
         <note>Settings item for clearing passwords and login data</note>
       </trans-unit>
-      <trans-unit id="Scan or enter code">
-        <source>Scan or enter code</source>
+      <trans-unit id="Scan">
+        <source>Scan</source>
+        <note>Scan sync code title</note>
+      </trans-unit>
+      <trans-unit id="Scan or enter sync code">
+        <source>Scan or enter sync code</source>
         <note>Scan sync code button title</note>
+      </trans-unit>
+      <trans-unit id="Scan this sync code">
+        <source>Scan this sync code</source>
+        <note>Add mobile device to sync with scan</note>
       </trans-unit>
       <trans-unit id="Scripts Blocked">
         <source>Scripts Blocked</source>
@@ -859,6 +1072,14 @@ Upgrades</source>
       </trans-unit>
       <trans-unit id="Search Settings">
         <source>Search Settings</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Search in New Private Tab">
+        <source>Search in New Private Tab</source>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Search in New Tab">
+        <source>Search in New Tab</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
       <trans-unit id="Search in page">
@@ -969,6 +1190,10 @@ Upgrades</source>
         <source>Show Tour</source>
         <note>Show the on-boarding screen again from the settings</note>
       </trans-unit>
+      <trans-unit id="Show code words instead">
+        <source>Show code words instead</source>
+        <note>Show code words instead</note>
+      </trans-unit>
       <trans-unit id="Show in landscape only">
         <source>Show in landscape only</source>
         <note>tabs bar show/hide option</note>
@@ -985,6 +1210,10 @@ Upgrades</source>
         <source>Start Browsing</source>
         <note>No comment provided by engineer.</note>
       </trans-unit>
+      <trans-unit id="Start a new sync chain">
+        <source>Start a new sync chain</source>
+        <note>New sync code button title</note>
+      </trans-unit>
       <trans-unit id="Stop">
         <source>Stop</source>
         <note>Accessibility Label for the browser toolbar Stop button</note>
@@ -1000,14 +1229,6 @@ Upgrades</source>
       <trans-unit id="Sync">
         <source>Sync</source>
         <note>Sync settings section title</note>
-      </trans-unit>
-      <trans-unit id="Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started.">
-        <source>Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started.</source>
-        <note>Sync settings welcome</note>
-      </trans-unit>
-      <trans-unit id="Sync on this device">
-        <source>Sync on this device</source>
-        <note>Sync device settings section title</note>
       </trans-unit>
       <trans-unit id="Sync to device">
         <source>Sync to device</source>
@@ -1081,9 +1302,12 @@ Upgrades</source>
         <source>Top sites</source>
         <note>Panel accessibility label</note>
       </trans-unit>
+      <trans-unit id="Top sites are now favorites.">
+        <source>Top sites are now favorites.</source>
+        <note>Title for convert favorites popup</note>
+      </trans-unit>
       <trans-unit id="Trackers \rBlocked">
-        <source>Trackers 
-Blocked</source>
+        <source>Trackers \rBlocked</source>
         <note>Shields Trackers Stat</note>
       </trans-unit>
       <trans-unit id="Try again">
@@ -1102,9 +1326,17 @@ Blocked</source>
         <source>URL</source>
         <note>Bookmark URL</note>
       </trans-unit>
+      <trans-unit id="Unable to Connect">
+        <source>Unable to Connect</source>
+        <note>Sync Alert</note>
+      </trans-unit>
       <trans-unit id="Unable to create new sync group.">
         <source>Unable to create new sync group.</source>
         <note>Description on popup when setting up a sync group fails</note>
+      </trans-unit>
+      <trans-unit id="Unable to join sync group. Please check the entered words and try again.">
+        <source>Unable to join sync group. Please check the entered words and try again.</source>
+        <note>Sync Alert</note>
       </trans-unit>
       <trans-unit id="Unsorted Bookmarks">
         <source>Unsorted Bookmarks</source>
@@ -1134,6 +1366,10 @@ Blocked</source>
         <source>Update password for %@?</source>
         <note>Prompt for updating a password with no username. The parameter is the hostname of the site.</note>
       </trans-unit>
+      <trans-unit id="Use Defaults">
+        <source>Use Defaults</source>
+        <note>Title for convert favorites popup use defaults button</note>
+      </trans-unit>
       <trans-unit id="Use regional adblock">
         <source>Use regional adblock</source>
         <note>Setting to allow user in non-english locale to use adblock rules specifc to their language</note>
@@ -1142,13 +1378,21 @@ Blocked</source>
         <source>Use your fingerprint to unlock Brave.</source>
         <note>Unlock Brave with fingerprint.</note>
       </trans-unit>
-      <trans-unit id="Using a second device navigate to Brave Settings &gt; Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available.">
-        <source>Using a second device navigate to Brave Settings &gt; Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available.</source>
+      <trans-unit id="Using a second phone or tablet, navigate to Brave Settings &gt; Sync &gt; Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.">
+        <source>Using a second phone or tablet, navigate to Brave Settings &gt; Sync &gt; Scan. \n\nCapture the QR Code (above) with your second device, or enter code words if no camera is available.</source>
+        <note>Sync add device description</note>
+      </trans-unit>
+      <trans-unit id="Using a second phone or tablet, navigate to Brave Settings &gt; Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.">
+        <source>Using a second phone or tablet, navigate to Brave Settings &gt; Sync. Choose “Enter a Sync Chain Code.” \n\nEnter the code words above, including spaces.</source>
         <note>Sync add device description</note>
       </trans-unit>
       <trans-unit id="Using existing synced device open Brave Settings and navigate to “Devices &amp; Settings”, tap ‘+’ to add a new device and reveal sync code.">
         <source>Using existing synced device open Brave Settings and navigate to “Devices &amp; Settings”, tap ‘+’ to add a new device and reveal sync code.</source>
         <note>Sync to existing device description</note>
+      </trans-unit>
+      <trans-unit id="Using existing synced device, open Brave Settings and navigate to Settings &gt; Sync. Choose “Add Device” then “Display code words instead”">
+        <source>Using existing synced device, open Brave Settings and navigate to Settings &gt; Sync. Choose “Add Device” then “Display code words instead”</source>
+        <note>Code words input help</note>
       </trans-unit>
       <trans-unit id="Version %@ (%@)">
         <source>Version %1$@ (%2$@)</source>
@@ -1186,6 +1430,10 @@ Blocked</source>
         <source>With Browser Lock, you will need to enter a PIN in order to access Brave.</source>
         <note>Browser Lock feature callout message.</note>
       </trans-unit>
+      <trans-unit id="Word count: %i">
+        <source>Word count: %i</source>
+        <note>Word count title</note>
+      </trans-unit>
       <trans-unit id="Yes">
         <source>Yes</source>
         <note>For search suggestions prompt. This string should be short so it fits nicely on the prompt row.</note>
@@ -1197,6 +1445,10 @@ Blocked</source>
       <trans-unit id="You can choose to show a popup to pick your password manager, or have the selected one open automatically.">
         <source>You can choose to show a popup to pick your password manager, or have the selected one open automatically.</source>
         <note>Footer message on picker for 3rd party password manager setting</note>
+      </trans-unit>
+      <trans-unit id="You can now edit and arrange favorites however you like. Add favorites from the share menu when visiting a website.">
+        <source>You can now edit and arrange favorites however you like. Add favorites from the share menu when visiting a website.</source>
+        <note>Description for convert favorites popup</note>
       </trans-unit>
       <trans-unit id="Your connection is not private">
         <source>Your connection is not private</source>
@@ -1268,9 +1520,9 @@ Blocked</source>
       </trans-unit>
     </body>
   </file>
-  <file original="brave/Shared.strings" source-language="en" datatype="plaintext">
+  <file original="brave/en.lproj/Shared.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="%@ on %@">
@@ -1279,9 +1531,9 @@ Blocked</source>
       </trans-unit>
     </body>
   </file>
-  <file original="Storage/BookmarkPanel.strings" source-language="en" datatype="plaintext">
+  <file original="Storage/en.lproj/BookmarkPanel.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="Desktop Bookmarks">
@@ -1290,28 +1542,33 @@ Blocked</source>
       </trans-unit>
     </body>
   </file>
-  <file original="Storage/Info.plist" source-language="en" datatype="plaintext">
+  <file original="Storage/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="CFBundleName">
         <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
       </trans-unit>
     </body>
   </file>
-  <file original="Storage/Localizable.strings" source-language="en" datatype="plaintext">
+  <file original="Storage/en.lproj/Localizable.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="Amazon">
         <source>Amazon</source>
         <note>Tile title for Amazon</note>
       </trans-unit>
-      <trans-unit id="Facebook">
-        <source>Facebook</source>
-        <note>Tile title for Facebook</note>
+      <trans-unit id="Coinmarketcap">
+        <source>Coinmarketcap</source>
+        <note>Tile title for Coinmarketcap</note>
+      </trans-unit>
+      <trans-unit id="Reddit">
+        <source>Reddit</source>
+        <note>Tile title for Reddit</note>
       </trans-unit>
       <trans-unit id="Twitter">
         <source>Twitter</source>
@@ -1327,9 +1584,9 @@ Blocked</source>
       </trans-unit>
     </body>
   </file>
-  <file original="Storage/Storage.strings" source-language="en" datatype="plaintext">
+  <file original="Storage/en.lproj/Storage.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
       <trans-unit id="Bookmarks Menu">
@@ -1355,90 +1612,14 @@ Blocked</source>
       </trans-unit>
     </body>
   </file>
-  <file original="brave/BraveInfo.plist" source-language="en" datatype="plaintext">
+  <file original="UITests/en.lproj/InfoPlist.strings" datatype="plaintext" source-language="en">
     <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.3" build-num="9E145"/>
     </header>
     <body>
-      <trans-unit id="CFBundleDisplayName">
-        <source>$(MOZ_BUNDLE_DISPLAY_NAME)</source>
-      </trans-unit>
       <trans-unit id="CFBundleName">
-        <source>$(MOZ_PRODUCT_NAME)</source>
-      </trans-unit>
-      <trans-unit id="NSCameraUsageDescription">
-        <source>Scan barcode for Brave sync.</source>
-      </trans-unit>
-      <trans-unit id="NSLocationWhenInUseUsageDescription">
-        <source>Websites you visit may request your location.</source>
-      </trans-unit>
-      <trans-unit id="NSPhotoLibraryAddUsageDescription">
-        <source>This app requires access to the photo library.</source>
-      </trans-unit>
-      <trans-unit id="NSPhotoLibraryUsageDescription">
-        <source>This app requires access to the photo library.</source>
-      </trans-unit>
-    </body>
-  </file>
-  <file original="brave/Localizable.strings" source-language="en" datatype="plaintext">
-    <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
-    </header>
-    <body>
-      <trans-unit id="Accept &amp; Continue">
-        <source>Accept &amp; Continue</source>
-        <note>No comment provided by engineer.</note>
-      </trans-unit>
-      <trans-unit id="By using this application, you agree to Brave’s Terms of Use.">
-        <source>By using this application, you agree to Brave’s Terms of Use.</source>
-        <note>No comment provided by engineer.</note>
-      </trans-unit>
-      <trans-unit id="Help make Brave better by sending usage statistics and crash reports to us.">
-        <source>Help make Brave better by sending usage statistics and crash reports to us.</source>
-        <note>No comment provided by engineer.</note>
-      </trans-unit>
-      <trans-unit id="Terms of Use.">
-        <source>Terms of Use.</source>
-        <note>No comment provided by engineer.</note>
-      </trans-unit>
-    </body>
-  </file>
-  <file original="brave/OnePasswordExtension.strings" source-language="en" datatype="plaintext">
-    <header>
-      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
-    </header>
-    <body>
-      <trans-unit id="1Password Extension was cancelled by the user">
-        <source>1Password Extension was cancelled by the user</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="App Extension API is not available in this version of iOS">
-        <source>App Extension API is not available in this version of iOS</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to contact the 1Password Extension">
-        <source>Failed to contact the 1Password Extension</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to execute script that collects web page information">
-        <source>Failed to execute script that collects web page information</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to fill web page because script could not be evaluated">
-        <source>Failed to fill web page because script could not be evaluated</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to fill web page because script is missing">
-        <source>Failed to fill web page because script is missing</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to obtain URL String from web view. The web view must be loaded completely when calling the 1Password Extension">
-        <source>Failed to obtain URL String from web view. The web view must be loaded completely when calling the 1Password Extension</source>
-        <note>1Password Extension Error Message</note>
-      </trans-unit>
-      <trans-unit id="Failed to parse information returned by 1Password Extension">
-        <source>Failed to parse information returned by 1Password Extension</source>
-        <note>1Password Extension Error Message</note>
+        <source>$(PRODUCT_NAME)</source>
+        <note>Bundle name</note>
       </trans-unit>
     </body>
   </file>

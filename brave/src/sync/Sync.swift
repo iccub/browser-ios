@@ -34,7 +34,7 @@ public enum SyncRecordType : String {
     //
     
     
-    // These are instances, and do not change, make lazy to cache value
+    // These are 'static', and do not change, would make actually lazy/static, but not allow for enums
     var fetchedModelType: SyncRecord.Type? {
         let map: [SyncRecordType : SyncRecord.Type] = [.bookmark : SyncBookmark.self, .prefs : SyncDevice.self]
         return map[self]
@@ -94,11 +94,11 @@ class Sync: JSInjector {
     fileprivate let prefFetchTimestamp = "sync-fetch-timestamp"
     
 //    #if DEBUG
-//    private let isDebug = true
-//    private let serverUrl = "https://sync-staging.brave.com"
+    fileprivate let isDebug = true
+    fileprivate let serverUrl = "https://sync-staging.brave.com"
 //    #else
-    fileprivate let isDebug = false
-    fileprivate let serverUrl = "https://sync.brave.com"
+//    fileprivate let isDebug = false
+//    fileprivate let serverUrl = "https://sync.brave.com"
 //    #endif
 
     fileprivate let apiVersion = 0
@@ -144,17 +144,20 @@ class Sync: JSInjector {
     func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
         
         
-        // Temporary auto-removal of sync groups, as sync releasing is being held off
+        #if NO_SYNC
+        if syncSeed == nil { return }
         
-        if syncSeed != nil {
-            leaveSyncGroup()
-            
-            let alert = UIAlertController(title: "Sync Disabled", message: "Sync has been disabled, as it will not be included in the next couple of production builds. Your iOS device has been auto-removed from any sync groups.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
-        }
-        // // //
+        leaveSyncGroup()
+    
+        let msg = """
+            Sync has been disabled, as it will not be included in the next couple of production builds.
+            Your iOS device has been auto-removed from any sync groups.
+        """
         
+        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
+        #endif
         
         if let joinedSeed = seed, joinedSeed.count == Sync.SeedByteLength {
             // Always attempt seed write, setter prevents bad overwrites
@@ -232,8 +235,7 @@ class Sync: JSInjector {
             // TODO: Update all records with originalSyncSeed
             
             if let device = Device.currentDevice() {
-                // Not even verified if this works on the sync side.
-                self.sendSyncRecords(recordType: .prefs, action: .delete, records: [device])
+                self.sendSyncRecords(action: .delete, records: [device])
             }
             
             Device.deleteAll {}
@@ -291,19 +293,20 @@ class Sync: JSInjector {
             // Attempt to authorize device
             
             syncReadyLock = true
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationSyncReady), object: nil)
             
             if let device = Device.currentDevice(), !device.isSynced {
-                self.sendSyncRecords(recordType: .prefs, action: .create, records: [device])
+                self.sendSyncRecords(action: .create, records: [device])
                 
                 // Currently just force this, should use network, but too error prone currently
                 Device.currentDevice()?.isSynced = true
                 DataController.saveContext(context: Device.currentDevice()?.managedObjectContext)
             }
             
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationSyncReady), object: nil)
+            
             func startFetching() {
                 // Perform first fetch manually
-                self.fetch(type: .bookmark)
+                self.fetchWrapper()
                 
                 // Fetch timer to run on regular basis
                 fetchTimer = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
@@ -317,7 +320,7 @@ class Sync: JSInjector {
                 // Sync local bookmarks, then proceed with fetching
                 // Pull all local bookmarks
                 // Insane .map required for mapping obj-c class to Swift, in order to use protocol instead of class for array param
-                self.sendSyncRecords(recordType: .bookmark, action: .create, records: Bookmark.getAllBookmarks(context: DataController.shared.workerContext).map{$0}) { error in
+                self.sendSyncRecords(action: .create, records: Bookmark.getAllBookmarks(context: DataController.shared.workerContext).map{$0}) { error in
                     startFetching()
                 }
             } else {
@@ -331,17 +334,20 @@ class Sync: JSInjector {
     // This can be removed and fetch called directly via scheduledTimerBlock
     func fetchWrapper() {
         self.fetch(type: .bookmark)
+        self.fetch(type: .devices)
     }
  }
 
 // MARK: Native-initiated Message category
 extension Sync {
     // TODO: Rename
-    func sendSyncRecords(recordType: SyncRecordType, action: SyncActions, records: [Syncable], completion: ((Error?) -> Void)? = nil) {
+    func sendSyncRecords<T: Syncable>(action: SyncActions, records: [T], completion: ((Error?) -> Void)? = nil) {
         
         // Consider protecting against (isSynced && .create)
         
-        if records.isEmpty {
+        // Strong typing guarantees that all records are same subclass, so can infer type of all objects
+        // Protects against empty record set too
+        guard let recordType = records.first?.recordType else {
             completion?(nil)
             return
         }
@@ -366,7 +372,7 @@ extension Sync {
             let evaluate = "callbackList['send-sync-records'](null, '\(recordType.rawValue)',\(json))"
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
-                                        if error != nil {
+                                        if let error = error {
                                             print(error)
                                         }
                                         
@@ -426,21 +432,21 @@ extension Sync {
                 let fetchedId = fetchedRoot.objectId
                 else { return }
             
-            let singleRecord = recordType.coredataModelType?.get(syncUUIDs: [fetchedId], context: context)?.first as? Syncable
+            let clientRecord = recordType.coredataModelType?.get(syncUUIDs: [fetchedId], context: context)?.first as? Syncable
             
             var action = SyncActions(rawValue: fetchedRoot.action ?? -1)
             if action == SyncActions.delete {
-                singleRecord?.remove(save: false)
+                clientRecord?.remove(save: false)
             } else if action == SyncActions.create {
                 
-                if singleRecord != nil {
+                if clientRecord != nil {
                     // This can happen pretty often, especially for records that don't use diffs (e.g. prefs>devices)
                     // They always return a create command, even if they already "exist", since there is no real 'resolving'
                     //  Hence check below to prevent duplication
                 }
                     
                 // TODO: Needs favicon
-                if singleRecord == nil {
+                if clientRecord == nil {
                     recordType.coredataModelType?.add(rootObject: fetchedRoot, save: false, sendToSync: false, context: context)
                 } else {
                     // TODO: use Switch with `fallthrough`
@@ -450,7 +456,7 @@ extension Sync {
             
             // Handled outside of else block since .create, can modify to an .update
             if action == .update {
-                singleRecord?.update(syncRecord: fetchedRoot)
+                clientRecord?.update(syncRecord: fetchedRoot)
             }
         }
         
@@ -573,56 +579,55 @@ extension Sync {
 extension Sync: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         
-        DispatchQueue.global(qos: .background).async {
+        // JS execution must be on main thread
         
-            print("😎 \(message.name) \(message.body)")
-            
-            let syncResponse = SyncResponse(object: message.body as? String ?? "")
-            guard let messageName = syncResponse.message else {
-                assert(false)
-                return
-            }
-
-            switch messageName {
-            case "get-init-data":
-    //            getInitData()
-                break
-            case "got-init-data":
-                self.gotInitData()
-            case "save-init-data" :
-                // A bit hacky, but this method's data is not very uniform
-                // (e.g. arg2 is [Int])
-                let data = JSON(parseJSON: message.body as? String ?? "")
-                self.saveInitData(data)
-            case "get-existing-objects":
-                self.getExistingObjects(syncResponse)
-            case "resolved-sync-records":
-                self.resolvedSyncRecords(syncResponse)
-            case "sync-debug":
-                let data = JSON(parseJSON: message.body as? String ?? "")
-                print("---- Sync Debug: \(data)")
-            case "sync-ready":
-                self.isSyncFullyInitialized.syncReady = true
-            case "fetch-sync-records":
-                self.isSyncFullyInitialized.fetchReady = true
-            case "send-sync-records":
-                self.isSyncFullyInitialized.sendRecordsReady = true
-            case "fetch-sync-devices":
-                self.isSyncFullyInitialized.fetchDevicesReady = true
-            case "resolve-sync-records":
-                self.isSyncFullyInitialized.resolveRecordsReady = true
-            case "delete-sync-user":
-                self.isSyncFullyInitialized.deleteUserReady = true
-            case "delete-sync-site-settings":
-                self.isSyncFullyInitialized.deleteSiteSettingsReady = true
-            case "delete-sync-category":
-                self.isSyncFullyInitialized.deleteCategoryReady = true
-            default:
-                print("\(messageName) not handled yet")
-            }
-
-            self.checkIsSyncReady()
+        print("😎 \(message.name) \(message.body)")
+        
+        let syncResponse = SyncResponse(object: message.body as? String ?? "")
+        guard let messageName = syncResponse.message else {
+            assert(false)
+            return
         }
+
+        switch messageName {
+        case "get-init-data":
+//            getInitData()
+            break
+        case "got-init-data":
+            self.gotInitData()
+        case "save-init-data" :
+            // A bit hacky, but this method's data is not very uniform
+            // (e.g. arg2 is [Int])
+            let data = JSON(parseJSON: message.body as? String ?? "")
+            self.saveInitData(data)
+        case "get-existing-objects":
+            self.getExistingObjects(syncResponse)
+        case "resolved-sync-records":
+            self.resolvedSyncRecords(syncResponse)
+        case "sync-debug":
+            let data = JSON(parseJSON: message.body as? String ?? "")
+            print("---- Sync Debug: \(data)")
+        case "sync-ready":
+            self.isSyncFullyInitialized.syncReady = true
+        case "fetch-sync-records":
+            self.isSyncFullyInitialized.fetchReady = true
+        case "send-sync-records":
+            self.isSyncFullyInitialized.sendRecordsReady = true
+        case "fetch-sync-devices":
+            self.isSyncFullyInitialized.fetchDevicesReady = true
+        case "resolve-sync-records":
+            self.isSyncFullyInitialized.resolveRecordsReady = true
+        case "delete-sync-user":
+            self.isSyncFullyInitialized.deleteUserReady = true
+        case "delete-sync-site-settings":
+            self.isSyncFullyInitialized.deleteSiteSettingsReady = true
+        case "delete-sync-category":
+            self.isSyncFullyInitialized.deleteCategoryReady = true
+        default:
+            print("\(messageName) not handled yet")
+        }
+
+        self.checkIsSyncReady()
     }
 }
 

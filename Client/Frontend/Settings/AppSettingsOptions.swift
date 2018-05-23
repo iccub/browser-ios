@@ -152,23 +152,24 @@ class SyncDevicesSetting: Setting {
     
     override var accessoryType: UITableViewCellAccessoryType { return .disclosureIndicator }
     
-    override var accessibilityIdentifier: String? { return "SyncDevices" }
+    override var accessibilityIdentifier: String? { return "Sync" }
     
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
         
-        let clearTitle = Strings.SyncDevices
+        let clearTitle = Strings.Sync
         super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
         
         if Sync.shared.isInSyncGroup {
-            let settingsTableViewController = SyncSettingsViewController(style: .grouped)
-            settingsTableViewController.profile = getApp().profile
-            navigationController?.pushViewController(settingsTableViewController, animated: true)
+            let syncSettingsView = SyncSettingsViewController(style: .grouped)
+            syncSettingsView.profile = getApp().profile
+            navigationController?.pushViewController(syncSettingsView, animated: true)
         } else {
-            navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
+            let view = SyncWelcomeViewController()
+            navigationController?.pushViewController(view, animated: true)
         }
     }
 }
@@ -177,50 +178,24 @@ class SyncDeviceSetting: Setting {
     let profile: Profile
     
     var onTap: (()->Void)?
-    internal var displayTitle: String!
+    internal var device: Device
+    
+    internal var displayTitle: String {
+        return device.name ?? ""
+    }
     
     override var accessoryType: UITableViewCellAccessoryType { return .none }
     
     override var accessibilityIdentifier: String? { return "SyncDevice" }
     
-    init(profile profile: Profile, title: String) {
+    init(profile: Profile, device: Device) {
         self.profile = profile
-        self.displayTitle = title
-        super.init(title: NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+        self.device = device
+        super.init(title: NSAttributedString(string: device.name ?? "", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
-        if onTap != nil {
-            onTap!()
-        }
-    }
-}
-
-class RemoveDeviceSetting: Setting {
-    let profile: Profile
-    
-    override var accessoryType: UITableViewCellAccessoryType { return .none }
-    
-    override var accessibilityIdentifier: String? { return "RemoveDeviceSetting" }
-    
-    override var textAlignment: NSTextAlignment { return .center }
-    
-    init(profile: Profile) {
-        self.profile = profile
-        let clearTitle = Strings.SyncRemoveThisDevice
-        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIColor.red, NSFontAttributeName: UIFont.systemFont(ofSize: 17, weight: UIFontWeightRegular)]))
-    }
-    
-    override func onClick(_ navigationController: UINavigationController?) {
-        
-        let alert = UIAlertController(title: Strings.SyncRemoveThisDeviceQuestion, message: Strings.SyncRemoveThisDeviceQuestionDesc, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.Cancel, style: UIAlertActionStyle.cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: Strings.Remove, style: UIAlertActionStyle.destructive) { action in
-            Sync.shared.leaveSyncGroup()
-            navigationController?.popToRootViewController(animated: true)
-        })
-        
-        navigationController?.present(alert, animated: true, completion: nil)
+        onTap?()
     }
 }
 
@@ -283,4 +258,3 @@ class ChangePinSetting: Setting {
         navigationController?.pushViewController(view, animated: true)
     }
 }
-

@@ -10,7 +10,11 @@ import GCDWebServers
 struct SessionRestoreHandler {
     static func register(_ webServer: WebServer) {
         // Register the handler that accepts /about/sessionrestore?history=...&currentpage=... requests.
-        webServer.registerHandlerForMethod("GET", module: "about", resource: "sessionrestore") { _ in
+        webServer.registerHandlerForMethod("GET", module: "about", resource: "sessionrestore") { request in
+            if let request = request, !webServer.isRequestAuthenticated(request) { 
+                return GCDWebServerResponse(statusCode: 401)
+            }
+            
             if let sessionRestorePath = Bundle.main.path(forResource: "SessionRestore", ofType: "html") {
                 do {
                     let sessionRestoreString = try String(contentsOfFile: sessionRestorePath)

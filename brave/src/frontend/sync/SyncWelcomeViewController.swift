@@ -3,195 +3,192 @@
 import UIKit
 import Shared
 
-let SyncBackgroundColor = UIColor(rgb: 0xF8F8F8)
+/// Sometimes during heavy operations we want to prevent user from navigating back, changing screen etc.
+protocol NavigationPrevention {
+    func enableNavigationPrevention()
+    func disableNavigationPrevention()
+}
 
-class SyncWelcomeViewController: UIViewController {
-    
-    var scrollView: UIScrollView!
-    var graphic: UIImageView!
-    var bg: UIImageView!
-    var titleLabel: UILabel!
-    var descriptionLabel: UILabel!
-    var newToSyncButton: UIButton!
-    var existingUserButton: UIButton!
-    
-    var loadingView = UIView()
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+class SyncWelcomeViewController: SyncViewController {
+
+    lazy var mainStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .fill
+        stackView.spacing = 8
+        return stackView
+    }()
+
+    lazy var syncImage: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "sync-art"))
+        // Shrinking image a bit on smaller devices.
+        imageView.setContentCompressionResistancePriority(250, for: .vertical)
+        imageView.contentMode = .scaleAspectFit
+
+        return imageView
+    }()
+
+    lazy var textStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 4
+        return stackView
+    }()
+
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+        label.textColor = BraveUX.GreyJ
+        label.text = Strings.BraveSync
+        label.textAlignment = .center
+        return label
+    }()
+
+    lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        label.textColor = BraveUX.GreyH
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.textAlignment = .center
+        label.text = Strings.BraveSyncWelcome
+        label.setContentHuggingPriority(250, for: .horizontal)
+
+        return label
+    }()
+
+    lazy var buttonsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 4
+        return stackView
+    }()
+
+    lazy var existingUserButton: RoundInterfaceButton = {
+        let button = RoundInterfaceButton(type: .roundedRect)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle(Strings.ScanSyncCode, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
+        button.setTitleColor(UIColor.white, for: .normal)
+        button.backgroundColor = BraveUX.BraveOrange
+        button.addTarget(self, action: #selector(existingUserAction), for: .touchUpInside)
+
+        button.snp.makeConstraints { make in
+            make.height.equalTo(50)
+        }
+
+        return button
+    }()
+
+    lazy var newToSyncButton: RoundInterfaceButton = {
+        let button = RoundInterfaceButton(type: .roundedRect)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle(Strings.NewSyncCode, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
+        button.setTitleColor(BraveUX.GreyH, for: .normal)
+        button.addTarget(self, action: #selector(newToSyncAction), for: .touchUpInside)
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         title = Strings.Sync
-        view.backgroundColor = SyncBackgroundColor
-        
-        scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = true
-        view.addSubview(scrollView)
-        
-        bg = UIImageView(image: UIImage(named: "sync-gradient"))
-        bg.translatesAutoresizingMaskIntoConstraints = false
-        bg.contentMode = .scaleAspectFill
-        bg.clipsToBounds = true
-        scrollView.addSubview(bg)
-        
-        graphic = UIImageView(image: UIImage(named: "sync-art"))
-        graphic.translatesAutoresizingMaskIntoConstraints = false
-        graphic.contentMode = .center
-        scrollView.addSubview(graphic)
-        
-        titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
-        titleLabel.textColor = UIColor.black
-        titleLabel.text = Strings.BraveSync
-        scrollView.addSubview(titleLabel)
-        
-        descriptionLabel = UILabel()
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
-        descriptionLabel.textColor = UIColor(rgb: 0x696969)
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.lineBreakMode = .byWordWrapping
-        descriptionLabel.textAlignment = .center
-        descriptionLabel.text = Strings.BraveSyncWelcome
-        scrollView.addSubview(descriptionLabel)
-        
-        newToSyncButton = UIButton(type: .roundedRect)
-        newToSyncButton.translatesAutoresizingMaskIntoConstraints = false
-        newToSyncButton.setTitle(Strings.NewSyncCode, for: .normal)
-        newToSyncButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
-        newToSyncButton.setTitleColor(UIColor.white, for: .normal)
-        newToSyncButton.backgroundColor = BraveUX.DefaultBlue
-        newToSyncButton.layer.cornerRadius = 8
-        newToSyncButton.addTarget(self, action: #selector(SEL_newToSync), for: .touchUpInside)
-        scrollView.addSubview(newToSyncButton)
-        
-        existingUserButton = UIButton(type: .roundedRect)
-        existingUserButton.translatesAutoresizingMaskIntoConstraints = false
-        existingUserButton.setTitle(Strings.ScanSyncCode, for: .normal)
-        existingUserButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
-        existingUserButton.setTitleColor(UIColor(rgb: 0x696969), for: .normal)
-        existingUserButton.addTarget(self, action: #selector(SEL_existingUser), for: .touchUpInside)
-        scrollView.addSubview(existingUserButton)
-        
-        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-        spinner.startAnimating()
-        loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
-        loadingView.isHidden = true
-        loadingView.addSubview(spinner)
-        view.addSubview(loadingView)
-        
-        edgesForExtendedLayout = UIRectEdge()
-        
-        scrollView.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.view)
+
+        view.addSubview(mainStackView)
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalTo(self.topLayoutGuide.snp.bottom)
+            // This VC doesn't rotate, no need to check for left and right safe area constraints.
+            make.left.right.equalTo(self.view).inset(16)
+            make.bottom.equalTo(self.view.safeArea.bottom).inset(32)
         }
-        
-        bg.snp.makeConstraints { (make) in
-            make.top.equalTo(self.scrollView)
-            make.width.equalTo(self.scrollView)
-        }
-        
-        graphic.snp.makeConstraints { (make) in
-            make.edges.equalTo(self.bg).inset(UIEdgeInsetsMake(0, 19, 0, 0))
-        }
-        
-        titleLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(self.bg.snp.bottom).offset(30)
-            make.centerX.equalTo(self.scrollView)
-        }
-        
-        descriptionLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(self.titleLabel.snp.bottom).offset(7)
-            make.left.equalTo(30)
-            make.right.equalTo(-30)
-        }
-        
-        newToSyncButton.snp.makeConstraints { (make) in
-            make.top.equalTo(self.descriptionLabel.snp.bottom).offset(30)
-            make.centerX.equalTo(self.scrollView)
-            make.left.equalTo(16)
-            make.right.equalTo(-16)
-            make.height.equalTo(50)
-        }
-        
-        existingUserButton.snp.makeConstraints { (make) in
-            make.top.equalTo(self.newToSyncButton.snp.bottom).offset(8)
-            make.centerX.equalTo(self.scrollView)
-            make.bottom.equalTo(-10)
-        }
-        
-        spinner.snp.makeConstraints { (make) in
-            make.center.equalTo(spinner.superview!)
-        }
-        
-        loadingView.snp.makeConstraints { (make) in
-            make.edges.equalTo(loadingView.superview!)
-        }
+
+        // Adding top margin to the image.
+        let syncImageStackView = UIStackView(arrangedSubviews: [UIView.spacer(.vertical, amount: 60), syncImage])
+        syncImageStackView.axis = .vertical
+        mainStackView.addArrangedSubview(syncImageStackView)
+
+        textStackView.addArrangedSubview(titleLabel)
+        // Side margins for description text.
+        let descriptionStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 8),
+                                                                  descriptionLabel,
+                                                                  UIView.spacer(.horizontal, amount: 8)])
+
+        textStackView.addArrangedSubview(descriptionStackView)
+        mainStackView.addArrangedSubview(textStackView)
+
+        buttonsStackView.addArrangedSubview(existingUserButton)
+        buttonsStackView.addArrangedSubview(newToSyncButton)
+        mainStackView.addArrangedSubview(buttonsStackView)
     }
     
-    func SEL_newToSync() {
-        
-        func attemptPush() {
-            if navigationController?.topViewController is SyncAddDeviceViewController {
-                // Already showing
-                return
+    func newToSyncAction() {
+        let addDevice = SyncSelectDeviceTypeViewController()
+        addDevice.syncInitHandler = { (title, type) in
+            weak var weakSelf = self
+            func pushAddDeviceVC() {
+                guard Sync.shared.isInSyncGroup else {
+                    addDevice.disableNavigationPrevention()
+                    let alert = UIAlertController(title: Strings.SyncUnsuccessful, message: Strings.SyncUnableCreateGroup, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: Strings.OK, style: .default, handler: nil))
+                    addDevice.present(alert, animated: true, completion: nil)
+                    return
+                }
+
+                let view = SyncAddDeviceViewController(title: title, type: type)
+                view.doneHandler = self.pushSettings
+                view.navigationItem.hidesBackButton = true
+                weakSelf?.navigationController?.pushViewController(view, animated: true)
             }
             
             if Sync.shared.isInSyncGroup {
-                let view = SyncAddDeviceViewController()
-                view.navigationItem.hidesBackButton = true
-                navigationController?.pushViewController(view, animated: true)
-            } else {
-                self.loadingView.isHidden = true
-                let alert = UIAlertController(title: Strings.SyncUnsuccessful, message: Strings.SyncUnableCreateGroup, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: Strings.OK, style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                pushAddDeviceVC()
+                return
+            }
+
+            addDevice.enableNavigationPrevention()
+            self.addSyncReadyNotificationObserver { pushAddDeviceVC() }
+            
+            Sync.shared.initializeNewSyncGroup(deviceName: UIDevice.current.name)
+        }
+
+        navigationController?.pushViewController(addDevice, animated: true)
+    }
+    
+    func existingUserAction() {
+        let pairCamera = SyncPairCameraViewController()
+        
+        pairCamera.syncHandler = { bytes in
+            pairCamera.enableNavigationPrevention()
+            Sync.shared.initializeSync(seed: bytes, deviceName: UIDevice.current.name)
+
+            self.addSyncReadyNotificationObserver {
+                pairCamera.disableNavigationPrevention()
+                self.pushSettings()
             }
         }
         
-        if !Sync.shared.isInSyncGroup {
-            NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady), object: nil, queue: OperationQueue.main) {
-                _ in attemptPush()
-            }
-            
-            getDeviceName {
-                input in
-                
-                if let input = input {
-                    Sync.shared.initializeNewSyncGroup(deviceName: input)
-                }
-            }
-            
-        } else {
-            attemptPush()
-        }
+        navigationController?.pushViewController(pairCamera, animated: true)
     }
-    
-    func SEL_existingUser() {
-        getDeviceName {
-            input in
-            
-            if let input = input {
-                let view = SyncPairCameraViewController()
-                view.deviceName = input
-                self.navigationController?.pushViewController(view, animated: true)
-            }
-        }
-    }
-    
-    func getDeviceName(callback: @escaping (String?) -> ()) {
-        self.loadingView.isHidden = false
 
-        let alert = UIAlertController.userTextInputAlert(title: Strings.NewDevice, message: Strings.DeviceFolderName, startingText: UIDevice.current.name, forcedInput: false) {
-            callback($0)
-            self.loadingView.isHidden = true
-        }
-        self.present(alert, animated: true, completion: nil)
+    private func addSyncReadyNotificationObserver(completion: @escaping () -> ()) {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NotificationSyncReady),
+                                               object: nil,
+                                               queue: OperationQueue.main,
+                                               using: { notification in
+                                                completion()
+                                                // This is a one-time notification, removing it immediately.
+                                                NotificationCenter.default.removeObserver(notification)
+        })
     }
     
+    private func pushSettings() {
+        let settings = SyncSettingsViewController(style: .grouped)
+        settings.profile = getApp().profile
+        settings.disableBackButton = true
+        self.navigationController?.pushViewController(settings, animated: true)
+    }
 }

@@ -44,7 +44,14 @@ class BraveScrollController: NSObject {
     fileprivate var isZoomedOut: Bool = false
     fileprivate var lastZoomedScale: CGFloat = 0
     fileprivate var isUserZoom: Bool = false
+    fileprivate var isDragging: Bool = false
     fileprivate var adjustWithScroll: Bool = false
+    fileprivate var adjustWithDrag: Bool = false {
+        didSet {
+            dragStartY = scrollView?.contentOffset.y ?? 0
+        }
+    }
+    fileprivate var dragStartY: CGFloat = 0
     fileprivate var previousScrollOffset: CGFloat = 0
     
     fileprivate var isTransitionIncomplete: Bool! {
@@ -131,6 +138,11 @@ class BraveScrollController: NSObject {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "contentSize" {
+            // There is no simple way to detect url changes without full-page-reload(pushState), observing contentSize is a workaround.
+            // This is UIWebView issue, on WKWebView 'URL' property is KVO compliant which would allow for easy check when url has changed.
+            // Be careful this line will break url history of sites like twitter, youtube, yahoonews.
+            tab?.webView?.contentSizeChanged()
+            
             if !checkScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
                 showToolbars(animated: true, completion: nil)
             }
@@ -334,10 +346,13 @@ extension BraveScrollController: UIScrollViewDelegate {
                 hideToolbars(animated: true)
             }
         }
+        
+        adjustWithDrag = false
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         adjustWithScroll = false
+        adjustWithDrag = true
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -346,9 +361,13 @@ extension BraveScrollController: UIScrollViewDelegate {
             return
         }
         
-        if adjustWithScroll {
+        if adjustWithScroll  {
             let delta = scrollView.contentOffset.y - previousScrollOffset
             scrollWithDelta(delta)
+            previousScrollOffset = scrollView.contentOffset.y
+        }
+        else if adjustWithDrag && dragStartY - offset > topScrollHeight * 2 {
+            adjustWithScroll = true
             previousScrollOffset = scrollView.contentOffset.y
         }
     }

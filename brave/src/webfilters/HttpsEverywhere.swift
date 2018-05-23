@@ -9,7 +9,7 @@ class HttpsEverywhere {
     static let kNotificationDataLoaded = "kNotificationDataLoaded"
     static let prefKey = "braveHttpsEverywhere"
     static let prefKeyDefaultValue = true
-    static let dataVersion = "5.2"
+    static let dataVersion = "6.0"
     var isNSPrefEnabled = true
 
     var httpseDb = HttpsEverywhereObjC()

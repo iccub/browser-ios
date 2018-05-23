@@ -21,6 +21,7 @@ class TabMO: NSManagedObject {
     @NSManaged var isSelected: Bool
     @NSManaged var isClosed: Bool
     @NSManaged var isPrivate: Bool
+    @NSManaged var color: String?
     
     var imageUrl: URL? {
         if let objectId = self.syncUUID, let url = URL(string: "https://imagecache.mo/\(objectId).png") {
@@ -42,6 +43,7 @@ class TabMO: NSManagedObject {
         }
     }
 
+    // Currently required, because not `syncable`
     static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
     }
@@ -56,8 +58,8 @@ class TabMO: NSManagedObject {
         return tab
     }
 
-    @discardableResult class func add(_ tabInfo: SavedTab, context: NSManagedObjectContext = DataController.shared.mainThreadContext) -> TabMO? {
-        let tab: TabMO? = getByID(tabInfo.id, context: context)
+    @discardableResult class func add(_ tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
+        let tab: TabMO? = get(byId: tabInfo.id, context: context)
         if tab == nil {
             return nil
         }
@@ -107,7 +109,7 @@ class TabMO: NSManagedObject {
         }
     }
     
-    class func getByID(_ id: String?, context: NSManagedObjectContext = DataController.shared.mainThreadContext) -> TabMO? {
+    class func get(byId id: String?, context: NSManagedObjectContext) -> TabMO? {
         guard let id = id else { return nil }
         
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
@@ -126,7 +128,7 @@ class TabMO: NSManagedObject {
         return result
     }
     
-    class func preserveTab(tab: Browser) {
+    class func preserve(tab: Browser) {
         if let data = savedTabData(tab: tab) {
             let context = DataController.shared.workerContext
             context.perform {
@@ -188,7 +190,7 @@ class TabMO: NSManagedObject {
             
             log.debug("---stack: \(urls)")
         }
-        if let id = TabMO.getByID(tab.tabID, context: context)?.syncUUID {
+        if let id = TabMO.get(byId: tab.tabID, context: context)?.syncUUID {
             let title = tab.displayTitle != "" ? tab.displayTitle : urlOverride ?? ""
             if urlOverride == nil && tab.url == nil {
                 log.warning("Missing tab url, using empty string as a fallback. Should not happen.")

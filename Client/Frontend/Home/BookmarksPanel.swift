@@ -104,7 +104,7 @@ class BookmarkEditingViewController: FormViewController {
     let BOOKMARK_FOLDER_ROW_TAG:String = "BOOKMARK_FOLDER_ROW_TAG"
 
     var titleRow:TextRow?
-    var urlRow:TextRow?
+    var urlRow: URLRow?
     
     init(bookmarksPanel: BookmarksPanel, indexPath: IndexPath, bookmark: Bookmark) {
         super.init(nibName: nil, bundle: nil)
@@ -128,7 +128,7 @@ class BookmarkEditingViewController: FormViewController {
             block(self)
         }
         
-        self.bookmark.update(customTitle: self.titleRow?.value, url: self.urlRow?.value, save: true)
+        self.bookmark.update(customTitle: self.titleRow?.value, url: self.urlRow?.value?.absoluteString, save: true)
     }
     
     var isEditingFolder:Bool {
@@ -153,10 +153,10 @@ class BookmarkEditingViewController: FormViewController {
         
         // Only show URL option for bookmarks, not folders
         if !isEditingFolder {
-            nameSection <<< TextRow() { row in
+            nameSection <<< URLRow() { row in
                 row.tag = BOOKMARK_URL_ROW_TAG
                 row.title = Strings.URL
-                row.value = bookmark.url
+                row.value = URL(string: bookmark.url ?? "")
                 self.urlRow = row
             }
         }
@@ -168,7 +168,7 @@ class BookmarkEditingViewController: FormViewController {
 
 class BookmarksPanel: SiteTableViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate? = nil
-    var frc: NSFetchedResultsController<NSFetchRequestResult>?
+    var bookmarksFRC: NSFetchedResultsController<NSFetchRequestResult>?
 
     fileprivate let BookmarkFolderCellIdentifier = "BookmarkFolderIdentifier"
     //private let BookmarkSeparatorCellIdentifier = "BookmarkSeparatorIdentifier"
@@ -176,7 +176,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     var editBookmarksToolbar:UIToolbar!
     var editBookmarksButton:UIBarButtonItem!
-    var addFolderButton:UIBarButtonItem!
+    var addFolderButton: UIBarButtonItem?
     weak var addBookmarksFolderOkAction: UIAlertAction?
   
     var isEditingIndividualBookmark:Bool = false
@@ -198,8 +198,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         
         self.currentFolder = folder
         self.title = folder?.displayTitle ?? Strings.Bookmarks
-        self.frc = Bookmark.frc(parentFolder: folder)
-        self.frc!.delegate = self
+        self.bookmarksFRC = Bookmark.frc(parentFolder: folder)
+        self.bookmarksFRC?.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.reloadData), name: NotificationMainThreadContextSignificantlyChanged, object: nil)
     }
@@ -223,7 +223,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let navBar = self.navigationController?.navigationBar
         navBar?.barTintColor = BraveUX.BackgroundColorForSideToolbars
         navBar?.isTranslucent = false
-        navBar?.titleTextAttributes = [NSFontAttributeName : UIFont.systemFont(ofSize: 18, weight: UIFontWeightMedium), NSForegroundColorAttributeName : UIColor.black]
+        navBar?.titleTextAttributes = [NSFontAttributeName : UIFont.systemFont(ofSize: UIConstants.DefaultChromeSize, weight: UIFontWeightMedium), NSForegroundColorAttributeName : BraveUX.GreyJ]
         navBar?.clipsToBounds = true
         
         let width = self.view.bounds.size.width
@@ -257,7 +257,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     override func reloadData() {
 
         do {
-            try self.frc?.performFetch()
+            try self.bookmarksFRC?.performFetch()
         } catch let error as NSError {
             print(error.description)
         }
@@ -277,7 +277,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         updateEditBookmarksButton(editMode)
         resetCellLongpressGesture(tableView.isEditing)
         
-        addFolderButton.isEnabled = !editMode
+        addFolderButton?.isEnabled = !editMode
     }
     
     func updateEditBookmarksButton(_ tableIsEditing:Bool) {
@@ -294,24 +294,22 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             }
         }
     }
-    
+
     func createEditBookmarksToolbar() {
         var items = [UIBarButtonItem]()
         
         items.append(UIBarButtonItem.createFixedSpaceItem(5))
 
-        addFolderButton = UIBarButtonItem(title: Strings.NewFolder,
-                                          style: .plain, target: self, action: #selector(onAddBookmarksFolderButton))
-        items.append(addFolderButton)
+        addFolderButton = UIBarButtonItem(image: UIImage(named: "bookmarks_newfolder_icon")?.withRenderingMode(.alwaysTemplate), style: .plain, target: self, action: #selector(onAddBookmarksFolderButton))
+        items.append(addFolderButton!)
         
         items.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil))
 
-        editBookmarksButton = UIBarButtonItem(title: Strings.Edit,
-                                              style: .plain, target: self, action: #selector(onEditBookmarksButton))
+        editBookmarksButton = UIBarButtonItem(image: UIImage(named: "edit")?.withRenderingMode(.alwaysTemplate), style: .plain, target: self, action: #selector(onEditBookmarksButton))
         items.append(editBookmarksButton)
         items.append(UIBarButtonItem.createFixedSpaceItem(5))
         
-        items.forEach { $0.tintColor = BraveUX.DefaultBlue }
+        items.forEach { $0.tintColor = BraveUX.LightBlue }
         
         editBookmarksToolbar.items = items
         
@@ -334,7 +332,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func onAddBookmarksFolderButton() {
         
         let alert = UIAlertController.userTextInputAlert(title: Strings.NewFolder, message: Strings.EnterFolderName) {
-            input in
+            input, _ in
             if let input = input, !input.isEmpty {
                 self.addFolder(titled: input)
             }
@@ -344,6 +342,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     func addFolder(titled title: String) {
         Bookmark.add(url: nil, title: nil, customTitle: title, parentFolder: currentFolder, isFolder: true)
+        tableView.setContentOffset(CGPoint.zero, animated: true)
     }
     
     func onEditBookmarksButton() {
@@ -351,37 +350,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     func tableView(_ tableView: UITableView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath) {
-
-        let dest = frc?.object(at: destinationIndexPath) as! Bookmark
-        let src = frc?.object(at: sourceIndexPath) as! Bookmark
-
-        if dest === src {
-            return
-        }
-
-        // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
-        // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
-        // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = self.frc?.fetchedObjects as! [Bookmark]
-        bms.remove(at: bms.index(of: src)!)
-        if sourceIndexPath.row > destinationIndexPath.row {
-            // insert before
-            bms.insert(src, at: bms.index(of: dest)!)
-        } else {
-            let end = bms.index(of: dest)! + 1
-            bms.insert(src, at: end)
-        }
-
-        for i in 0..<bms.count {
-            bms[i].order = Int16(i)
-        }
-
-        // I am stumped, I can't find the notification that animation is complete for moving.
-        // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
-        // Adding a delay to let animation complete avoids this problem
-        postAsyncToMain(0.25) {
-            DataController.saveContext(context: self.frc?.managedObjectContext)
-        }
+        // Using the same reorder logic as in FavoritesDataSource
+        Bookmark.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
     }
 
     func tableView(_ tableView: UITableView, canMoveRowAtIndexPath indexPath: IndexPath) -> Bool {
@@ -413,7 +383,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return frc?.fetchedObjects?.count ?? 0
+        return bookmarksFRC?.fetchedObjects?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -423,7 +393,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func getLongPressUrl(forIndexPath indexPath: IndexPath) -> (URL?, [Int]?) {
-        guard let obj = frc?.object(at: indexPath) as? Bookmark else { return (nil, nil) }
+        guard let obj = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return (nil, nil) }
         return (obj.url != nil ? URL(string: obj.url!) : nil, obj.isFolder ? obj.syncUUID : nil)
     }
     
@@ -431,7 +401,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     fileprivate func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
 
-        guard let item = frc?.object(at: indexPath) as? Bookmark else { return }
+        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
         cell.tag = item.objectID.hashValue
 
         func configCell(image: UIImage? = nil, icon: FaviconMO? = nil, longPressForContextMenu: Bool = false) {
@@ -449,6 +419,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             if let image = image {
                 // folder or preset icon
                 cell.imageView?.image = image
+                cell.imageView?.contentMode = .center
             }
             else if let faviconMO = item.domain?.favicon, let urlString = faviconMO.url, let url = URL(string: urlString), let bookmarkUrlString = item.url, let bookmarkUrl = URL(string: bookmarkUrlString) {
                 // favicon object associated through domain relationship - set from cache or download
@@ -482,6 +453,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let fontSize: CGFloat = 14.0
         cell.textLabel?.text = item.displayTitle ?? item.url
         cell.textLabel?.lineBreakMode = .byTruncatingTail
+        
+        cell.contentView.backgroundColor = .white
         
         if !item.isFolder {
             configCell(icon: item.domain?.favicon, longPressForContextMenu: true)
@@ -549,11 +522,17 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func tableView(_ tableView: UITableView, willSelectRowAtIndexPath indexPath: IndexPath) -> IndexPath? {
         return indexPath
     }
-    
+
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return false }
+
+        return !bookmark.isFavorite
+    }
+
     func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
 
-        guard let bookmark = frc?.object(at: indexPath) as? Bookmark else { return }
+        guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
 
         if !bookmark.isFolder {
             if tableView.isEditing {
@@ -588,7 +567,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
-        guard let item = frc?.object(at: indexPath) as? Bookmark else { return nil }
+        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return nil }
 
         let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete, handler: { (action, indexPath) in
 
@@ -620,7 +599,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     fileprivate func showEditBookmarkController(_ tableView: UITableView, indexPath:IndexPath) {
-        guard let item = frc?.object(at: indexPath) as? Bookmark else { return }
+        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark, !item.isFavorite else { return }
         let nextController = BookmarkEditingViewController(bookmarksPanel: self, indexPath: indexPath, bookmark: item)
 
         nextController.completionBlock = { controller in
@@ -753,23 +732,20 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch (type) {
         case .update:
-            if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
-                configureCell(cell, atIndexPath: indexPath)
+            guard let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) else {
+                return
             }
+            configureCell(cell, atIndexPath: indexPath)
        case .insert:
-            if let path = newIndexPath {
-                let objectIdHash = tableView.cellForRow(at: path)?.tag ?? 0
-                if objectIdHash != (anObject as AnyObject).objectID.hashValue {
-                    tableView.insertRows(at: [path], with: .automatic)
-                }
+            guard let path = newIndexPath else {
+                return
             }
-
+            tableView.insertRows(at: [path], with: .automatic)
         case .delete:
-            if let indexPath = indexPath {
-                tableView.deleteRows(at: [indexPath], with: .automatic)
+            guard let indexPath = indexPath else {
+                return
             }
-
-
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         case .move:
             break
         }

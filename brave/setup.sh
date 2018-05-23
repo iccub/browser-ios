@@ -63,6 +63,5 @@ fi
 ## setup sync
 (cd ../Carthage/Checkouts/sync && brew install yarn; yarn install && yarn run build)
 
-# setup niceware
-(cd ../Carthage/Checkouts/niceware && brew install yarn; yarn install && yarn run build)
-
+# setup brave/crypto
+(cd ../Carthage/Checkouts/crypto && brew install yarn; yarn install && yarn run build)

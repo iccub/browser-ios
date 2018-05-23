@@ -126,7 +126,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             log.error("Failed to assign AVAudioSession category to allow playing with silent switch on for aural progress bar")
         }
 
-        let defaultRequest = URLRequest(url: UIConstants.DefaultHomePage as URL)
+        var defaultRequest = URLRequest(url: UIConstants.DefaultHomePage as URL)
+        defaultRequest.addValue(WebServer.uniqueBytes, forHTTPHeaderField: WebServer.headerAuthKey)
         let imageStore = DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.ScreenshotQuality)
 
         log.debug("Configuring tabManager…")
@@ -153,6 +154,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             }
         })
 
+        let favoritesInit = profile.prefs.boolForKey(FavoritesHelper.initPrefsKey) ?? false
+        if !favoritesInit {
+            let isFirstLaunch = profile.prefs.arrayForKey(DAU.preferencesKey) == nil
+
+            if isFirstLaunch {
+                log.info("Favorites initialization, new user.")
+                FavoritesHelper.addDefaultFavorites()
+            } else { // existing user, using Brave before the topsites to favorites change.
+                log.info("Favorites initialization, existing user.")
+                postAsyncToMain(1.5) {
+                    self.browserViewController.tabManager.addAdjacentTabAndSelect()
+                    self.browserViewController.presentTopSitesToFavoritesChange()
+                }
+            }
+
+            profile.prefs.setBool(true, forKey: FavoritesHelper.initPrefsKey)
+        }
+        
         // MARK: User referral program
         if let urp = UserReferralProgram() {
             let isFirstLaunch = self.getProfile(application).prefs.arrayForKey(DAU.preferencesKey) == nil
@@ -486,7 +505,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         ReaderModeHandlers.register(server, profile: profile)
         ErrorPageHelper.register(server, certStore: profile.certStore)
         AboutHomeHandler.register(server)
-        AboutLicenseHandler.register(server)
         SessionRestoreHandler.register(server)
         // Bug 1223009 was an issue whereby CGDWebserver crashed when moving to a background task
         // catching and handling the error seemed to fix things, but we're not sure why.

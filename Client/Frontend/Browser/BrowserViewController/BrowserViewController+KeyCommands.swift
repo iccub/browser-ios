@@ -32,14 +32,13 @@ extension BrowserViewController {
 
     func newTab() {
         openBlankNewTabAndFocus(isPrivate: PrivateBrowsing.singleton.isOn)
-        postAsyncToMain(0.2) {
-            self.selectLocationBar()
-        }
+        self.selectLocationBar()
     }
 
     func newPrivateTab() {
         openBlankNewTabAndFocus(isPrivate: true)
-        postAsyncToMain(0.2) {
+        
+        if PinViewController.isBrowserLockEnabled {
             self.selectLocationBar()
         }
     }

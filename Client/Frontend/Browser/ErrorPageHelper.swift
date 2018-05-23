@@ -133,22 +133,24 @@ class ErrorPageHelper {
         self.certStore = certStore
 
         server.registerHandlerForMethod("GET", module: "errors", resource: "error.html", handler: { (request) -> GCDWebServerResponse! in
-            guard let url = ErrorPageHelper.originalURLFromQuery((request?.url)!) else {
+            guard let request = request, let url = ErrorPageHelper.originalURLFromQuery(request.url) else {
                 return GCDWebServerResponse(statusCode: 404)
             }
-
+            
             guard let index = self.redirecting.index(of: url) else {
                 return GCDWebServerDataResponse(redirect: url, permanent: false)
             }
 
             self.redirecting.remove(at: index)
+            
+            if !server.isRequestAuthenticated(request) { return GCDWebServerResponse(statusCode: 401) }
 
-            guard let code = request?.query["code"] as? String,
+            guard let code = request.query["code"] as? String,
                   let errCode = Int(code),
-                  let errDescription = request?.query["description"] as? String,
-                  let errURLString = request?.query["url"] as? String,
+                  let errDescription = request.query["description"] as? String,
+                  let errURLString = request.query["url"] as? String,
                   let errURLDomain = URL(string: errURLString)?.host,
-                  var errDomain = request?.query["domain"] as? String else {
+                  var errDomain = request.query["domain"] as? String else {
                 return GCDWebServerResponse(statusCode: 404)
             }
 
@@ -175,7 +177,7 @@ class ErrorPageHelper {
                 }
                 errDomain = ""
             } else if CertErrors.contains(errCode) {
-                guard let certError = request?.query["certerror"] as? String else {
+                guard let certError = request.query["certerror"] as? String else {
                     return GCDWebServerResponse(statusCode: 404)
                 }
 
@@ -251,7 +253,8 @@ class ErrorPageHelper {
         }
 
         components.queryItems = queryItems
-        webView.loadRequest(URLRequest(url: components.url!))
+        
+        webView.loadRequest(WebServer.localhostRequest(url: components.url!))
     }
 
     class func isErrorPageURL(_ url: URL) -> Bool {

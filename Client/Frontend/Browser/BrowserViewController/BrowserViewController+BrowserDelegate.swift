@@ -97,6 +97,9 @@ extension BrowserViewController: BrowserDelegate {
 
         let favicons = FaviconManager(browser: browser, profile: profile)
         browser.addHelper(favicons)
+        
+        let siteColor = SiteColorManager(browser: browser, profile: profile)
+        browser.addHelper(siteColor)
 
         let logins = LoginsHelper(browser: browser, profile: profile)
         browser.addHelper(logins)
