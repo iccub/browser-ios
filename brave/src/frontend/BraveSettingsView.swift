@@ -45,9 +45,8 @@ class BraveSettingsView : AppSettingsTableViewController {
         let prefs = profile.prefs
         var generalSettings = [
             SearchSetting(settings: self),
-            BoolSetting(prefs: prefs, prefKey: "saveLogins", defaultValue: true, titleText: Strings.Save_Logins, statusText: nil)
-            ,BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true,
-                titleText: Strings.Block_Popups)
+            BoolSetting(prefs: prefs, prefKey: "saveLogins", defaultValue: true, titleText: Strings.Save_Logins, statusText: nil),
+            BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true, titleText: Strings.Block_Popups)
         ]
 
         if UIDevice.current.userInterfaceIdiom == .pad {
