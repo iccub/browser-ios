@@ -11,11 +11,11 @@ private let log = Logger.browserLogger
 
 struct TabsButtonUX {
     static let CornerRadius: CGFloat = 2
-    static let TitleFont: UIFont = UIConstants.DefaultChromeSmallFontBold
+    static let TitleFont: UIFont = UIFont.systemFont(ofSize: 10, weight: UIFontWeightSemibold)
     static let BorderStrokeWidth: CGFloat = 1.5
     static let BorderColor = UIColor.clear
     static let HighlightButtonColor = UIColor.clear
-    static let TitleInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+    static let TitleInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
 
     static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
@@ -99,11 +99,12 @@ class TabsButton: UIControl {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        insideButton.addSubview(imageView)
         
-//        insideButton.addSubview(labelBackground)
-//        insideButton.addSubview(borderView)
-//        insideButton.addSubview(titleLabel)
+//        insideButton.addSubview(imageView)
+        insideButton.addSubview(labelBackground)
+        insideButton.addSubview(borderView)
+        insideButton.addSubview(titleLabel)
+        
         addSubview(insideButton)
         isAccessibilityElement = true
         accessibilityTraits |= UIAccessibilityTraitButton
@@ -116,24 +117,26 @@ class TabsButton: UIControl {
     override func updateConstraints() {
         super.updateConstraints()
 
-//        labelBackground.snp.remakeConstraints { (make) -> Void in
-//            make.edges.equalTo(insideButton)
-//        }
-//        borderView.snp.remakeConstraints { (make) -> Void in
-//            make.edges.equalTo(insideButton)
-//        }
-//        titleLabel.snp.remakeConstraints { (make) -> Void in
-//            make.edges.equalTo(insideButton)
-//        }
-        imageView.contentMode = .center
-        imageView.snp.remakeConstraints { (make) -> Void in
+//            imageView.contentMode = .center
+//            imageView.snp.remakeConstraints { (make) -> Void in
+//                make.edges.equalTo(insideButton)
+//            }
+
+        labelBackground.snp.remakeConstraints { (make) -> Void in
             make.edges.equalTo(insideButton)
         }
+        borderView.snp.remakeConstraints { (make) -> Void in
+            make.edges.equalTo(insideButton)
+        }
+        titleLabel.snp.remakeConstraints { (make) -> Void in
+            make.edges.equalTo(insideButton)
+        }
+        
         insideButton.snp.remakeConstraints { (make) -> Void in
           // BRAVE mod: getting layout errors with firefox method, temporary hack to bypass the errors
           make.right.equalTo(self).inset(12)
           make.centerY.equalTo(self)
-          make.size.equalTo(22)
+          make.size.equalTo(19)
         }
     }
 
