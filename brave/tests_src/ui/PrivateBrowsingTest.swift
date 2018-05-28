@@ -37,7 +37,7 @@ class PrivateBrowsingTest: XCTestCase {
 
         XCTAssert(privModeButton.isSelected)
 
-        app.buttons["TabTrayController.searchButton"].tap()
+        app.buttons["TabTrayController.addTabButton"].tap()
         
         UITestUtils.loadSite(app, "www.google.ca")
 
