@@ -17,7 +17,7 @@ protocol BrowserToolbarProtocol {
     var pwdMgrButton: UIButton { get }
     var forwardButton: UIButton { get }
     var backButton: UIButton { get }
-    var searchButton: UIButton { get }
+    var addTabButton: UIButton { get }
     
     // While implementing protocol lazy var `self` is not usable to access instance variables, so this needs to be a function/calc var
     var actionButtons: [UIButton] { get }
@@ -69,9 +69,9 @@ open class BrowserToolbarHelper: NSObject {
         toolbar.shareButton.accessibilityLabel = Strings.Share
         toolbar.shareButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickShare), for: UIControlEvents.touchUpInside)
         
-        toolbar.searchButton.setImage(UIImage(named: "toolbar_search"), for: .normal)
-        toolbar.searchButton.accessibilityLabel = Strings.Search
-        toolbar.searchButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickSearch), for: UIControlEvents.touchUpInside)
+        toolbar.addTabButton.setImage(UIImage(named: "add"), for: .normal)
+        toolbar.addTabButton.accessibilityLabel = Strings.Add_Tab
+        toolbar.addTabButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickAddTab), for: UIControlEvents.touchUpInside)
 
         toolbar.pwdMgrButton.setImage(UIImage(named: "passhelper_1pwd")?.withRenderingMode(.alwaysTemplate), for: .normal)
         toolbar.pwdMgrButton.isHidden = true
@@ -85,11 +85,6 @@ open class BrowserToolbarHelper: NSObject {
     }
 
     func SELdidClickBack() {
-        guard let bvc = getApp().browserViewController else { return }
-        if bvc.urlBar.inSearchMode {
-            bvc.urlBar.leaveSearchMode()
-            return
-        }
         toolbar.browserToolbarDelegate?.browserToolbarDidPressBack(toolbar, button: toolbar.backButton)
     }
 
@@ -101,8 +96,10 @@ open class BrowserToolbarHelper: NSObject {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressForward(toolbar, button: toolbar.forwardButton)
     }
     
-    func SELdidClickSearch() {
+    func SELdidClickAddTab() {
         let app = UIApplication.shared.delegate as! AppDelegate
+
+        app.tabManager.addTabAndSelect()
         app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
     }
     
@@ -121,10 +118,10 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     
     let forwardButton = UIButton()
     let backButton = UIButton()
-    let searchButton = UIButton()
+    let addTabButton = UIButton()
     
     var actionButtons: [UIButton] {
-        return [self.shareButton, self.forwardButton, self.backButton, self.searchButton]
+        return [self.shareButton, self.forwardButton, self.backButton, self.addTabButton]
     }
 
     var stopReloadButton: UIButton {

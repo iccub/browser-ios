@@ -78,7 +78,6 @@ class BraveURLBarView : URLBarView {
     override func commonInit() {
         BraveURLBarView.currentInstance = self
         locationContainer.layer.cornerRadius = BraveUX.TextFieldCornerRadius
-        locationContainer.layer.borderWidth = 0.5
 
         addSubview(leftSidePanelButton.underlay)
         addSubview(leftSidePanelButton)
@@ -151,10 +150,8 @@ class BraveURLBarView : URLBarView {
         switch(themeName) {
         case Theme.NormalMode:
             backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
-            locationContainer.layer.borderColor = BraveUX.GreyD.cgColor
         case Theme.PrivateMode:
             backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
-            locationContainer.layer.borderColor = BraveUX.GreyI.cgColor
         default:
             break
         }
