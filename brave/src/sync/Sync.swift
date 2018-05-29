@@ -79,7 +79,15 @@ class Sync: JSInjector {
 
     // Should not be accessed directly
     fileprivate var syncReadyLock = false
-    var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, fetchDevicesReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
+    var isSyncFullyInitialized = (syncReady: Bool, 
+                                  fetchReady: Bool, 
+                                  sendRecordsReady: Bool, 
+                                  fetchDevicesReady: Bool, 
+                                  resolveRecordsReady: Bool, 
+                                  deleteUserReady: Bool, 
+                                  deleteSiteSettingsReady: Bool, 
+                                  deleteCategoryReady: Bool,
+                                  baseSyncOrderReady: Bool)(false, false, false, false, false, false, false, false, false)
     
     var isInSyncGroup: Bool {
         return syncSeed != nil
@@ -247,7 +255,7 @@ class Sync: JSInjector {
             lastSuccessfulSync = 0
             lastFetchWasTrimmed = false
             syncReadyLock = false
-            isSyncFullyInitialized = (false, false, false, false, false, false, false, false)
+            isSyncFullyInitialized = (false, false, false, false, false, false, false, false, false)
             
             fetchTimer?.invalidate()
             fetchTimer = nil
@@ -362,7 +370,7 @@ extension Sync {
         
         // FIXME: This isn't probably enough, we need to have base sync order and set syncOrder of all bookmarks before 
         // syncing them.
-        if baseSyncOrder == nil {
+        if let syncBookmark = records.first?.recordType, syncBookmark == .bookmark, baseSyncOrder == nil {
             completion?(nil)
             return
         }
@@ -654,6 +662,7 @@ extension Sync: WKScriptMessageHandler {
             saveBaseBookmarkOrder(message.body)
             // add syncOrder to all current bookmarks
             Bookmark.setSyncOrderForAll(parentFolder: nil)
+            self.isSyncFullyInitialized.baseSyncOrderReady   = true
         default:
             print("\(messageName) not handled yet")
         }
