@@ -71,7 +71,7 @@ extension Bookmark {
         // 1. At least one bookmark is present at a given level -> we do the JS call
         // 2. Root level, no bookmarks added -> need to use baseSyncOrder 
         // 3. Nested folder, no bookmarks -> need to get parent folder syncOrder
-        if previousOrder == nil && nextOrder == nil && parentFolder != nil {
+        if previousOrder == nil && nextOrder == nil && parentFolder == nil {
             syncOrder = baseOrder + "1"
         } else if let parentOrder = parentFolder?.syncOrder, previousOrder == nil, nextOrder == nil {
             syncOrder = parentOrder + ".1"
