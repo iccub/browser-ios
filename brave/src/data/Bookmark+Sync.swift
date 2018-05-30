@@ -4,6 +4,7 @@
 import Foundation
 import CoreData
 import Shared
+import JavaScriptCore
 
 private let log = Logger.browserLogger
 
@@ -33,7 +34,7 @@ extension Bookmark {
             return
         }
         
-        var counter = 0
+        var counter = 1
         
         for bookmark in allBookmarks {
             if bookmark.syncOrder != nil { continue }
@@ -60,45 +61,48 @@ extension Bookmark {
     
     
     func setSyncOrder(context: NSManagedObjectContext) {
-        var predicate: NSPredicate?
+        guard let baseOrder = Sync.shared.baseSyncOrder else  { return } 
         
-        guard let baseSyncOrder = Sync.shared.baseSyncOrder else { return }
-        if syncOrder != nil { return }
+        let previousOrder = getBookmarkWith(prevOrNext: .previous)?.syncOrder
+        let nextOrder = getBookmarkWith(prevOrNext: .next)?.syncOrder
         
-        if let parent = parentFolder {
-            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parent)
+        // The sync lib javascript method doesn't handle cases when there are no other bookmarks on a given level.
+        // We need to do it locally, there are 3 cases:
+        // 1. At least one bookmark is present at a given level -> we do the JS call
+        // 2. Root level, no bookmarks added -> need to use baseSyncOrder 
+        // 3. Nested folder, no bookmarks -> need to get parent folder syncOrder
+        if previousOrder == nil && nextOrder == nil && parentFolder != nil {
+            syncOrder = baseOrder + "1"
+        } else if let parentOrder = parentFolder?.syncOrder, previousOrder == nil, nextOrder == nil {
+            syncOrder = parentOrder + ".1"
         } else {
-            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
-        }
-        
-        guard let allBookmarks = Bookmark.get(predicate: predicate, context: context) as? [Bookmark] else {
-            return
-        }
-        
-        // There are 3 cases to consider while initializing a sync order for new bookmarks:
-        // 1. Root level, no other bookmarks added - we're setting sync base order + 0
-        // 2. Nested folder, no other bookmarks added - taking parent folder sync ordder and adding .0
-        // 3. At least 1 bookmark is present at given level, taking the highest sync order out of all bookmarks of a level
-        // and incrementing last bit by 1.
-        if parentFolder == nil && allBookmarks.count < 2 {
-            syncOrder = "\(baseSyncOrder)0"
-        } else if let parent = parentFolder, let parentSyncOrder = parent.syncOrder, allBookmarks.count < 2 {
-            syncOrder = "\(parentSyncOrder).0"
-        } else {
-            // First bookmark is created with order 0
-            // We don't check for empty bookmarks array because the new bookmark is already added into context.
-            
-            guard var maxSyncOrder = (allBookmarks.map { $0.syncOrder ?? "" }.max()) else { return }
-            guard let lastNumber = maxSyncOrder.split(separator: ".").last else { return }
-            
-            guard let number = Int(lastNumber) else { return }
-            
-            maxSyncOrder.replaceSubrange(lastNumber.startIndex..<lastNumber.endIndex, with: "\(number + 1)")
-            
-            syncOrder = maxSyncOrder
+            syncOrder = Sync.getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder)
         }
         
         DataController.saveContext(context: context)
+    }
+    
+    private enum BookmarkNeighbour { case previous, next }
+    
+    private func getBookmarkWith(prevOrNext: BookmarkNeighbour) -> Bookmark? {
+        var predicate: NSPredicate?
+        let orderToGet = prevOrNext == .previous ? order - 1 : order + 1
+        
+        if let parentFolder = parentFolder {
+            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO AND order == \(orderToGet)", parentFolder)
+        } else {
+            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO AND order == \(orderToGet)")
+        }
+        
+        let context = DataController.shared.workerContext
+        
+        guard let foundBookmark = Bookmark.get(predicate: predicate, context: context)?.first as? Bookmark else {
+            // Edge case, first bookmark in a nested folder. We do not have any info about prev and next,
+            // need to look at the parent folder
+            return parentFolder
+        }
+        
+        return foundBookmark
     }
     
     class func removeSyncOrders() {

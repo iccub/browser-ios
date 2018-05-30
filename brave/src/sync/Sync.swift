@@ -6,6 +6,9 @@ import Shared
 import CoreData
 import SwiftKeychainWrapper
 import SwiftyJSON
+import JavaScriptCore
+
+private let log = Logger.browserLogger
 
 /*
  module.exports.categories = {
@@ -605,7 +608,35 @@ extension Sync {
         guard let stringData = data as? String else { return }
         baseSyncOrder = JSON(parseJSON: stringData)["arg1"].string
     }
-
+    
+    class func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
+        
+        // Empty string as a parameter means next/previous bookmark doesn't exist
+        let prev = previousOrder ?? ""
+        let next = nextOrder ?? ""
+        
+        // TODO: Abstract it
+        let jsContext = JSContext()
+        jsContext?.exceptionHandler = { _, exc in
+            log.error(exc.debugDescription)
+        }
+        guard let path = Bundle.main.path(forResource: "bookmark_util", ofType: "js") else {
+            log.error("Could not load bookmark_util.js")
+            return nil
+        }
+        
+        do {
+            let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            _ = jsContext?.evaluateScript(scriptAsString)
+            let function = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
+            
+            return function?.call(withArguments: [prev, next]).toString()
+        } catch (let error) {
+            log.error("Failed to parse script file: \(error)")
+        }
+        
+        return nil
+    }
 }
 
 extension Sync: WKScriptMessageHandler {

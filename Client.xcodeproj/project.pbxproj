@@ -87,6 +87,7 @@
 		0A59F2E620740AEB00B0779F /* DigiCertHighAssurance.cer in Resources */ = {isa = PBXBuildFile; fileRef = 0A59F2E520740AEB00B0779F /* DigiCertHighAssurance.cer */; };
 		0A5B1B5CA22425374E4B314C /* arena.h in Headers */ = {isa = PBXBuildFile; fileRef = C38C829D7A278B0AE23070C8 /* arena.h */; };
 		0A6365D92012011700371C27 /* FavoritesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6365D82012011700371C27 /* FavoritesHelper.swift */; };
+		0A64E22720BEF8FB00887EEE /* bookmark_util.js in Resources */ = {isa = PBXBuildFile; fileRef = 0A64E22620BEF8FB00887EEE /* bookmark_util.js */; };
 		0A7C92BE201F3FDA0070BF98 /* SyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7C92BD201F3FDA0070BF98 /* SyncViewController.swift */; };
 		0A7D73992076BAAD00BD66E3 /* CustomHeaderData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7D73982076BAAD00BD66E3 /* CustomHeaderData.swift */; };
 		0A7F5B77B9A8F11B77C97932 /* SiteTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4EC7836B7D80B31285DCC6 /* SiteTableViewController.swift */; };
@@ -1034,6 +1035,7 @@
 		0A59F2CA207406D900B0779F /* GlobalSign_r1.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = GlobalSign_r1.cer; sourceTree = "<group>"; };
 		0A59F2E520740AEB00B0779F /* DigiCertHighAssurance.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = DigiCertHighAssurance.cer; sourceTree = "<group>"; };
 		0A6365D82012011700371C27 /* FavoritesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesHelper.swift; sourceTree = "<group>"; };
+		0A64E22620BEF8FB00887EEE /* bookmark_util.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bookmark_util.js; sourceTree = "<group>"; };
 		0A7C92BD201F3FDA0070BF98 /* SyncViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SyncViewController.swift; path = brave/src/frontend/sync/SyncViewController.swift; sourceTree = "<group>"; };
 		0A7D73982076BAAD00BD66E3 /* CustomHeaderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderData.swift; sourceTree = "<group>"; };
 		0A8053951FC59D82008D6822 /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
@@ -3431,6 +3433,7 @@
 			children = (
 				EBDB7D561E14337800D744C7 /* ios-sync.js */,
 				0A3D9E64207FBC290034D5F0 /* crypto.js */,
+				0A64E22620BEF8FB00887EEE /* bookmark_util.js */,
 				EBDB7D511E14331900D744C7 /* polyfill */,
 				EBDB7D4C1E1432E800D744C7 /* bundles */,
 				5D2785991E70D7EF0066EC15 /* JSInjector.swift */,
@@ -4326,6 +4329,7 @@
 				8F8FEAE7F3F5794866B0163C /* topdomains.txt in Resources */,
 				0AFA59701FA09D6B00E9F2EE /* LaunchScreen.storyboard in Resources */,
 				A017135F85E8E813D1E8DF11 /* WindowCloseHelper.js in Resources */,
+				0A64E22720BEF8FB00887EEE /* bookmark_util.js in Resources */,
 				C68CDF76C7FC1770D6427F76 /* Home.xcassets in Resources */,
 				3E0F37CB279D8276AD55303D /* Intro.xcassets in Resources */,
 				0A3D9E65207FBC290034D5F0 /* crypto.js in Resources */,
