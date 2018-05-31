@@ -63,8 +63,8 @@ extension Bookmark {
     func setSyncOrder(context: NSManagedObjectContext) {
         guard let baseOrder = Sync.shared.baseSyncOrder else  { return } 
         
-        let previousOrder = getBookmarkWith(prevOrNext: .previous)?.syncOrder
-        let nextOrder = getBookmarkWith(prevOrNext: .next)?.syncOrder
+        let previousOrder = getBookmarkWith(prevOrNext: .previous, orderToGet: order)?.syncOrder
+        let nextOrder = getBookmarkWith(prevOrNext: .next, orderToGet: order)?.syncOrder
         
         // The sync lib javascript method doesn't handle cases when there are no other bookmarks on a given level.
         // We need to do it locally, there are 3 cases:
@@ -82,16 +82,16 @@ extension Bookmark {
         DataController.saveContext(context: context)
     }
     
-    private enum BookmarkNeighbour { case previous, next }
+    enum BookmarkNeighbour { case previous, next }
     
-    private func getBookmarkWith(prevOrNext: BookmarkNeighbour) -> Bookmark? {
+    func getBookmarkWith(prevOrNext: BookmarkNeighbour, orderToGet: Int16) -> Bookmark? {
         var predicate: NSPredicate?
-        let orderToGet = prevOrNext == .previous ? order - 1 : order + 1
+        let orderParam = prevOrNext == .previous ? orderToGet - 1 : orderToGet + 1
         
         if let parentFolder = parentFolder {
-            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO AND order == \(orderToGet)", parentFolder)
+            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO AND order == \(orderParam)", parentFolder)
         } else {
-            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO AND order == \(orderToGet)")
+            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO AND order == \(orderParam)")
         }
         
         let context = DataController.shared.workerContext
@@ -112,6 +112,8 @@ extension Bookmark {
         let updateRequest = NSBatchUpdateRequest(entityName: "Bookmark")
         updateRequest.predicate = NSPredicate(format: "isFavorite == NO")
         updateRequest.propertiesToUpdate = ["syncOrder": NSExpression(forConstantValue: nil)]
+        
+        Sync.shared.baseSyncOrder = nil
         
         do {
             try context.execute(updateRequest)

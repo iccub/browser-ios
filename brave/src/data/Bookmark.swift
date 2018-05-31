@@ -328,6 +328,21 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             return
         }
         
+        if Sync.shared.baseSyncOrder != nil {
+            let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
+            
+            // Depending on drag direction, all other bookmarks are pushed up or down. 
+            if isMovingUp {
+                let prev = dest.getBookmarkWith(prevOrNext: .previous, orderToGet: dest.order)?.syncOrder
+                let next = dest.syncOrder
+                src.syncOrder = Sync.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+            } else {
+                let prev = dest.syncOrder
+                let next = dest.getBookmarkWith(prevOrNext: .next, orderToGet: dest.order)?.syncOrder
+                src.syncOrder = Sync.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+            }
+        }
+        
         // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
         // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
         // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.

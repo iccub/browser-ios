@@ -97,7 +97,7 @@ class Sync: JSInjector {
     }
     
     fileprivate var fetchTimer: Timer?
-    fileprivate(set) var baseSyncOrder: String?
+    var baseSyncOrder: String?
 
     // TODO: Move to a better place
     fileprivate let prefNameId = "device-id-js-array"
