@@ -195,7 +195,9 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
                 bk.order = 0
             }
             
-            bk.setSyncOrder(context: context)
+            if bk.syncOrder == nil {
+                bk.setSyncOrder(context: context)
+            }
         }
         
         if save {
