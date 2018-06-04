@@ -745,7 +745,8 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
             }
             tableView.deleteRows(at: [indexPath], with: .automatic)
         case .move:
-            break
+            guard let indexPath = indexPath, let newIndexPath = newIndexPath else { return }
+            tableView.moveRow(at: indexPath, to: newIndexPath)
         }
     }
 }

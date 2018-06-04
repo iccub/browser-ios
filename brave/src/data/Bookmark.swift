@@ -98,6 +98,7 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     func update(syncRecord record: SyncRecord?) {
         guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
         title = site.title
+        syncOrder = bookmark.syncOrder
         update(customTitle: site.customTitle, url: site.location)
         lastVisited = Date(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bookmark.parentFolderObjectId
