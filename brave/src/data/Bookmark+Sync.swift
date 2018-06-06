@@ -14,10 +14,6 @@ extension Bookmark {
     class func setSyncOrderForAll(parentFolder: Bookmark? = nil) {
         var predicate: NSPredicate?
         
-        guard let baseSyncOrder = Sync.shared.baseSyncOrder else { return }
-        
-        print("base sync order: \(baseSyncOrder)")
-        
         if let parentFolder = parentFolder {
             predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parentFolder)
         } else {
@@ -37,14 +33,11 @@ extension Bookmark {
         var counter = 1
         
         for bookmark in allBookmarks {
-            if bookmark.syncOrder != nil { continue }
-            
-            // set order
             if let parent = parentFolder, let syncOrder = parent.syncOrder {
                 let order = syncOrder + ".\(counter)"
                 bookmark.syncOrder = order
             } else {
-                let order = baseSyncOrder + "\(counter)"
+                let order = baseOrder + "\(counter)"
                 bookmark.syncOrder = order
             }
             
@@ -61,22 +54,20 @@ extension Bookmark {
     
     
     func setSyncOrder(context: NSManagedObjectContext) {
-        guard let baseOrder = Sync.shared.baseSyncOrder else  { return } 
-        
         let previousOrder = getBookmarkWith(prevOrNext: .previous, orderToGet: order)?.syncOrder
         let nextOrder = getBookmarkWith(prevOrNext: .next, orderToGet: order)?.syncOrder
         
         // The sync lib javascript method doesn't handle cases when there are no other bookmarks on a given level.
         // We need to do it locally, there are 3 cases:
         // 1. At least one bookmark is present at a given level -> we do the JS call
-        // 2. Root level, no bookmarks added -> need to use baseSyncOrder 
+        // 2. Root level, no bookmarks added -> need to use baseOrder 
         // 3. Nested folder, no bookmarks -> need to get parent folder syncOrder
         if previousOrder == nil && nextOrder == nil && parentFolder == nil {
-            syncOrder = baseOrder + "1"
+            syncOrder = Bookmark.baseOrder + "1"
         } else if let parentOrder = parentFolder?.syncOrder, previousOrder == nil, nextOrder == nil {
             syncOrder = parentOrder + ".1"
         } else {
-            syncOrder = Sync.getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder)
+            syncOrder = Sync.shared.getBookmarkOrder(previousOrder: previousOrder, nextOrder: nextOrder)
         }
         
         DataController.saveContext(context: context)
@@ -107,18 +98,13 @@ extension Bookmark {
     
     class func removeSyncOrders() {
         let context = DataController.shared.workerContext
+        let allBookmarks = getAllBookmarks(context: context)
         
-        // FIXME: Use something better than hardocded strings
-        let updateRequest = NSBatchUpdateRequest(entityName: "Bookmark")
-        updateRequest.predicate = NSPredicate(format: "isFavorite == NO")
-        updateRequest.propertiesToUpdate = ["syncOrder": NSExpression(forConstantValue: nil)]
-        
-        Sync.shared.baseSyncOrder = nil
-        
-        do {
-            try context.execute(updateRequest)
-        } catch {
-            log.error("Failed to remove syncOrder")
+        allBookmarks.forEach { bookmark in
+            bookmark.syncOrder = nil
         }
+        
+        DataController.saveContext(context: context)
+        Sync.shared.baseSyncOrder = nil
     }
 }

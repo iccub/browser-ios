@@ -62,6 +62,12 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         return nil
     }
     
+    /// If sync is not used, we still utilize its syncOrder algorithm to determine order of bookmarks.
+    /// Base order is needed to distinguish between bookmarks on different devices and platforms.
+    static var baseOrder: String {
+        return Sync.shared.baseSyncOrder ?? "0.0."
+    }
+    
     override func awakeFromInsert() {
         super.awakeFromInsert()
         created = Date()
@@ -98,17 +104,16 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     func update(syncRecord record: SyncRecord?) {
         guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
         title = site.title
-        syncOrder = bookmark.syncOrder
-        update(customTitle: site.customTitle, url: site.location)
+        update(customTitle: site.customTitle, url: site.location, newSyncOrder: bookmark.syncOrder)
         lastVisited = Date(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bookmark.parentFolderObjectId
         // No auto-save, must be handled by caller if desired
     }
     
-    func update(customTitle: String?, url: String?, save: Bool = false) {
+    func update(customTitle: String?, url: String?, newSyncOrder: String? = nil, save: Bool = false) {
         
         // See if there has been any change
-        if self.customTitle == customTitle && self.url == url {
+        if self.customTitle == customTitle && self.url == url && syncOrder == newSyncOrder {
             return
         }
         
@@ -123,6 +128,10 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             } else {
                 domain = nil
             }
+        }
+        
+        if newSyncOrder != nil {
+            syncOrder = newSyncOrder
         }
         
         if save {
@@ -331,18 +340,18 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             return
         }
         
-        if Sync.shared.baseSyncOrder != nil {
+        if !src.isFavorite {
             let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
             
             // Depending on drag direction, all other bookmarks are pushed up or down. 
             if isMovingUp {
                 let prev = dest.getBookmarkWith(prevOrNext: .previous, orderToGet: dest.order)?.syncOrder
                 let next = dest.syncOrder
-                src.syncOrder = Sync.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+                src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
             } else {
                 let prev = dest.syncOrder
                 let next = dest.getBookmarkWith(prevOrNext: .next, orderToGet: dest.order)?.syncOrder
-                src.syncOrder = Sync.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+                src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
             }
         }
         
@@ -368,6 +377,10 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         // Adding a delay to let animation complete avoids this problem
         postAsyncToMain(0.25) {
             DataController.saveContext(context: frc?.managedObjectContext)
+            
+            if !src.isFavorite {
+                Sync.shared.sendSyncRecords(action: .update, records: [src])
+            }
         }
 
     }

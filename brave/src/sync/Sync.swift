@@ -89,8 +89,7 @@ class Sync: JSInjector {
                                   resolveRecordsReady: Bool, 
                                   deleteUserReady: Bool, 
                                   deleteSiteSettingsReady: Bool, 
-                                  deleteCategoryReady: Bool,
-                                  baseSyncOrderReady: Bool)(false, false, false, false, false, false, false, false, false)
+                                  deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
     
     var isInSyncGroup: Bool {
         return syncSeed != nil
@@ -132,6 +131,29 @@ class Sync: JSInjector {
         webCfg.userContentController = userController
         return webCfg
     }
+    
+    fileprivate lazy var jsContext: JSContext? = {
+        let context = JSContext()
+        
+        context?.exceptionHandler = { _, exc in
+            log.error(exc.debugDescription)
+        }
+        guard let path = Bundle.main.path(forResource: "bookmark_util", ofType: "js") else {
+            log.error("Could not load bookmark_util.js")
+            return nil
+        }
+        
+        do {
+            let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            _ = context?.evaluateScript(scriptAsString)
+            
+        } catch (let error) {
+            log.error("Failed to parse script file: \(error)")
+            return nil
+        }
+        
+        return context
+    }()
     
     override init() {
         super.init()
@@ -252,13 +274,12 @@ class Sync: JSInjector {
             }
             
             Device.deleteAll {}
-            Bookmark.removeSyncOrders()
             
             lastFetchedRecordTimestamp = 0
             lastSuccessfulSync = 0
             lastFetchWasTrimmed = false
             syncReadyLock = false
-            isSyncFullyInitialized = (false, false, false, false, false, false, false, false, false)
+            isSyncFullyInitialized = (false, false, false, false, false, false, false, false)
             
             fetchTimer?.invalidate()
             fetchTimer = nil
@@ -597,45 +618,29 @@ extension Sync {
 
     }
     
-    fileprivate func getBaseBookmarkOrder() {
-        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
-        let script = "callbackList['get-bookmarks-base-order'](null, '\(deviceId)', 'ios')"
-        
-        webView.evaluateJavaScript(script)
-    }
-    
-    fileprivate func saveBaseBookmarkOrder(_ data: Any) {
-        guard let stringData = data as? String else { return }
-        baseSyncOrder = JSON(parseJSON: stringData)["arg1"].string
-    }
-    
-    class func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
+    func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
         
         // Empty string as a parameter means next/previous bookmark doesn't exist
         let prev = previousOrder ?? ""
         let next = nextOrder ?? ""
         
-        // TODO: Abstract it
-        let jsContext = JSContext()
-        jsContext?.exceptionHandler = { _, exc in
-            log.error(exc.debugDescription)
-        }
-        guard let path = Bundle.main.path(forResource: "bookmark_util", ofType: "js") else {
-            log.error("Could not load bookmark_util.js")
-            return nil
-        }
+        let function = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
+        return function?.call(withArguments: [prev, next]).toString()
+    }
+    
+    fileprivate func setBaseBookmarkOrder() {
+        // Removing local ordering in favor of the sync one.
+        Bookmark.removeSyncOrders()
         
-        do {
-            let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-            _ = jsContext?.evaluateScript(scriptAsString)
-            let function = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
-            
-            return function?.call(withArguments: [prev, next]).toString()
-        } catch (let error) {
-            log.error("Failed to parse script file: \(error)")
-        }
+        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
+        let function = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
         
-        return nil
+        guard let baseOrder = function?.call(withArguments: [deviceId, "ios"]).toString() else { return } 
+        
+        if baseOrder != "undefined" {
+            baseSyncOrder = baseOrder
+            Bookmark.setSyncOrderForAll(parentFolder: nil)
+        }
     }
 }
 
@@ -672,7 +677,7 @@ extension Sync: WKScriptMessageHandler {
             print("---- Sync Debug: \(data)")
         case "sync-ready":
             self.isSyncFullyInitialized.syncReady = true
-            getBaseBookmarkOrder()
+            setBaseBookmarkOrder()
         case "fetch-sync-records":
             self.isSyncFullyInitialized.fetchReady = true
         case "send-sync-records":
@@ -687,13 +692,6 @@ extension Sync: WKScriptMessageHandler {
             self.isSyncFullyInitialized.deleteSiteSettingsReady = true
         case "delete-sync-category":
             self.isSyncFullyInitialized.deleteCategoryReady = true
-        case "get-bookmarks-base-order":
-            break
-        case "save-bookmarks-base-order":
-            saveBaseBookmarkOrder(message.body)
-            // add syncOrder to all current bookmarks
-            Bookmark.setSyncOrderForAll(parentFolder: nil)
-            self.isSyncFullyInitialized.baseSyncOrderReady   = true
         default:
             print("\(messageName) not handled yet")
         }
