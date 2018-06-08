@@ -629,9 +629,6 @@ extension Sync {
     }
     
     fileprivate func setBaseBookmarkOrder() {
-        // Removing local ordering in favor of the sync one.
-        Bookmark.removeSyncOrders()
-        
         guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
         let function = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
         
@@ -668,6 +665,7 @@ extension Sync: WKScriptMessageHandler {
             // (e.g. arg2 is [Int])
             let data = JSON(parseJSON: message.body as? String ?? "")
             self.saveInitData(data)
+            Bookmark.removeSyncOrders()
         case "get-existing-objects":
             self.getExistingObjects(syncResponse)
         case "resolved-sync-records":

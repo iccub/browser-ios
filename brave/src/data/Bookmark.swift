@@ -206,7 +206,7 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             }
             
             if bk.syncOrder == nil {
-                bk.setSyncOrder(context: context)
+                bk.setLastSyncOrder(context: context)
             }
         }
         
@@ -235,7 +235,6 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             return nil
         }
         
-        // First bookmark is created with order 0
         // We don't check for empty bookmarks array because the new bookmark is already added into context.
         if allBookmarks.count < 2 { return nil }
         
