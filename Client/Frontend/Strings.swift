@@ -133,6 +133,8 @@ extension Strings {
     public static let This_allows_you_to_save_the_image_to_your_CameraRoll = NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
     public static let Open_Settings = NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let Copy_Image = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
+    public static let Call_number = NSLocalizedString("Call %@", comment: "Context menu item for calling a phone number")
+    public static let Copy_Phone_Number = NSLocalizedString("Copy Phone Number", comment: "Context menu item for copying a phone number")
     public static let Call = NSLocalizedString("Call", comment:"Alert Call Button")
     public static let AllowOpenITunes_template = NSLocalizedString("Allow %@ to open iTunes?", comment: "Ask user if site can open iTunes store URL")
     public static let Paste_and_Go = NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit")

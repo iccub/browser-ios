@@ -122,6 +122,13 @@ class BraveContextMenu {
             return
         }
 
+        // A phone URL should be in the form "tel:x".
+        // Sometimes, the element's URL includes the page's URL before the tel scheme ("https://example.com/tel:x").
+        // Remove the page's URL to get the phone URL.
+        if let url = hit?.url {
+            hit?.url = url.regexReplacePattern("(?:.*)(tel:)(.*)", with: "$1$2")
+        }
+
         tappedElement = ContextMenuHelper.Elements(link: hit!.url != nil ? URL(string: hit!.url!) : nil, image: hit!.image != nil ? URL(string: hit!.image!) : nil, folder: nil)
 
         func blockOtherGestures(_ views: [UIView]?) {
