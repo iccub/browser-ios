@@ -352,6 +352,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func tableView(_ tableView: UITableView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath) {
         // Using the same reorder logic as in FavoritesDataSource
         Bookmark.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        tableView.reloadData()
     }
 
     func tableView(_ tableView: UITableView, canMoveRowAtIndexPath indexPath: IndexPath) -> Bool {

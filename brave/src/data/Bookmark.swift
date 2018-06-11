@@ -332,56 +332,74 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
 
     class func reorderBookmarks(frc: NSFetchedResultsController<NSFetchRequestResult>?, sourceIndexPath: IndexPath,
                                 destinationIndexPath: IndexPath) {
-        let dest = frc?.object(at: destinationIndexPath) as! Bookmark
-        let src = frc?.object(at: sourceIndexPath) as! Bookmark
+        
+        guard let frc = frc else { return }
+        
+        let dest = frc.object(at: destinationIndexPath) as! Bookmark
+        let src = frc.object(at: sourceIndexPath) as! Bookmark
         
         if dest === src {
             return
         }
         
-        if !src.isFavorite {
+        // Favorites use regular order algorithm
+        if src.isFavorite {
+            // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
+            // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
+            // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
+                    var bms = frc.fetchedObjects as! [Bookmark]
+                    bms.remove(at: bms.index(of: src)!)
+                    if sourceIndexPath.row > destinationIndexPath.row {
+                        // insert before
+                        bms.insert(src, at: bms.index(of: dest)!)
+                    } else {
+                        let end = bms.index(of: dest)! + 1
+                        bms.insert(src, at: end)
+                    }
+                    
+                    for i in 0..<bms.count {
+                        bms[i].order = Int16(i)
+                    }
+            
+             // I am stumped, I can't find the notification that animation is complete for moving.
+             // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
+             // Adding a delay to let animation complete avoids this problem
+                    postAsyncToMain(0.25) {
+                        DataController.saveContext(context: frc.managedObjectContext)
+                    }
+        } else {
             let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
             
             // Depending on drag direction, all other bookmarks are pushed up or down. 
             if isMovingUp {
-                let prev = dest.getBookmarkWith(prevOrNext: .previous, orderToGet: dest.order)?.syncOrder
+                var prev: String?
+                
+                // TODO: Replace with a fetch request, with offset and batch size to grab previous and next bookmark.
+                if destinationIndexPath.row > 0 {
+                    let ind = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
+                    prev = (frc.object(at: ind) as! Bookmark).syncOrder
+                }
+                
                 let next = dest.syncOrder
                 src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
             } else {
                 let prev = dest.syncOrder
-                let next = dest.getBookmarkWith(prevOrNext: .next, orderToGet: dest.order)?.syncOrder
+                var next: String?
+                
+                if destinationIndexPath.row + 1 < (frc.fetchedObjects!.count) {
+                    let ind = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
+                    next = (frc.object(at: ind) as! Bookmark).syncOrder
+                }
+                
                 src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
             }
-        }
-        
-        // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
-        // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
-        // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = frc?.fetchedObjects as! [Bookmark]
-        bms.remove(at: bms.index(of: src)!)
-        if sourceIndexPath.row > destinationIndexPath.row {
-            // insert before
-            bms.insert(src, at: bms.index(of: dest)!)
-        } else {
-            let end = bms.index(of: dest)! + 1
-            bms.insert(src, at: end)
-        }
-        
-        for i in 0..<bms.count {
-            bms[i].order = Int16(i)
-        }
-        
-        // I am stumped, I can't find the notification that animation is complete for moving.
-        // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
-        // Adding a delay to let animation complete avoids this problem
-        postAsyncToMain(0.25) {
-            DataController.saveContext(context: frc?.managedObjectContext)
+            
+            DataController.saveContext(context: frc.managedObjectContext)
             
             if !src.isFavorite {
                 Sync.shared.sendSyncRecords(action: .update, records: [src])
             }
         }
-
     }
 }
 
