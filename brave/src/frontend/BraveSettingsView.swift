@@ -11,6 +11,7 @@ let kPrefKeyPrivateBrowsingAlwaysOn = "privateBrowsingAlwaysOn"
 let kPrefKeyBrowserLock = "browserLock"
 let kPrefKeySetBrowserLock = "setBrowserLockPin"
 let kPrefKeyPopupForBrowserLock = "popupForBrowserLock"
+let kPrefKeyPopupForDDG = "popupForDDG"
 
 class BraveSettingsView : AppSettingsTableViewController {
 
@@ -43,7 +44,7 @@ class BraveSettingsView : AppSettingsTableViewController {
 
     override func generateSettings() -> [SettingSection] {
         let prefs = profile.prefs
-        var generalSettings = [
+            var generalSettings = [
             SearchSetting(settings: self),
             BoolSetting(prefs: prefs, prefKey: "saveLogins", defaultValue: true, titleText: Strings.Save_Logins, statusText: nil),
             BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true, titleText: Strings.Block_Popups)

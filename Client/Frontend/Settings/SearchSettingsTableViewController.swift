@@ -8,8 +8,9 @@ import Shared
 class SearchSettingsTableViewController: UITableViewController {
     fileprivate let SectionDefault = 0
     fileprivate let ItemDefaultEngine = 0
-    fileprivate let ItemDefaultSuggestions = 1
-    fileprivate let NumberOfItemsInSectionDefault = 2
+    fileprivate let ItemDefaultPrivateEngine = 1
+    fileprivate let ItemDefaultSuggestions = 2
+    fileprivate let NumberOfItemsInSectionDefault = 3
     fileprivate let SectionOrder = 1
     fileprivate let NumberOfSections = 2
     fileprivate let IconSize = CGSize(width: OpenSearchEngine.PreferredIconSize, height: OpenSearchEngine.PreferredIconSize)
@@ -49,13 +50,22 @@ class SearchSettingsTableViewController: UITableViewController {
         if indexPath.section == SectionDefault {
             switch indexPath.item {
             case ItemDefaultEngine:
-                engine = model.defaultEngine
-                cell = UITableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: nil)
+                engine = model.defaultEngine(forType: .standard)
+                cell = UITableViewCell(style: UITableViewCellStyle.value1, reuseIdentifier: nil)
                 cell.editingAccessoryType = UITableViewCellAccessoryType.disclosureIndicator
                 cell.accessibilityLabel = Strings.DefaultSearchEngine
                 cell.accessibilityValue = engine.shortName
-                cell.textLabel?.text = engine.shortName
-                cell.imageView?.image = engine.image?.createScaled(IconSize)
+                cell.textLabel?.text = Strings.StandardTabSearch
+                cell.detailTextLabel?.text = engine.shortName
+                
+            case ItemDefaultPrivateEngine:
+                engine = model.defaultEngine(forType: .privateMode)
+                cell = UITableViewCell(style: UITableViewCellStyle.value1, reuseIdentifier: nil)
+                cell.editingAccessoryType = UITableViewCellAccessoryType.disclosureIndicator
+                cell.accessibilityLabel = Strings.DefaultSearchEngine
+                cell.accessibilityValue = engine.shortName
+                cell.textLabel?.text = Strings.PrivateTabSearch
+                cell.detailTextLabel?.text = engine.shortName
 
             case ItemDefaultSuggestions:
                 cell = UITableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: nil)
@@ -115,12 +125,21 @@ class SearchSettingsTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         if indexPath.section == SectionDefault && indexPath.item == ItemDefaultEngine {
-            let searchEnginePicker = SearchEnginePicker()
+            let searchEnginePicker = SearchEnginePicker(type: .standard)
             // Order alphabetically, so that picker is always consistently ordered.
             // Every engine is a valid choice for the default engine, even the current default engine.
             searchEnginePicker.engines = model.orderedEngines.sorted { e, f in e.shortName < f.shortName }
             searchEnginePicker.delegate = self
-            searchEnginePicker.selectedSearchEngineName = model.defaultEngine.shortName
+            searchEnginePicker.selectedSearchEngineName = model.defaultEngine(forType: .standard).shortName
+            navigationController?.pushViewController(searchEnginePicker, animated: true)
+        }
+        else if indexPath.section == SectionDefault && indexPath.item == ItemDefaultPrivateEngine {
+            let searchEnginePicker = SearchEnginePicker(type: .privateMode)
+            // Order alphabetically, so that picker is always consistently ordered.
+            // Every engine is a valid choice for the default engine, even the current default engine.
+            searchEnginePicker.engines = model.orderedEngines.sorted { e, f in e.shortName < f.shortName }
+            searchEnginePicker.delegate = self
+            searchEnginePicker.selectedSearchEngineName = model.defaultEngine(forType: .privateMode).shortName
             navigationController?.pushViewController(searchEnginePicker, animated: true)
         }
         return nil
@@ -224,9 +243,9 @@ class SearchSettingsTableViewController: UITableViewController {
 }
 
 extension SearchSettingsTableViewController: SearchEnginePickerDelegate {
-    func searchEnginePicker(_ searchEnginePicker: SearchEnginePicker, didSelectSearchEngine searchEngine: OpenSearchEngine?) {
-        if let engine = searchEngine {
-            model.defaultEngine = engine
+    func searchEnginePicker(_ searchEnginePicker: SearchEnginePicker, didSelectSearchEngine searchEngine: OpenSearchEngine?, forType: DefaultEngineType?) {
+        if let engine = searchEngine, let type = forType {
+            model.defaultEngine(engine.shortName, forType: type)
             self.tableView.reloadData()
         }
         navigationController?.popViewController(animated: true)

@@ -6,14 +6,28 @@ import UIKit
 import Shared
 
 protocol SearchEnginePickerDelegate {
-    func searchEnginePicker(_ searchEnginePicker: SearchEnginePicker, didSelectSearchEngine engine: OpenSearchEngine?) -> Void
+    func searchEnginePicker(_ searchEnginePicker: SearchEnginePicker, didSelectSearchEngine engine: OpenSearchEngine?, forType: DefaultEngineType?) -> Void
 }
 
 class SearchEnginePicker: UITableViewController {
     var delegate: SearchEnginePickerDelegate?
     var engines: [OpenSearchEngine]!
     var selectedSearchEngineName: String?
-
+    var type: DefaultEngineType?
+    
+    convenience init(type: DefaultEngineType) {
+        self.init(style: .plain)
+        self.type = type
+    }
+    
+    override init(style: UITableViewStyle) {
+        super.init(style: style)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -38,7 +52,7 @@ class SearchEnginePicker: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let engine = engines[indexPath.item]
-        delegate?.searchEnginePicker(self, didSelectSearchEngine: engine)
+        delegate?.searchEnginePicker(self, didSelectSearchEngine: engine, forType: type)
 
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
         cell.accessoryType = UITableViewCellAccessoryType.checkmark
@@ -49,6 +63,6 @@ class SearchEnginePicker: UITableViewController {
     }
 
     func SELcancel() {
-        delegate?.searchEnginePicker(self, didSelectSearchEngine: nil)
+        delegate?.searchEnginePicker(self, didSelectSearchEngine: nil, forType: nil)
     }
 }

@@ -49,10 +49,6 @@ class TopSitesPanel: UIViewController, HomePanel {
         return view
     }()
 
-    fileprivate lazy var privateTabGraphic: UIImageView = {
-        return UIImageView(image: UIImage(named: "privateLion"))
-    }()
-
     fileprivate lazy var privateTabTitleLabel: UILabel = {
         let view = UILabel()
         view.lineBreakMode = .byWordWrapping
@@ -87,12 +83,32 @@ class TopSitesPanel: UIViewController, HomePanel {
         view.addTarget(self, action: #selector(showPrivateTabInfo), for: .touchUpInside)
         return view
     }()
+    
+    fileprivate var ddgLogo = UIImageView(image: UIImage(named: "duckduckgo"))
+    
+    fileprivate lazy var ddgLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textColor = BraveUX.GreyD
+        label.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)
+        label.text = Strings.DDG_promotion
+        return label
+    }()
+    
+    fileprivate lazy var ddgButton: UIControl = {
+        let control = UIControl()
+        control.addTarget(self, action: #selector(showDDGCallout), for: .touchUpInside)
+        return control
+    }()
 
     fileprivate lazy var braveShieldStatsView: BraveShieldStatsView = {
         let view = BraveShieldStatsView(frame: CGRect.zero)
         view.autoresizingMask = [.flexibleWidth]
         return view
     }()
+    
+    /// Called after user taps on ddg popup to set it as a default search enginge in private browsing mode.
+    var ddgPrivateSearchCompletionBlock: (() -> ())?
 
     // MARK: - Init/lifecycle
     init() {
@@ -141,14 +157,25 @@ class TopSitesPanel: UIViewController, HomePanel {
         braveShieldStatsView.frame = statsViewFrame
 
         collection.addSubview(braveShieldStatsView)
+        
+        ddgButton.addSubview(ddgLogo)
+        ddgButton.addSubview(ddgLabel)
 
-        privateTabMessageContainer.addSubview(privateTabGraphic)
         privateTabMessageContainer.addSubview(privateTabTitleLabel)
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
         privateTabMessageContainer.addSubview(privateTabLinkButton)
+        privateTabMessageContainer.addSubview(ddgButton)
         collection.addSubview(privateTabMessageContainer)
 
         makeConstraints()
+        
+        if let profile = getApp().profile, profile.searchEngines.defaultEngine(forType: .privateMode).shortName == "DuckDuckGo" {
+            hideDDG()
+        }
+        
+        ddgPrivateSearchCompletionBlock = { [weak self] in
+            self?.hideDDG()
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -156,6 +183,10 @@ class TopSitesPanel: UIViewController, HomePanel {
 
         // This makes collection view layout to recalculate its cell size.
         collection.collectionViewLayout.invalidateLayout()
+    }
+    
+    func hideDDG() {
+        ddgButton.isHidden = true
     }
 
     /// Handles long press gesture for UICollectionView cells reorder.
@@ -196,21 +227,16 @@ class TopSitesPanel: UIViewController, HomePanel {
                 make.width.equalTo(400)
             }
             else {
-                make.top.equalTo(self.braveShieldStatsView.snp.bottom).offset(20)
+                make.top.equalTo(self.braveShieldStatsView.snp.bottom).offset(25)
                 make.leftMargin.equalTo(collection).offset(8)
                 make.rightMargin.equalTo(collection).offset(-8)
             }
             make.bottom.equalTo(collection)
         }
 
-        privateTabGraphic.snp.makeConstraints { (make) -> Void in
-            make.top.equalTo(0)
-            make.centerX.equalTo(self.privateTabMessageContainer)
-        }
-
         if UIDevice.current.userInterfaceIdiom == .pad {
             privateTabTitleLabel.snp.makeConstraints { make in
-                make.top.equalTo(self.privateTabGraphic.snp.bottom).offset(15)
+                make.top.equalTo(15)
                 make.centerX.equalTo(self.privateTabMessageContainer)
                 make.left.right.equalTo(0)
             }
@@ -229,7 +255,24 @@ class TopSitesPanel: UIViewController, HomePanel {
                 make.top.equalTo(self.privateTabInfoLabel.snp.bottom).offset(10)
                 make.left.equalTo(0)
                 make.right.equalTo(0)
-                make.bottom.equalTo(0)
+            }
+            
+            ddgLogo.snp.makeConstraints { make in
+                make.top.left.bottom.equalTo(0)
+                make.size.equalTo(38)
+            }
+            
+            ddgLabel.snp.makeConstraints { make in
+                make.top.right.bottom.equalTo(0)
+                make.left.equalTo(self.ddgLogo.snp.right).offset(5)
+                make.width.equalTo(180)
+                make.centerY.equalTo(self.ddgLogo)
+            }
+            
+            ddgButton.snp.makeConstraints { make in
+                make.top.equalTo(self.privateTabLinkButton.snp.bottom).offset(30)
+                make.centerX.equalTo(self.collection)
+                make.bottom.equalTo(-8)
             }
         } else {
             updateIphoneConstraints()
@@ -255,18 +298,13 @@ class TopSitesPanel: UIViewController, HomePanel {
         }
         
         let isLandscape = UIApplication.shared.statusBarOrientation.isLandscape
-        
-        UIView.animate(withDuration: 0.2, animations: {
-            self.privateTabGraphic.alpha = isLandscape ? 0 : 1
-        })
-        
         let offset = isLandscape ? 10 : 15
         
         privateTabTitleLabel.snp.remakeConstraints { make in
             if isLandscape {
                 make.top.equalTo(0)
             } else {
-                make.top.equalTo(self.privateTabGraphic.snp.bottom).offset(offset)
+                make.top.equalTo(offset)
             }
             make.centerX.equalTo(self.privateTabMessageContainer)
             make.left.right.equalTo(0)
@@ -282,12 +320,32 @@ class TopSitesPanel: UIViewController, HomePanel {
             make.top.equalTo(self.privateTabInfoLabel.snp.bottom).offset(offset)
             make.left.equalTo(32)
             make.right.equalTo(-32)
+        }
+        
+        ddgLogo.snp.remakeConstraints { make in
+            make.top.left.bottom.equalTo(0)
+            make.size.equalTo(38)
+        }
+
+        ddgLabel.snp.remakeConstraints { make in
+            make.top.right.bottom.equalTo(0)
+            make.left.equalTo(self.ddgLogo.snp.right).offset(5)
+            make.width.equalTo(180)
+            make.centerY.equalTo(self.ddgLogo)
+        }
+        
+        ddgButton.snp.remakeConstraints { make in
+            make.top.equalTo(self.privateTabLinkButton.snp.bottom).offset(30)
+            make.centerX.equalTo(self.collection)
             make.bottom.equalTo(-8)
         }
         
         self.view.setNeedsUpdateConstraints()
     }
 
+    func showDDGCallout() {
+        getApp().browserViewController.presentDDGCallout(force: true)
+    }
 
     func endEditing() {
         (view.window as! BraveMainWindow).removeTouchFilter(self)

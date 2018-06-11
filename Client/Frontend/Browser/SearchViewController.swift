@@ -209,7 +209,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
             // Show the default search engine first.
             if !isPrivate {
                 let ua = SearchViewController.userAgent as String! ?? "FxSearch"
-                suggestClient = SearchSuggestClient(searchEngine: searchEngines.defaultEngine, userAgent: ua)
+                suggestClient = SearchSuggestClient(searchEngine: searchEngines.defaultEngine(), userAgent: ua)
             }
 
             // Reload the footer list of search engines.
@@ -225,7 +225,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         // If we're not showing search suggestions, the default search engine won't be visible
         // at the top of the table. Show it with the others in the bottom search bar.
         if isPrivate || !searchEngines.shouldShowSearchSuggestions {
-            engines?.insert(searchEngines.defaultEngine, at: 0)
+            engines?.insert(searchEngines.defaultEngine(), at: 0)
         }
 
         return engines!
@@ -600,9 +600,9 @@ extension SearchViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch SearchListSection(rawValue: indexPath.section)! {
         case .searchSuggestions:
-            suggestionCell.imageView?.image = searchEngines.defaultEngine.image
+            suggestionCell.imageView?.image = searchEngines.defaultEngine().image
             suggestionCell.imageView?.isAccessibilityElement = true
-            suggestionCell.imageView?.accessibilityLabel = String(format: Strings.Search_suggestions_from_template, searchEngines.defaultEngine.shortName)
+            suggestionCell.imageView?.accessibilityLabel = String(format: Strings.Search_suggestions_from_template, searchEngines.defaultEngine().shortName)
             return suggestionCell
 
         case .bookmarksAndHistory:
@@ -649,7 +649,7 @@ extension SearchViewController: SuggestionCellDelegate {
         var url = URIFixup.getURL(suggestion)
         if url == nil {
             // Assume that only the default search engine can provide search suggestions.
-            url = searchEngines?.defaultEngine.searchURLForQuery(suggestion)
+            url = searchEngines?.defaultEngine().searchURLForQuery(suggestion)
         }
 
         if let url = url {

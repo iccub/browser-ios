@@ -49,6 +49,8 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
 
     fileprivate var finishEditingButton: UIButton?
     fileprivate var editingPanel: HomePanel?
+    
+    var topSitesPanel: UIViewController?
 
     override func viewDidLoad() {
         view.backgroundColor = HomePanelViewControllerUX.BackgroundColor
@@ -82,13 +84,13 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
 
         self.panels = HomePanels().enabledPanels
         
-        let panel = self.panels[0].makeViewController(profile)
+        topSitesPanel = self.panels[0].makeViewController(profile)
         let accessibilityLabel = self.panels[0].accessibilityLabel
-        if let panelController = panel as? UINavigationController,
+        if let panelController = topSitesPanel as? UINavigationController,
             let rootPanel = panelController.viewControllers.first {
             setupHomePanel(rootPanel, accessibilityLabel: accessibilityLabel)
             self.showPanel(panelController)
-        } else {
+        } else if let panel = topSitesPanel {
             setupHomePanel(panel, accessibilityLabel: accessibilityLabel)
             self.showPanel(panel)
         }
@@ -141,7 +143,7 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
         // they'd copied and pasted into the URL bar.
         // See BrowserViewController.urlBar:didSubmitText:.
         guard let url = URIFixup.getURL(url) ??
-                        profile.searchEngines.defaultEngine.searchURLForQuery(url) else {
+                        profile.searchEngines.defaultEngine().searchURLForQuery(url) else {
             Logger.browserLogger.warning("Invalid URL, and couldn't generate a search URL for it.")
             return
         }

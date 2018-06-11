@@ -17,6 +17,8 @@ private let ShowSearchSuggestions = "search.suggestions.show"
  * first search engine is distinguished and labeled the "default" search engine; it can never be
  * disabled.  Search suggestions should always be sourced from the default search engine.
  *
+ * Users can set standard tab default search engine and private tab search engine.
+ *
  * Two additional bits of information are maintained: whether the user should be shown "opt-in to
  * search suggestions" UI, and whether search suggestions are enabled.
  *
@@ -28,6 +30,12 @@ private let ShowSearchSuggestions = "search.suggestions.show"
  * The search engines are backed by a write-through cache into a ProfilePrefs instance.  This class
  * is not thread-safe -- you should only access it on a single thread (usually, the main thread)!
  */
+
+enum DefaultEngineType: String {
+    case standard = "search.default.name"
+    case privateMode = "search.defaultprivate.name"
+}
+
 class SearchEngines {
     let prefs: Prefs
     init(prefs: Prefs) {
@@ -44,20 +52,17 @@ class SearchEngines {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-
-    var defaultEngine: OpenSearchEngine {
-        get {
+    
+    func defaultEngine(forType type: DefaultEngineType = PrivateBrowsing.singleton.isOn ? .privateMode : .standard) -> OpenSearchEngine {
+        if let name = prefs.stringForKey(type.rawValue), let defaultEngine = self.orderedEngines.first(where: { $0.shortName == name }) {
+            return defaultEngine
+        } else {
             return self.orderedEngines[0]
         }
-
-        set(defaultEngine) {
-            // The default engine is always enabled.
-            self.enableEngine(defaultEngine)
-            // The default engine is always first in the list.
-            var orderedEngines = self.orderedEngines.filter({ engine in engine.shortName != defaultEngine.shortName })
-            orderedEngines.insert(defaultEngine, at: 0)
-            self.orderedEngines = orderedEngines
-        }
+    }
+    
+    func defaultEngine(_ engine: String, forType type: DefaultEngineType) {
+        prefs.setString(engine, forKey: type.rawValue)
     }
 
     @objc
@@ -67,7 +72,7 @@ class SearchEngines {
     }
 
     func isEngineDefault(_ engine: OpenSearchEngine) -> Bool {
-        return defaultEngine.shortName == engine.shortName
+        return defaultEngine().shortName == engine.shortName
     }
 
     // The keys of this dictionary are used as a set.
