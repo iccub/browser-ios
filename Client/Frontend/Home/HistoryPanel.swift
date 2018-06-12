@@ -113,14 +113,21 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         cell.imageView?.layer.cornerRadius = 6
         cell.imageView?.layer.masksToBounds = true
         
-        if let faviconMO = site.domain?.favicon, let urlString = faviconMO.url, let url = URL(string: urlString) {
+        if let faviconMO = site.domain?.favicon,
+            let urlString = faviconMO.url,
+            let url = URL(string: urlString),
+            let cacheUrlString = site.domain?.url,
+            let cacheUrl = URL(string: cacheUrlString) {
+            
             ImageCache.shared.image(url, type: .square, callback: { (image) in
                 if image == nil {
                     postAsyncToMain {
                         cell.imageView?.contentMode = .scaleAspectFit
-                        cell.imageView?.sd_setImage(with: url, completed: { (img, err, type, url) in
-                            if let img = img, let url = url {
-                                ImageCache.shared.cache(img, url: url, type: .square, callback: nil)
+                        cell.imageView?.sd_setImage(with: url, completed: { (img, err, type, u) in
+                            postAsyncToMain {
+                                let favicon = FaviconFetcher.bestOrFallback(img, url: url, cacheUrl: cacheUrl)
+                                ImageCache.shared.cache(favicon, url: cacheUrl, type: .square, callback: nil)
+                                cell.imageView?.image = favicon
                             }
                         })
                     }

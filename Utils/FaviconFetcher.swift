@@ -13,6 +13,12 @@ import WebImage
 private let log = Logger.browserLogger
 private let queue = DispatchQueue(label: "FaviconFetcher", attributes: DispatchQueue.Attributes.concurrent)
 
+struct FallbackIcon {
+    static let minSize = CGSize(width: 120, height: 120)
+    static let size = CGSize(width: 250, height: 250)
+    static let color: UIColor = BraveUX.GreyE
+}
+
 class FaviconFetcherErrorType: MaybeErrorType {
     let description: String
     init(description: String) {
@@ -200,6 +206,34 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         }
         
         return deferred
+    }
+    
+    static func bestOrFallback(_ img: UIImage?, url: URL, cacheUrl: URL) -> UIImage {
+        var finalImage = img
+        var useFallback = false
+        
+        if img == nil {
+            useFallback = true
+        } else if let img = img, img.size.width < FallbackIcon.minSize.width && img.size.height < FallbackIcon.minSize.height {
+            useFallback = true
+        }
+        
+        if useFallback, let host = url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
+            var bgColor = FallbackIcon.color
+            
+            let context = DataController.shared.mainThreadContext
+            
+            // Only use stored color if it's not too light.
+            if let domain = Domain.getOrCreateForUrl(cacheUrl, context: context),
+                let colorString = domain.color,
+                !UIColor(colorString: colorString).isLight {
+                bgColor = UIColor(colorString: colorString)
+            }
+            
+            finalImage = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: bgColor, andSize: FallbackIcon.size)
+        }
+        
+        return finalImage ?? FaviconFetcher.defaultFavicon
     }
 }
 

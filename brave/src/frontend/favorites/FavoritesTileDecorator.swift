@@ -6,12 +6,6 @@ import Shared
 
 private let log = Logger.browserLogger
 
-struct FallbackIconUX {
-    static let minSize = CGSize(width: 120, height: 120)
-    static let size = CGSize(width: 250, height: 250)
-    static let color: UIColor = BraveUX.GreyE
-}
-
 enum FavoritesTileType {
     /// Predefinied tile color and custom icon, used for most popular websites.
     case preset
@@ -117,30 +111,9 @@ class FavoritesTileDecorator {
             else {
                 postAsyncToMain {
                     cell.imageView.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        var finalImage = img
-                        var useFallback = false
-
-                        if img == nil {
-                            useFallback = true
-                        } else if let img = img, img.size.width < FallbackIconUX.minSize.width && img.size.height < FallbackIconUX.minSize.height {
-                            useFallback = true
-                        }
-
-                        if useFallback, let host = self.url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
-                            var tabColor = FallbackIconUX.color
-                            
-                            // Only use stored color if it's not too light.
-                            if let color = self.color, !color.isLight {
-                                tabColor = color
-                            }
-                            
-                            finalImage = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: tabColor, andSize: FallbackIconUX.size)
-                        }
-
-                        if let finalImage = finalImage {
-                            ImageCache.shared.cache(finalImage, url: cacheWithUrl, type: .square, callback: nil)
-                            cell.imageView.image = finalImage
-                        }
+                        let favicon = FaviconFetcher.bestOrFallback(img, url: iconUrl, cacheUrl: cacheWithUrl)
+                        ImageCache.shared.cache(favicon, url: cacheWithUrl, type: .square, callback: nil)
+                        cell.imageView.image = favicon
                     })
                 }
             }

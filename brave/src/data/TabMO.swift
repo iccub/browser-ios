@@ -21,7 +21,6 @@ class TabMO: NSManagedObject {
     @NSManaged var isSelected: Bool
     @NSManaged var isClosed: Bool
     @NSManaged var isPrivate: Bool
-    @NSManaged var color: String?
     
     var imageUrl: URL? {
         if let objectId = self.syncUUID, let url = URL(string: "https://imagecache.mo/\(objectId).png") {
