@@ -392,8 +392,6 @@ extension Sync {
             return
         }
         
-        // FIXME: This isn't probably enough, we need to have base sync order and set syncOrder of all bookmarks before 
-        // syncing them.
         if let syncBookmark = records.first?.recordType, syncBookmark == .bookmark, baseSyncOrder == nil {
             completion?(nil)
             return
