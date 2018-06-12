@@ -374,10 +374,10 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             if isMovingUp {
                 var prev: String?
                 
-                // TODO: Replace with a fetch request, with offset and batch size to grab previous and next bookmark.
+                // Bookmark at the top has no previous bookmark.
                 if destinationIndexPath.row > 0 {
-                    let ind = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
-                    prev = (frc.object(at: ind) as! Bookmark).syncOrder
+                    let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
+                    prev = (frc.object(at: index) as! Bookmark).syncOrder
                 }
                 
                 let next = dest.syncOrder
@@ -386,19 +386,17 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
                 let prev = dest.syncOrder
                 var next: String?
                 
-                if destinationIndexPath.row + 1 < (frc.fetchedObjects!.count) {
-                    let ind = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
-                    next = (frc.object(at: ind) as! Bookmark).syncOrder
+                // Bookmark at the bottom has no next bookmark.
+                if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
+                    let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
+                    next = (frc.object(at: index) as! Bookmark).syncOrder
                 }
                 
                 src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
             }
             
             DataController.saveContext(context: frc.managedObjectContext)
-            
-            if !src.isFavorite {
-                Sync.shared.sendSyncRecords(action: .update, records: [src])
-            }
+            Sync.shared.sendSyncRecords(action: .update, records: [src])
         }
     }
 }
