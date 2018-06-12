@@ -89,12 +89,8 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         let orderSort = NSSortDescriptor(key:"order", ascending: true)
         let createdSort = NSSortDescriptor(key:"created", ascending: true)
         fetchRequest.sortDescriptors = [syncOrderSort, orderSort, createdSort]
-
-        if let parentFolder = parentFolder {
-            fetchRequest.predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parentFolder)
-        } else {
-            fetchRequest.predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
-        }
+         
+        fetchRequest.predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
 
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:context,
                                           sectionNameKeyPath: nil, cacheName: nil)
@@ -198,16 +194,8 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
             }
         }
         
-        if !bk.isFavorite {
-            if let maxOrder = maxBookmarkOrder(parent: parentFolder, context: context) { 
-                bk.order = maxOrder + 1
-            } else {
-                bk.order = 0
-            }
-            
-            if bk.syncOrder == nil {
-                bk.setLastSyncOrder(context: context)
-            }
+        if !bk.isFavorite && bk.syncOrder == nil {
+            bk.newBookmarkSyncOrder(context: context)
         }
         
         if save {
@@ -222,23 +210,15 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
         return bk
     }
     
-    private class func maxBookmarkOrder(parent: Bookmark?, context: NSManagedObjectContext) -> Int16? {
-        var predicate: NSPredicate?
+    class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
+        let isFavoriteKP = #keyPath(Bookmark.isFavorite)
+        let parentFolderKP = #keyPath(Bookmark.parentFolder)
         
-        if let parent = parent {
-            predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parent)
+        if let parentFolder = parent {
+            return NSPredicate(format: "%K == %@ AND %K == NO", parentFolderKP, parentFolder, isFavoriteKP)
         } else {
-            predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
+            return NSPredicate(format: "%K == nil AND %K == NO", parentFolderKP, isFavoriteKP)
         }
-        
-        guard let allBookmarks = Bookmark.get(predicate: predicate, context: context) as? [Bookmark] else {
-            return nil
-        }
-        
-        // We don't check for empty bookmarks array because the new bookmark is already added into context.
-        if allBookmarks.count < 2 { return nil }
-        
-        return allBookmarks.map { $0.order }.max()
     }
     
     // TODO: DELETE
