@@ -178,21 +178,20 @@ class Sync: JSInjector {
     func initializeSync(seed: [Int]? = nil, deviceName: String? = nil) {
         
         
-        // FIXME: Uncomment after sync work.
-//        #if NO_SYNC
-//        if syncSeed == nil { return }
-//        
-//        leaveSyncGroup()
-//    
-//        let msg = """
-//            Sync has been disabled, as it will not be included in the next couple of production builds.
-//            Your iOS device has been auto-removed from any sync groups.
-//        """
-//        
-//        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
-//        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-//        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
-//        #endif
+        #if NO_SYNC
+        if syncSeed == nil { return }
+        
+        leaveSyncGroup()
+    
+        let msg = """
+            Sync has been disabled, as it will not be included in the next couple of production builds.
+            Your iOS device has been auto-removed from any sync groups.
+        """
+        
+        let alert = UIAlertController(title: "Sync Disabled", message: msg, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        (UIApplication.shared.delegate as! AppDelegate).browserViewController.present(alert, animated: true, completion: nil)
+        #endif
         
         if let joinedSeed = seed, joinedSeed.count == Sync.SeedByteLength {
             // Always attempt seed write, setter prevents bad overwrites

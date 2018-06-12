@@ -105,12 +105,11 @@ class BraveSettingsView : AppSettingsTableViewController {
             SettingSection(title: NSAttributedString(string: Strings.General.uppercased()), children: generalSettings)
         ]
             
-        // FIXME: Comment after sync work
-        // #if !NO_SYNC
+        #if !NO_SYNC
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.OtherSettings.uppercased()), children:[SyncDevicesSetting(settings: self)]),
         ]
-        // #endif
+        #endif
         
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.Privacy.uppercased()), children:
