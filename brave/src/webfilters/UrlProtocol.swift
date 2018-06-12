@@ -34,6 +34,11 @@ class URLProtocol: Foundation.URLProtocol {
         }
 
         guard let url = request.url else { return false }
+        
+        // We let reader moded requests through to add auth headers to them.
+        if ReaderModeUtils.isReaderModeURL(url) {
+            return true
+        }
 
         let shieldState = testShieldState != nil ? testShieldState! : getShields(request)
         if shieldState.isAllOff() {
@@ -153,6 +158,12 @@ class URLProtocol: Foundation.URLProtocol {
     override func startLoading() {
         let newRequest = URLProtocol.cloneRequest(request)
         Foundation.URLProtocol.setProperty(true, forKey: markerRequestHandled, in: newRequest)
+        
+        if let url = request.url, ReaderModeUtils.isReaderModeURL(url) {
+            newRequest.addValue(WebServer.uniqueBytes, forHTTPHeaderField: WebServer.headerAuthKey)
+            connection = NSURLConnection(request: newRequest as URLRequest, delegate: self)
+            return
+        }
 
         let shieldState = URLProtocol.getShields(request)
         let ua = request.allHTTPHeaderFields?["User-Agent"]

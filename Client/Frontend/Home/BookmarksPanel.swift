@@ -455,6 +455,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         cell.textLabel?.text = item.displayTitle ?? item.url
         cell.textLabel?.lineBreakMode = .byTruncatingTail
         
+        cell.contentView.backgroundColor = .white
+        
         if !item.isFolder {
             configCell(icon: item.domain?.favicon, longPressForContextMenu: true)
             cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)

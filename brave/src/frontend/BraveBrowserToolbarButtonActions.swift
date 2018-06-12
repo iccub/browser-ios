@@ -23,7 +23,8 @@ extension BraveBrowserToolbarButtonActions {
     func respondToNewPrivateTab(action: UIAlertAction) {
         getApp().browserViewController.switchBrowsingMode(toPrivate: true)
         
-        if PinViewController.isBrowserLockEnabled {
+        let profile = getApp().profile
+        if PinViewController.isBrowserLockEnabled && profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true {
             let app = UIApplication.shared.delegate as! AppDelegate
             app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
         }

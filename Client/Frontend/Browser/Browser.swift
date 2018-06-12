@@ -302,6 +302,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             }
             
             lastRequest = URLRequest(url: restoreURL)
+            lastRequest?.addValue(WebServer.uniqueBytes, forHTTPHeaderField: WebServer.headerAuthKey)
             webView.loadRequest(lastRequest!)
         } else if let request = lastRequest {
             webView.loadRequest(request)

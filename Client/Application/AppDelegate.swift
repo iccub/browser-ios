@@ -126,7 +126,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             log.error("Failed to assign AVAudioSession category to allow playing with silent switch on for aural progress bar")
         }
 
-        let defaultRequest = URLRequest(url: UIConstants.DefaultHomePage as URL)
+        var defaultRequest = URLRequest(url: UIConstants.DefaultHomePage as URL)
+        defaultRequest.addValue(WebServer.uniqueBytes, forHTTPHeaderField: WebServer.headerAuthKey)
         let imageStore = DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.ScreenshotQuality)
 
         log.debug("Configuring tabManager…")
@@ -504,7 +505,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         ReaderModeHandlers.register(server, profile: profile)
         ErrorPageHelper.register(server, certStore: profile.certStore)
         AboutHomeHandler.register(server)
-        AboutLicenseHandler.register(server)
         SessionRestoreHandler.register(server)
         // Bug 1223009 was an issue whereby CGDWebserver crashed when moving to a background task
         // catching and handling the error seemed to fix things, but we're not sure why.

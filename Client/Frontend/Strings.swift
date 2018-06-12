@@ -79,7 +79,9 @@ extension Strings {
     public static let SyncUnableCreateGroup = NSLocalizedString("Unable to create new sync group.", comment: "Description on popup when setting up a sync group fails")
 
     public static let ShowTour = NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings")
-    public static let DefaultSearchEngine = NSLocalizedString("Default Search Engine", comment: "Open search section of settings")
+    public static let DefaultSearchEngine = NSLocalizedString("Search Engine", comment: "Open search section of settings")
+    public static let StandardTabSearch = NSLocalizedString("Standard Tab", comment: "Open search section of settings")
+    public static let PrivateTabSearch = NSLocalizedString("Private Tab", comment: "Open search section of settings")
     public static let Logins = NSLocalizedString("Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
     public static let Settings = NSLocalizedString("Settings", comment: "")
     public static let OtherSettings = NSLocalizedString("Other Settings", comment: "Other settings sectiont title")
@@ -131,6 +133,8 @@ extension Strings {
     public static let This_allows_you_to_save_the_image_to_your_CameraRoll = NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
     public static let Open_Settings = NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let Copy_Image = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
+    public static let Call_number = NSLocalizedString("Call %@", comment: "Context menu item for calling a phone number")
+    public static let Copy_Phone_Number = NSLocalizedString("Copy Phone Number", comment: "Context menu item for copying a phone number")
     public static let Call = NSLocalizedString("Call", comment:"Alert Call Button")
     public static let AllowOpenITunes_template = NSLocalizedString("Allow %@ to open iTunes?", comment: "Ask user if site can open iTunes store URL")
     public static let Paste_and_Go = NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit")
@@ -361,6 +365,12 @@ extension Strings {
     public static let Browser_lock_callout_message = NSLocalizedString("With Browser Lock, you will need to enter a PIN in order to access Brave.", comment: "Browser Lock feature callout message.")
     public static let Browser_lock_callout_not_now = NSLocalizedString("Not Now", comment: "Browser Lock feature callout not now action.")
     public static let Browser_lock_callout_enable = NSLocalizedString("Enable", comment: "Browser Lock feature callout enable action.")
+    
+    public static let DDG_callout_title = NSLocalizedString("Private search with DuckDuckGo?", comment: "DuckDuckGo callout title.")
+    public static let DDG_callout_message = NSLocalizedString("With private search, Brave will use DuckDuckGo to answer your searches while you are in this private tab. DuckDuckGo is a search engine that does not track your search history, enabling you to search privately.", comment: "DuckDuckGo message.")
+    public static let DDG_callout_no = NSLocalizedString("No", comment: "DuckDuckGo callout no action.")
+    public static let DDG_callout_enable = NSLocalizedString("Yes", comment: "DuckDuckGo callout enable action.")
+    public static let DDG_promotion = NSLocalizedString("Learn about private search \rwith DuckDuckGo", comment: "DuckDuckGo promotion label.")
 }
 
 // SYNC.

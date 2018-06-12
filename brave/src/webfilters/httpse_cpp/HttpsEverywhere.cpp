@@ -47,6 +47,8 @@ std::string HTTPSEverywhere::applyRedirectRule(std::string originalUrl, const st
         if (!exclusions.is_null() && exclusions.is_array()) {
             std::vector<json> v = exclusions;
             for (auto item : v) {
+                if (item.empty()) { continue; }
+
                 std::string pattern = item["p"];
                 if (std::regex_match(originalUrl, std::regex(pattern))) {
                     //printf("exclusion %s\n", originalUrl.c_str());

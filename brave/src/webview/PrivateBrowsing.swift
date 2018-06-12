@@ -82,7 +82,7 @@ class PrivateBrowsing {
         }
         
         postAsyncToMain(1.3) {
-            getApp().browserViewController.presentBrowserLockCallout()
+            getApp().browserViewController.presentDDGCallout()
         }
         
         isOn = true

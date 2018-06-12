@@ -46,15 +46,8 @@ extension BrowserViewController {
                     do {
                         try self.readerModeCache.put(currentURL, readabilityResult)
                     } catch _ {}
-
-                    #if BRAVE
-                        // this is not really correct, the original code is ignoring the navigation
-                        webView.loadRequest(URLRequest(url: readerModeURL))
-                    #else
-                        if let nav = webView.loadRequest(URLRequest(url: readerModeURL)) {
-                            self.ignoreNavigationInTab(tab, navigation: nav)
-                        }
-                    #endif
+                    
+                    webView.loadRequest(URLRequest(url: readerModeURL))
                 }
             })
         }

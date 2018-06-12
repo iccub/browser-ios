@@ -28,9 +28,7 @@ class AdBlocker {
             updateRegionalAdblockEnabledState()
         }
     }
-    fileprivate var isRegionalAdblockEnabled: Bool? = nil
-    // From https://github.com/brave/browser-android-tabs/blob/master/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java#L84
-    fileprivate let wellTestedAdblockRegions = ["ru", "uk", "be", "hi", "sv"]
+    fileprivate var isRegionalAdblockEnabled = prefKeyUseRegionalDefaultValue
 
     fileprivate init() {
         NotificationCenter.default.addObserver(self, selector: #selector(AdBlocker.prefsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
@@ -81,7 +79,7 @@ class AdBlocker {
 
     func isRegionalAdblockPossible() -> (hasRegionalFile: Bool, isDefaultSettingOn: Bool) {
         return (hasRegionalFile: currentLocaleCode != "en" && regionToS3FileName[currentLocaleCode] != nil,
-                isDefaultSettingOn: isRegionalAdblockEnabled ?? false)
+                isDefaultSettingOn: isRegionalAdblockEnabled)
    }
 
     func updateEnabledState() {
@@ -89,13 +87,9 @@ class AdBlocker {
     }
 
     fileprivate func updateRegionalAdblockEnabledState() {
-        isRegionalAdblockEnabled = BraveApp.getPrefs()?.boolForKey(AdBlocker.prefKeyUseRegional)
-        if isRegionalAdblockEnabled == nil && wellTestedAdblockRegions.contains(currentLocaleCode) {
-            // in this case it is only enabled by default for well tested regions (leave set to nil otherwise)
-            isRegionalAdblockEnabled = true
-        }
+        isRegionalAdblockEnabled = BraveApp.getPrefs()?.boolForKey(AdBlocker.prefKeyUseRegional) ?? AdBlocker.prefKeyUseRegionalDefaultValue
 
-        if currentLocaleCode != "en" && (isRegionalAdblockEnabled ?? false) {
+        if currentLocaleCode != "en" && isRegionalAdblockEnabled {
             if let file = regionToS3FileName[currentLocaleCode] {
                 if networkLoaders[currentLocaleCode] == nil {
                     networkLoaders[currentLocaleCode] = getNetworkLoader(forLocale: currentLocaleCode, name: file)

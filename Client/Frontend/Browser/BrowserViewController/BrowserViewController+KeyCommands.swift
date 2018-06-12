@@ -37,8 +37,8 @@ extension BrowserViewController {
 
     func newPrivateTab() {
         openBlankNewTabAndFocus(isPrivate: true)
-        
-        if PinViewController.isBrowserLockEnabled {
+        let profile = getApp().profile
+        if PinViewController.isBrowserLockEnabled && profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true {
             self.selectLocationBar()
         }
     }

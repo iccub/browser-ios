@@ -101,8 +101,14 @@ extension UIAlertController {
                                   forcedInput: Bool = true,
                                   callbackOnMain: @escaping (_ input: String?, _ input2: String?) -> ()) -> UIAlertController {
         // Returning alert, so no external, strong reference to initial instance
-        return UserTextInputAlert(title: title, message: message, startingText: startingText, placeholder: placeholder,
-                                  startingText2: startingText2, placeholder2: placeholder2, forcedInput: forcedInput,
+        return UserTextInputAlert(title: title, message: message, 
+                                  startingText: startingText, 
+                                  placeholder: placeholder,
+                                  keyboardType: keyboardType,
+                                  startingText2: startingText2, 
+                                  placeholder2: placeholder2,
+                                  keyboardType2: keyboardType2,
+                                  forcedInput: forcedInput,
                                   callbackOnMain: callbackOnMain).alert
     }
 
@@ -150,38 +156,29 @@ class UserTextInputAlert {
         alert.addAction(self.okAction)
         alert.addAction(cancelAction)
         
-        alert.addTextField {
-            textField in
+        alert.addTextField(configurationHandler: textFieldConfig(text: startingText, placeholder: placeholder, 
+                                                              keyboardType: keyboardType, forcedInput: forcedInput))
+
+        if startingText2 != nil {
+            alert.addTextField(configurationHandler: textFieldConfig(text: startingText2, placeholder: placeholder2, 
+                                                                  keyboardType: keyboardType2, forcedInput: forcedInput))        
+        }
+    }
+    
+    private func textFieldConfig(text: String?, placeholder: String?, keyboardType: UIKeyboardType?, forcedInput: Bool)
+        -> (UITextField) -> () {
+        return { textField in 
             textField.placeholder = placeholder
             textField.isSecureTextEntry = false
             textField.keyboardAppearance = .dark
-            textField.autocapitalizationType = .words
-            textField.autocorrectionType = .default
+            textField.autocapitalizationType = keyboardType == .URL ? .none : .words 
+            textField.autocorrectionType = keyboardType == .URL ? .no : .default
             textField.returnKeyType = .done
-            textField.text = startingText
+            textField.text = text
             textField.keyboardType = keyboardType ?? .default
             
             if forcedInput {
                 NotificationCenter.default.addObserver(self, selector: #selector(self.notificationReceived(notification:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
-            }
-        }
-
-        // TODO: Abstract to an array of textfields to DRY?
-        if let text2 = startingText2 {
-            alert.addTextField {
-                textField in
-                textField.placeholder = placeholder2
-                textField.isSecureTextEntry = false
-                textField.keyboardAppearance = .dark
-                textField.autocapitalizationType = .words
-                textField.autocorrectionType = .default
-                textField.returnKeyType = .done
-                textField.text = text2
-                textField.keyboardType = keyboardType2 ?? .default
-
-                if forcedInput {
-                    NotificationCenter.default.addObserver(self, selector: #selector(self.notificationReceived(notification:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
-                }
             }
         }
     }

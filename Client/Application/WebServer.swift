@@ -17,6 +17,9 @@ class WebServer {
     var base: String {
         return "http://localhost:\(server.port)"
     }
+    
+    static let headerAuthKey = "gcd-auth"
+    static let uniqueBytes = UUID().uuidString
 
     static var port = 5309
     static let kMaxPortNum = 5400
@@ -71,5 +74,19 @@ class WebServer {
             components?.port = Int(WebServer.sharedInstance.server.port)
         }
         return components?.url
+    }
+    
+    /// Each request to GCDWebserver should be authenticated by passing a random number auth header
+    static func localhostRequest(url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.addValue(uniqueBytes, forHTTPHeaderField: headerAuthKey)
+        
+        return request
+    }
+    
+    func isRequestAuthenticated(_ request: GCDWebServerRequest) -> Bool {
+        guard let headerValue = request.headers[WebServer.headerAuthKey] as? String else { return false }
+        
+        return headerValue.sha256 == WebServer.uniqueBytes.sha256
     }
 }
