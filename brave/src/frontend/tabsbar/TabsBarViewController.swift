@@ -192,7 +192,7 @@ class TabsBarViewController: UIViewController {
         
         collectionView.snp.makeConstraints { (make) in
             make.bottom.top.left.equalTo(view)
-            make.right.equalTo(view).inset(BraveUX.TabsBarPlusButtonWidth)
+            make.right.equalTo(view)
         }
 
         getApp().tabManager.addDelegate(self)
