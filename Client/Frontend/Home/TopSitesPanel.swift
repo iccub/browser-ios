@@ -169,7 +169,7 @@ class TopSitesPanel: UIViewController, HomePanel {
 
         makeConstraints()
         
-        if let profile = getApp().profile, profile.searchEngines.defaultEngine(forType: .privateMode).shortName == "DuckDuckGo" {
+        if let profile = getApp().profile, profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
             hideDDG()
         }
         

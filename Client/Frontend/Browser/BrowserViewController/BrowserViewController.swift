@@ -606,6 +606,11 @@ class BrowserViewController: UIViewController {
             return
         }
         
+        // Do not show ddg popup if user already chose it for private browsing. 
+        if profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
+            return
+        }
+        
         weak var weakSelf = self
         let popup = AlertPopupView(image: UIImage(named: "duckduckgo"), title: Strings.DDG_callout_title, message: Strings.DDG_callout_message)
         popup.dismissHandler = {
@@ -621,7 +626,7 @@ class BrowserViewController: UIViewController {
             }
             
             weakSelf?.profile.prefs.setBool(true, forKey: kPrefKeyPopupForDDG)
-            weakSelf?.profile.searchEngines.defaultEngine("DuckDuckGo", forType: .privateMode)
+            weakSelf?.profile.searchEngines.defaultEngine(OpenSearchEngine.EngineNames.duckDuckGo, forType: .privateMode)
             
             if let topSitesPanel = weakSelf?.homePanelController?.topSitesPanel as? TopSitesPanel {
                 topSitesPanel.ddgPrivateSearchCompletionBlock?()
