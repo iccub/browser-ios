@@ -64,7 +64,6 @@ class FavoritesTileDecorator {
             cell.imageView.backgroundColor = website.backgroundColor
             cell.imageView.contentMode = .scaleAspectFit
             cell.imageView.layer.minificationFilter = kCAFilterTrilinear
-            cell.showBorder(!PrivateBrowsing.singleton.isOn)
 
             UIGraphicsBeginImageContextWithOptions(image.size, false, 0)
             image.draw(in: CGRect(origin: CGPoint(x: 3, y: 6), size: CGSize(width: image.size.width - 6, height: image.size.height - 6)))
@@ -93,7 +92,6 @@ class FavoritesTileDecorator {
                 // last resort - download the icon
                 downloadFaviconsAndUpdateForUrl(url, indexPath: indexPath)
             }
-            break
         }
     }
 
@@ -109,12 +107,10 @@ class FavoritesTileDecorator {
                 }
             }
             else {
-                postAsyncToMain {
-                    cell.imageView.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        let favicon = FaviconFetcher.bestOrFallback(img, url: iconUrl, cacheUrl: cacheWithUrl)
-                        ImageCache.shared.cache(favicon, url: cacheWithUrl, type: .square, callback: nil)
-                        cell.imageView.image = favicon
-                    })
+                cell.imageView.setFaviconImage(with: iconUrl, cacheUrl: cacheWithUrl) { image in
+                    if image.getPixelColor(of: CGPoint(x: 10, y: 10)).isVeryLight {
+                        cell.showBorder(true)
+                    }
                 }
             }
         })

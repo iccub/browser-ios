@@ -47,4 +47,10 @@ extension UIColor {
         getWhite(&white, alpha: nil)
         return white > 0.5
     }
+    
+    public var isVeryLight: Bool {
+        var white: CGFloat = 0
+        getWhite(&white, alpha: nil)
+        return white < 0.3
+    }
 }

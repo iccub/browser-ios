@@ -61,4 +61,20 @@ extension UIImage {
     public static func templateImageNamed(_ name: String) -> UIImage? {
         return UIImage(named: name)?.withRenderingMode(.alwaysTemplate)
     }
+    
+    public func getPixelColor(of point: CGPoint) -> UIColor {
+        guard let pixelData = cgImage?.dataProvider?.data else { return UIColor.white }
+        
+        let data = CFDataGetBytePtr(pixelData)!
+        
+        let pixelInfo = Int(size.width * point.y) + Int(point.x * 4)
+        let pixelValues: CGFloat = 255.0
+        
+        let r = CGFloat(data[pixelInfo+0]) / pixelValues
+        let g = CGFloat(data[pixelInfo+1]) / pixelValues
+        let b = CGFloat(data[pixelInfo+2]) / pixelValues
+        let a = CGFloat(data[pixelInfo+3]) / pixelValues
+        
+        return UIColor(red: b, green: g, blue: r, alpha: a)
+    }
 }

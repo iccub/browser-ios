@@ -58,7 +58,10 @@ struct FavoritesHelper {
         return  renderer.image { ctx in
             let rectangle = CGRect(x: 0, y: 0, width: iconSize.width, height: iconSize.height)
             
+            let textColor = color.isLight ? BraveUX.GreyH : BraveUX.White
+            
             ctx.cgContext.addRect(rectangle)
+            ctx.cgContext.setStrokeColor(UIColor.clear.cgColor)
             ctx.cgContext.setFillColor(color.cgColor)
             ctx.cgContext.drawPath(using: .fillStroke)
             
@@ -67,7 +70,7 @@ struct FavoritesHelper {
             
             let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: iconSize.height-90) ?? UIFont.systemFont(ofSize: iconSize.height-90, weight: UIFontWeightThin),
                          NSParagraphStyleAttributeName: paragraphStyle,
-                         NSForegroundColorAttributeName: BraveUX.White]
+                         NSForegroundColorAttributeName: textColor]
             
             let string: NSString = NSString(string: letter.uppercased())
             let size = string.size(attributes: attrs)

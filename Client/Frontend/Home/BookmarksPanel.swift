@@ -486,15 +486,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 }
             }
             else {
-                postAsyncToMain {
-                    cell.imageView?.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        postAsyncToMain {
-                            let favicon = FaviconFetcher.bestOrFallback(img, url: iconUrl, cacheUrl: cacheWithUrl)
-                            ImageCache.shared.cache(favicon, url: cacheWithUrl, type: .square, callback: nil)
-                            cell.imageView?.image = favicon
-                        }
-                    })
-                }
+                cell.imageView?.setFaviconImage(with: iconUrl, cacheUrl: cacheWithUrl)
             }
         })
     }

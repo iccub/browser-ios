@@ -8,8 +8,8 @@ import Shared
 struct ThumbnailCellUX {
     /// Ratio of width:height of the thumbnail image.
     static let ImageAspectRatio: Float = 1.0
-    static let BorderColor = BraveUX.GreyJ
-    static let BorderWidth: CGFloat = 0
+    static let BorderColor = BraveUX.GreyD
+    static let BorderWidth: CGFloat = 0.5
     static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? BraveUX.GreyJ : BraveUX.GreyH
     static let LabelAlignment: NSTextAlignment = .center
 
@@ -103,7 +103,6 @@ class ThumbnailCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = ThumbnailCellUX.CornerRadius
         imageView.layer.borderColor = ThumbnailCellUX.BorderColor.cgColor
-        imageView.layer.borderWidth = ThumbnailCellUX.BorderWidth
         imageView.layer.minificationFilter = kCAFilterTrilinear
         imageView.layer.magnificationFilter = kCAFilterNearest
         return imageView

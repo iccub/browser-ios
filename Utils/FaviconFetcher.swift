@@ -208,8 +208,7 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         return deferred
     }
     
-    static func bestOrFallback(_ img: UIImage?, url: URL, cacheUrl: URL) -> UIImage {
-        var finalImage = img
+    static func bestOrFallback(_ img: UIImage?, url: URL, cacheUrl: URL) -> (image: UIImage, shouldCache: Bool) {
         var useFallback = false
         
         if img == nil {
@@ -219,21 +218,45 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         }
         
         if useFallback, let host = url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
-            var bgColor = FallbackIcon.color
-            
             let context = DataController.shared.mainThreadContext
             
-            // Only use stored color if it's not too light.
-            if let domain = Domain.getOrCreateForUrl(cacheUrl, context: context),
-                let colorString = domain.color,
-                !UIColor(colorString: colorString).isLight {
-                bgColor = UIColor(colorString: colorString)
+            guard let domain = Domain.getOrCreateForUrl(cacheUrl, context: context) else {
+                return (FaviconFetcher.defaultFavicon, false)
             }
             
-            finalImage = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: bgColor, andSize: FallbackIcon.size)
+            var bgColor = FallbackIcon.color
+            if let domainColor = domain.color {
+                bgColor = UIColor(colorString: domainColor)
+            }
+            
+            let fallback = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: bgColor, andSize: FallbackIcon.size)
+            return (fallback, false)
         }
         
-        return finalImage ?? FaviconFetcher.defaultFavicon
+        if let img = img {
+            return (img, true)
+        } 
+        
+        return (FaviconFetcher.defaultFavicon, false)
     }
 }
 
+extension UIImageView {
+    func setFaviconImage(with iconUrl: URL, cacheUrl: URL, completion: ((UIImage) -> ())? = nil) {
+        postAsyncToMain {
+            self.sd_setImage(with: iconUrl, completed: { img, _, _, _ in
+                let favicon = FaviconFetcher.bestOrFallback(img, url: iconUrl, cacheUrl: cacheUrl)
+                if favicon.shouldCache {
+                    ImageCache.shared.cache(favicon.image, url: cacheUrl, type: .square, callback: nil)
+                } else {
+                    // The only case where we want to return an image is fallback icon, we can then detect if its background
+                    // color is light enough to add borders.
+                    completion?(favicon.image)
+                }
+                
+                self.image = favicon.image
+                
+            })
+        }
+    }
+}

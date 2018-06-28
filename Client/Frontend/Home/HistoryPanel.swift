@@ -123,13 +123,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
                 if image == nil {
                     postAsyncToMain {
                         cell.imageView?.contentMode = .scaleAspectFit
-                        cell.imageView?.sd_setImage(with: url, completed: { (img, err, type, u) in
-                            postAsyncToMain {
-                                let favicon = FaviconFetcher.bestOrFallback(img, url: url, cacheUrl: cacheUrl)
-                                ImageCache.shared.cache(favicon, url: cacheUrl, type: .square, callback: nil)
-                                cell.imageView?.image = favicon
-                            }
-                        })
+                        cell.imageView?.setFaviconImage(with: url, cacheUrl: cacheUrl)
                     }
                 }
                 else {
