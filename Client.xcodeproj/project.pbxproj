@@ -591,7 +591,6 @@
 		EB00A2F51E1BF4CC00680DB8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB009F1E1E1BF4CA00680DB8 /* BloomFilter.cpp */; };
 		EB00A2F61E1BF4CC00680DB8 /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = EB009F1F1E1BF4CA00680DB8 /* BloomFilter.h */; };
 		EB00A3081E1BF4CC00680DB8 /* hashFn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB009F391E1BF4CA00680DB8 /* hashFn.cpp */; };
-		EB00A3091E1BF4CC00680DB8 /* hashFn.h in Headers */ = {isa = PBXBuildFile; fileRef = EB009F3A1E1BF4CA00680DB8 /* hashFn.h */; };
 		EB00A6871E1C071000680DB8 /* ad_block_client.cc in Sources */ = {isa = PBXBuildFile; fileRef = EB00A6831E1C071000680DB8 /* ad_block_client.cc */; };
 		EB00A6881E1C071000680DB8 /* ad_block_client.h in Headers */ = {isa = PBXBuildFile; fileRef = EB00A6841E1C071000680DB8 /* ad_block_client.h */; };
 		EB00A6891E1C071000680DB8 /* cosmetic_filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = EB00A6851E1C071000680DB8 /* cosmetic_filter.cc */; };
@@ -1643,7 +1642,6 @@
 		EB009F1E1E1BF4CA00680DB8 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomFilter.cpp; sourceTree = "<group>"; };
 		EB009F1F1E1BF4CA00680DB8 /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilter.h; sourceTree = "<group>"; };
 		EB009F391E1BF4CA00680DB8 /* hashFn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hashFn.cpp; sourceTree = "<group>"; };
-		EB009F3A1E1BF4CA00680DB8 /* hashFn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashFn.h; sourceTree = "<group>"; };
 		EB00A6831E1C071000680DB8 /* ad_block_client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ad_block_client.cc; sourceTree = "<group>"; };
 		EB00A6841E1C071000680DB8 /* ad_block_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ad_block_client.h; sourceTree = "<group>"; };
 		EB00A6851E1C071000680DB8 /* cosmetic_filter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cosmetic_filter.cc; sourceTree = "<group>"; };
@@ -3381,7 +3379,6 @@
 				EB009F1E1E1BF4CA00680DB8 /* BloomFilter.cpp */,
 				EB009F1F1E1BF4CA00680DB8 /* BloomFilter.h */,
 				EB009F391E1BF4CA00680DB8 /* hashFn.cpp */,
-				EB009F3A1E1BF4CA00680DB8 /* hashFn.h */,
 			);
 			name = "bloom-filter-cpp";
 			path = "brave/node_modules/bloom-filter-cpp";
@@ -3722,7 +3719,6 @@
 				61464FBEE20CE5E041C799A2 /* ABPFilterLibWrapper.h in Headers */,
 				B18C45C6E899AE3490F9B440 /* HttpsEverywhere.h in Headers */,
 				0A03FF991FCDF0C400DF32C9 /* mix.h in Headers */,
-				EB00A3091E1BF4CC00680DB8 /* hashFn.h in Headers */,
 				0A03FFEC1FCDF0C400DF32C9 /* set.h in Headers */,
 				0A03FFE21FCDF0C400DF32C9 /* unicode_groups.h in Headers */,
 				EB00A68A1E1C071000680DB8 /* cosmetic_filter.h in Headers */,
@@ -5202,7 +5198,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					$SRCROOT/,
 					$SDKROOT/usr/include/libxml2,
-					"$SRCROOT/brave/node_modules/tracking-protection/node_modules/hashset-cpp",
+					"$SRCROOT/brave/node_modules/ad-block/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -5797,7 +5793,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					$SRCROOT/,
 					$SDKROOT/usr/include/libxml2,
-					"$SRCROOT/brave/node_modules/tracking-protection/node_modules/hashset-cpp",
+					"$SRCROOT/brave/node_modules/ad-block/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
