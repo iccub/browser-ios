@@ -355,6 +355,12 @@ class TopSitesPanel: UIViewController, HomePanel {
     // MARK: - Private browsing modde
     func privateBrowsingModeChanged() {
         let isPrivateBrowsing = PrivateBrowsing.singleton.isOn
+        
+        if isPrivateBrowsing {
+            let profile = getApp().profile
+            
+            ddgButton.isHidden = profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo 
+        }
 
         // TODO: This entire blockshould be abstracted
         //  to make code in this class DRY (duplicates from elsewhere)
