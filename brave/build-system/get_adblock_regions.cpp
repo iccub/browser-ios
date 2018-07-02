@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <fstream>
-#include "regions.h"
+#include "filter_list.cc"
+#include "lists/regions.h"
 
 // Gets regions from regions.h file and parses it to a format supported by iOS app.
 int main(int argc, const char * argv[]) {
