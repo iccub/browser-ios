@@ -10,7 +10,7 @@
 #include "./bad_fingerprint.h"
 #include "./bad_fingerprints.h"
 #include "./cosmetic_filter.h"
-#include "./hashFn.h"
+#include "hashFn.h"
 #include "./no_fingerprint_domain.h"
 
 #include "BloomFilter.h"

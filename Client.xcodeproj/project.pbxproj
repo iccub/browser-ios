@@ -21,6 +21,17 @@
 		08A6B9B1A574E15F5AD1DDC2 /* BrowserTrayAnimators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F371D05B609063A51549E8 /* BrowserTrayAnimators.swift */; };
 		08BC96A6EFBA13BBE99C9A0F /* BraveUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8856E29DAA2D9EAC4F9A85 /* BraveUtil.swift */; };
 		0A02A948202B66FF00A1E754 /* UrpLogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A02A947202B66FF00A1E754 /* UrpLogsViewController.swift */; };
+		0A02B80520EA32CD00E1BB44 /* hash_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A02B7EE20EA32CC00E1BB44 /* hash_set.cc */; };
+		0A02B80620EA32CD00E1BB44 /* hash_set.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B80320EA32CC00E1BB44 /* hash_set.h */; };
+		0A02B80720EA32CD00E1BB44 /* hash_item.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B80420EA32CD00E1BB44 /* hash_item.h */; };
+		0A02B80A20EA34EC00E1BB44 /* no_fingerprint_domain.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A02B80820EA34EB00E1BB44 /* no_fingerprint_domain.cc */; };
+		0A02B80B20EA34EC00E1BB44 /* no_fingerprint_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B80920EA34EB00E1BB44 /* no_fingerprint_domain.h */; };
+		0A02B80E20EA356600E1BB44 /* protocol.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A02B80C20EA356500E1BB44 /* protocol.cc */; };
+		0A02B80F20EA356600E1BB44 /* protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B80D20EA356600E1BB44 /* protocol.h */; };
+		0A02B81320EA359700E1BB44 /* FirstPartyHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B81120EA359700E1BB44 /* FirstPartyHost.h */; };
+		0A02B81620EA35EC00E1BB44 /* TrackerData.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A02B81420EA35EB00E1BB44 /* TrackerData.h */; };
+		0A02B81A20EA364000E1BB44 /* FirstPartyHost.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A02B81820EA363F00E1BB44 /* FirstPartyHost.cpp */; };
+		0A02B81B20EA364000E1BB44 /* TrackerData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0A02B81920EA364000E1BB44 /* TrackerData.cpp */; };
 		0A03788F20211D1D00E52C13 /* ReferralData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A03788C20211D1D00E52C13 /* ReferralData.swift */; };
 		0A03789020211D1D00E52C13 /* UserReferralProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A03788D20211D1D00E52C13 /* UserReferralProgram.swift */; };
 		0A03789120211D1D00E52C13 /* UrpService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A03788E20211D1D00E52C13 /* UrpService.swift */; };
@@ -577,9 +588,6 @@
 		EAF3EC8A333CDF89EAF36E30 /* thread_annotations.h in Headers */ = {isa = PBXBuildFile; fileRef = 421F3D5F398D03429D10C994 /* thread_annotations.h */; };
 		EB0090841E1BF23D00680DB8 /* base.h in Headers */ = {isa = PBXBuildFile; fileRef = EB00886E1E1BF23800680DB8 /* base.h */; };
 		EB0090A01E1BF23D00680DB8 /* filter.h in Headers */ = {isa = PBXBuildFile; fileRef = EB0088981E1BF23800680DB8 /* filter.h */; };
-		EB009BAF1E1BF44200680DB8 /* HashItem.h in Headers */ = {isa = PBXBuildFile; fileRef = EB0097E21E1BF44000680DB8 /* HashItem.h */; };
-		EB009BB01E1BF44200680DB8 /* HashSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB0097E31E1BF44000680DB8 /* HashSet.cpp */; };
-		EB009BB11E1BF44200680DB8 /* HashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = EB0097E41E1BF44000680DB8 /* HashSet.h */; };
 		EB00A2F51E1BF4CC00680DB8 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB009F1E1E1BF4CA00680DB8 /* BloomFilter.cpp */; };
 		EB00A2F61E1BF4CC00680DB8 /* BloomFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = EB009F1F1E1BF4CA00680DB8 /* BloomFilter.h */; };
 		EB00A3081E1BF4CC00680DB8 /* hashFn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB009F391E1BF4CA00680DB8 /* hashFn.cpp */; };
@@ -968,6 +976,17 @@
 		0994D8CB826BBAE3C446B125 /* Crasher.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Crasher.h; path = ./Client/Application/Crasher.h; sourceTree = "<group>"; };
 		09B26BBAC8D68EFA2A333975 /* CharisSILR.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = CharisSILR.ttf; path = ./Client/Assets/Fonts/CharisSILR.ttf; sourceTree = "<group>"; };
 		0A02A947202B66FF00A1E754 /* UrpLogsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrpLogsViewController.swift; sourceTree = "<group>"; };
+		0A02B7EE20EA32CC00E1BB44 /* hash_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hash_set.cc; sourceTree = "<group>"; };
+		0A02B80320EA32CC00E1BB44 /* hash_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hash_set.h; sourceTree = "<group>"; };
+		0A02B80420EA32CD00E1BB44 /* hash_item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hash_item.h; sourceTree = "<group>"; };
+		0A02B80820EA34EB00E1BB44 /* no_fingerprint_domain.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = no_fingerprint_domain.cc; sourceTree = "<group>"; };
+		0A02B80920EA34EB00E1BB44 /* no_fingerprint_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = no_fingerprint_domain.h; sourceTree = "<group>"; };
+		0A02B80C20EA356500E1BB44 /* protocol.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = protocol.cc; sourceTree = "<group>"; };
+		0A02B80D20EA356600E1BB44 /* protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = protocol.h; sourceTree = "<group>"; };
+		0A02B81120EA359700E1BB44 /* FirstPartyHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirstPartyHost.h; sourceTree = "<group>"; };
+		0A02B81420EA35EB00E1BB44 /* TrackerData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackerData.h; sourceTree = "<group>"; };
+		0A02B81820EA363F00E1BB44 /* FirstPartyHost.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FirstPartyHost.cpp; sourceTree = "<group>"; };
+		0A02B81920EA364000E1BB44 /* TrackerData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TrackerData.cpp; sourceTree = "<group>"; };
 		0A03788C20211D1D00E52C13 /* ReferralData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferralData.swift; sourceTree = "<group>"; };
 		0A03788D20211D1D00E52C13 /* UserReferralProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserReferralProgram.swift; sourceTree = "<group>"; };
 		0A03788E20211D1D00E52C13 /* UrpService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UrpService.swift; sourceTree = "<group>"; };
@@ -1621,9 +1640,6 @@
 		EAF179D957607D89D4BDC9A3 /* crc32c.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = crc32c.h; path = ./brave/ThirdParty/leveldb/util/crc32c.h; sourceTree = "<group>"; };
 		EB00886E1E1BF23800680DB8 /* base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base.h; sourceTree = "<group>"; };
 		EB0088981E1BF23800680DB8 /* filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filter.h; sourceTree = "<group>"; };
-		EB0097E21E1BF44000680DB8 /* HashItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashItem.h; sourceTree = "<group>"; };
-		EB0097E31E1BF44000680DB8 /* HashSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HashSet.cpp; sourceTree = "<group>"; };
-		EB0097E41E1BF44000680DB8 /* HashSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HashSet.h; sourceTree = "<group>"; };
 		EB009F1E1E1BF4CA00680DB8 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomFilter.cpp; sourceTree = "<group>"; };
 		EB009F1F1E1BF4CA00680DB8 /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilter.h; sourceTree = "<group>"; };
 		EB009F391E1BF4CA00680DB8 /* hashFn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hashFn.cpp; sourceTree = "<group>"; };
@@ -2062,9 +2078,13 @@
 		0D2D7788962AEC9F27031459 /* tracking-protection */ = {
 			isa = PBXGroup;
 			children = (
+				0A02B81820EA363F00E1BB44 /* FirstPartyHost.cpp */,
 				32454E9E39178D4B3CD31294 /* FirstPartyHost.h */,
-				3AFA720AEE3F432355F29EEA /* TPParser.h */,
 				F90C6C6C21DCA3E0ED89E177 /* TPParser.cpp */,
+				3AFA720AEE3F432355F29EEA /* TPParser.h */,
+				0A02B81920EA364000E1BB44 /* TrackerData.cpp */,
+				0A02B81420EA35EB00E1BB44 /* TrackerData.h */,
+				0A02B81120EA359700E1BB44 /* FirstPartyHost.h */,
 			);
 			name = "tracking-protection";
 			path = "brave/node_modules/tracking-protection";
@@ -3326,15 +3346,19 @@
 		EB00885E1E1BF23800680DB8 /* ad-block */ = {
 			isa = PBXGroup;
 			children = (
-				EB00A6831E1C071000680DB8 /* ad_block_client.cc */,
-				EB00A6841E1C071000680DB8 /* ad_block_client.h */,
-				EB00A6851E1C071000680DB8 /* cosmetic_filter.cc */,
-				EB00A6861E1C071000680DB8 /* cosmetic_filter.h */,
 				EB009F141E1BF4CA00680DB8 /* bloom-filter-cpp */,
 				EB0097C51E1BF44000680DB8 /* hashset-cpp */,
+				EB00A6831E1C071000680DB8 /* ad_block_client.cc */,
+				EB00A6841E1C071000680DB8 /* ad_block_client.h */,
 				EB00886E1E1BF23800680DB8 /* base.h */,
-				EB0088981E1BF23800680DB8 /* filter.h */,
+				EB00A6851E1C071000680DB8 /* cosmetic_filter.cc */,
+				EB00A6861E1C071000680DB8 /* cosmetic_filter.h */,
 				EB00A68B1E1C079800680DB8 /* filter.cc */,
+				EB0088981E1BF23800680DB8 /* filter.h */,
+				0A02B80820EA34EB00E1BB44 /* no_fingerprint_domain.cc */,
+				0A02B80920EA34EB00E1BB44 /* no_fingerprint_domain.h */,
+				0A02B80C20EA356500E1BB44 /* protocol.cc */,
+				0A02B80D20EA356600E1BB44 /* protocol.h */,
 			);
 			name = "ad-block";
 			path = "brave/node_modules/ad-block";
@@ -3343,9 +3367,9 @@
 		EB0097C51E1BF44000680DB8 /* hashset-cpp */ = {
 			isa = PBXGroup;
 			children = (
-				EB0097E21E1BF44000680DB8 /* HashItem.h */,
-				EB0097E31E1BF44000680DB8 /* HashSet.cpp */,
-				EB0097E41E1BF44000680DB8 /* HashSet.h */,
+				0A02B80420EA32CD00E1BB44 /* hash_item.h */,
+				0A02B7EE20EA32CC00E1BB44 /* hash_set.cc */,
+				0A02B80320EA32CC00E1BB44 /* hash_set.h */,
 			);
 			name = "hashset-cpp";
 			path = "brave/node_modules/hashset-cpp";
@@ -3620,6 +3644,7 @@
 				1D0EC87F3C7005732156DB55 /* dbformat.h in Headers */,
 				C7E48472B057D3EF5E14CC21 /* filename.h in Headers */,
 				C1689483F3FAE27CC30E202B /* log_format.h in Headers */,
+				0A02B80720EA32CD00E1BB44 /* hash_item.h in Headers */,
 				ED86C167052A9F70FAF747C4 /* log_reader.h in Headers */,
 				97F8E33B27BCC1B7187533D4 /* log_writer.h in Headers */,
 				7A820CE2A74B2B30F2297291 /* memtable.h in Headers */,
@@ -3629,6 +3654,7 @@
 				CFF6C3BBB78F3B7F99DC50B6 /* version_edit.h in Headers */,
 				EB00A2F61E1BF4CC00680DB8 /* BloomFilter.h in Headers */,
 				0DFE30543A571642D72FA039 /* version_set.h in Headers */,
+				0A02B80620EA32CD00E1BB44 /* hash_set.h in Headers */,
 				D7C5871B5B5ADBFAC3919E65 /* write_batch_internal.h in Headers */,
 				EB0090A01E1BF23D00680DB8 /* filter.h in Headers */,
 				691BA9CA6E3647CC3D9ECAB6 /* memenv.h in Headers */,
@@ -3659,6 +3685,8 @@
 				56439B27AA657730554FE84A /* block_builder.h in Headers */,
 				F90CAD0FC189B7DC71007DA7 /* filter_block.h in Headers */,
 				9A3CF331365EA997C962DCF5 /* format.h in Headers */,
+				0A02B81320EA359700E1BB44 /* FirstPartyHost.h in Headers */,
+				0A02B80B20EA34EC00E1BB44 /* no_fingerprint_domain.h in Headers */,
 				0A03FFE91FCDF0C400DF32C9 /* regexp.h in Headers */,
 				0A03FF9D1FCDF0C400DF32C9 /* utf.h in Headers */,
 				8C3AB1D6EF08514FD714B10A /* iterator_wrapper.h in Headers */,
@@ -3672,6 +3700,8 @@
 				EE651A235D2355ECC0865F46 /* crc32c.h in Headers */,
 				8DBAF4A0231278A32A7B53E7 /* hash.h in Headers */,
 				0A03FFA01FCDF0C400DF32C9 /* logging.h in Headers */,
+				0A02B81620EA35EC00E1BB44 /* TrackerData.h in Headers */,
+				0A02B80F20EA356600E1BB44 /* protocol.h in Headers */,
 				0A03FF9A1FCDF0C400DF32C9 /* sparse_array.h in Headers */,
 				817E102C969EE4EA83036999 /* histogram.h in Headers */,
 				29AC3A5CDE2EEC83A5C0A735 /* logging.h in Headers */,
@@ -3681,7 +3711,6 @@
 				0A03FF9B1FCDF0C400DF32C9 /* flags.h in Headers */,
 				E39C2782941C47224F91EAF6 /* testharness.h in Headers */,
 				0A03FFEB1FCDF0C400DF32C9 /* re2.h in Headers */,
-				EB009BB11E1BF44200680DB8 /* HashSet.h in Headers */,
 				EF875F2BA5E1EB136ADE64CA /* testutil.h in Headers */,
 				BF983D0715644F1AB0F23E68 /* NSData+GZIP.h in Headers */,
 				C6FF450832F5A645F9E9ECF9 /* NSFileManager+Tar.h in Headers */,
@@ -3689,7 +3718,6 @@
 				0A03FFEA1FCDF0C400DF32C9 /* bitmap256.h in Headers */,
 				F1D4718E1D777C7C007B443D /* OnePasswordExtension.h in Headers */,
 				0A03FFBA1FCDF0C400DF32C9 /* prefilter_tree.h in Headers */,
-				EB009BAF1E1BF44200680DB8 /* HashItem.h in Headers */,
 				E8A10AA61C5538355063C087 /* SwizzlingToHideSharePicker.h in Headers */,
 				61464FBEE20CE5E041C799A2 /* ABPFilterLibWrapper.h in Headers */,
 				B18C45C6E899AE3490F9B440 /* HttpsEverywhere.h in Headers */,
@@ -4639,6 +4667,7 @@
 				5FBB6E142EFF5F6E989ABD49 /* block_builder.cc in Sources */,
 				1204E92DCEECF3540EA648CF /* filter_block.cc in Sources */,
 				5D71B69B1E6885E00073621F /* SyncCrypto.swift in Sources */,
+				0A02B80A20EA34EC00E1BB44 /* no_fingerprint_domain.cc in Sources */,
 				0A03FFEE1FCDF0C400DF32C9 /* prog.cc in Sources */,
 				5C1A9E851F97D6060071495E /* PopupView.swift in Sources */,
 				40DD8F2FF8733625CF906534 /* format.cc in Sources */,
@@ -4686,6 +4715,7 @@
 				B559CDC0AF8A6D35DE545B6A /* BraveBrowserViewController.swift in Sources */,
 				CBE8F9770BF74CCB68E0807A /* BraveMainWindow.swift in Sources */,
 				184619D873835F18B9731D1E /* BraveScrollController.swift in Sources */,
+				0A02B81A20EA364000E1BB44 /* FirstPartyHost.cpp in Sources */,
 				8999244A8E5D55AF862B8167 /* BraveSettingsView.swift in Sources */,
 				42BB62D8A935B31499CE77E3 /* BraveTopViewController.swift in Sources */,
 				0A03FFE51FCDF0C400DF32C9 /* prefilter_tree.cc in Sources */,
@@ -4758,6 +4788,7 @@
 				D50043B62400690CFBBB5859 /* AdjustIntegration.swift in Sources */,
 				5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */,
 				19503FBC8FFDBFB991DC9387 /* CrashReporter.swift in Sources */,
+				0A02B80520EA32CD00E1BB44 /* hash_set.cc in Sources */,
 				0A03FFB41FCDF0C400DF32C9 /* regexp.cc in Sources */,
 				518DC47C3214F272D78DFBD9 /* DebugSettingsBundleOptions.swift in Sources */,
 				5C32C7B6034B41A9C822555E /* main.swift in Sources */,
@@ -4790,7 +4821,6 @@
 				969DAF9437DD60D2DE8021A0 /* BrowserViewController+ToolbarAndUrlbarDelegate.swift in Sources */,
 				0A7D73992076BAAD00BD66E3 /* CustomHeaderData.swift in Sources */,
 				0A03FFBC1FCDF0C400DF32C9 /* dfa.cc in Sources */,
-				EB009BB01E1BF44200680DB8 /* HashSet.cpp in Sources */,
 				2AC0D22C9C73296D030162EE /* BrowserViewController+WKNavigationDelegate.swift in Sources */,
 				10EAA024996482D72088EBEF /* BrowserViewController+WKUIDelegate.swift in Sources */,
 				0857095CBFE00F31F190C638 /* BrowserViewController.swift in Sources */,
@@ -4838,6 +4868,7 @@
 				5F4A4A111C9E46036CF35F76 /* WindowCloseHelper.swift in Sources */,
 				68450568B88EB41CBF2CF6B0 /* BookmarksPanel.swift in Sources */,
 				162A3AF42CC684A194F305D6 /* HistoryPanel.swift in Sources */,
+				0A02B80E20EA356600E1BB44 /* protocol.cc in Sources */,
 				92B2B7F2B17137887C97E54D /* HomePanels.swift in Sources */,
 				10DF79DE9188E0B7D4188CA0 /* HomePanelViewController.swift in Sources */,
 				5C404E1B2531DC2E178F80F8 /* ReaderPanel.swift in Sources */,
@@ -4871,6 +4902,7 @@
 				B742F2D270D9E2378953F327 /* RequestDesktopSiteActivity.swift in Sources */,
 				55195FD4D07FD5DE37700D77 /* ShareExtensionHelper.swift in Sources */,
 				F3DF5AD139E1BA9D27631B8C /* TitleActivityItemProvider.swift in Sources */,
+				0A02B81B20EA364000E1BB44 /* TrackerData.cpp in Sources */,
 				309EA23114E638AD05EBCD27 /* UIConstants.swift in Sources */,
 				E46B3A85CE3EEB162E7691FF /* AuralProgressBar.swift in Sources */,
 				718321E1107FDDED70FDD449 /* AutocompleteTextField.swift in Sources */,
@@ -5170,6 +5202,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					$SRCROOT/,
 					$SDKROOT/usr/include/libxml2,
+					"$SRCROOT/brave/node_modules/tracking-protection/node_modules/hashset-cpp",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -5764,6 +5797,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					$SRCROOT/,
 					$SDKROOT/usr/include/libxml2,
+					"$SRCROOT/brave/node_modules/tracking-protection/node_modules/hashset-cpp",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;

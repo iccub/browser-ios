@@ -8,7 +8,7 @@
 
 #include <math.h>
 #include <string.h>
-#include "./hash_set.h"
+#include "hash_set.h"
 
 class CosmeticFilter {
  public:
