@@ -606,8 +606,10 @@ class BrowserViewController: UIViewController {
             return
         }
         
-        // Do not show ddg popup if user already chose it for private browsing. 
+        // Do not show ddg popup if user already chose it for private browsing.
         if profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
+            // Showing only pin code popup.
+            presentBrowserLockCallout()
             return
         }
         
