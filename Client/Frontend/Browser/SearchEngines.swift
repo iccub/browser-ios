@@ -45,12 +45,30 @@ class SearchEngines {
         self.shouldShowSearchSuggestions = prefs.boolForKey(ShowSearchSuggestions) ?? false
         self.disabledEngineNames = getDisabledEngineNames()
         self.orderedEngines = getOrderedEngines()
+        
+        initSearchEnginesForRegion()
 
         NotificationCenter.default.addObserver(self, selector: #selector(SearchEngines.SELdidResetPrompt(_:)), name: NSNotification.Name(rawValue: "SearchEnginesPromptReset"), object: nil)
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func initSearchEnginesForRegion() {
+        // Never override existing user's search engine preferences. 
+        let isFirstLaunch = prefs.arrayForKey(DAU.preferencesKey) == nil
+        if !isFirstLaunch { return }
+        
+        guard let region = Locale.current.regionCode else { return }
+        
+        switch region {
+        case "DE", "FR":
+            defaultEngine(OpenSearchEngine.EngineNames.qwant, forType: .standard)
+            defaultEngine(OpenSearchEngine.EngineNames.qwant, forType: .privateMode)
+        default:
+            return
+        }
     }
     
     func defaultEngine(forType type: DefaultEngineType = PrivateBrowsing.singleton.isOn ? .privateMode : .standard) -> OpenSearchEngine {

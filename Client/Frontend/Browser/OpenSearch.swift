@@ -16,6 +16,7 @@ class OpenSearchEngine {
     
     struct EngineNames {
         static let duckDuckGo = "DuckDuckGo"
+        static let qwant = "Qwant"
     }
 
     let shortName: String

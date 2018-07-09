@@ -600,7 +600,15 @@ class BrowserViewController: UIViewController {
         popup.showWithType(showType: .flyUp)
     }
     
-    func presentDDGCallout(force: Bool = false) {
+    var shouldShowDDGPromo: Bool {
+        // We want to show ddg promo in most cases so guard returns true.
+        guard let region = Locale.current.regionCode else { return true } 
+        return region != "DE" && region != "FR" 
+    }
+    
+    func presentDDGCallout(force: Bool = false) { 
+        if !shouldShowDDGPromo { return }
+        
         let profile = getApp().profile
         if profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true && !force {
             return

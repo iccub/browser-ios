@@ -169,6 +169,10 @@ class TopSitesPanel: UIViewController, HomePanel {
 
         makeConstraints()
         
+        if !getApp().browserViewController.shouldShowDDGPromo {
+            hideDDG()
+        }
+        
         if let profile = getApp().profile, profile.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
             hideDDG()
         }
@@ -359,7 +363,10 @@ class TopSitesPanel: UIViewController, HomePanel {
         if isPrivateBrowsing {
             let profile = getApp().profile
             
-            ddgButton.isHidden = profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo 
+            let isDDGSet = profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo
+            let shouldShowDDGPromo = getApp().browserViewController.shouldShowDDGPromo
+            
+            ddgButton.isHidden = isDDGSet || !shouldShowDDGPromo
         }
 
         // TODO: This entire blockshould be abstracted
