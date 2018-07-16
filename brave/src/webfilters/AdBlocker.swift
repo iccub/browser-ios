@@ -4,7 +4,7 @@ import Foundation
 import Shared
 
 class AdblockNetworkDataFileLoader: NetworkDataFileLoader {
-    var lang = "en"
+    var lang = AdBlocker.defaultLocale
 }
 
 typealias localeCode = String
@@ -13,7 +13,6 @@ private let log = Logger.browserLogger
 
 class AdBlocker {
     static let singleton = AdBlocker()
-    let adBlockDataFolderName = "abp-data"
 
     static let prefKey = "braveBlockAdsAndTracking"
     static let prefKeyDefaultValue = true
@@ -22,13 +21,15 @@ class AdBlocker {
     static let dataVersion: Int32 = 4
     
     static let dataVersionPrefKey = "dataVersionPrefKey"
+    static let defaultLocale = "en"
 
+    let adBlockDataFolderName = "abp-data"
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     fileprivate var regionToS3FileName = [localeCode: String]()
     fileprivate var networkLoaders = [localeCode: AdblockNetworkDataFileLoader]()
     fileprivate lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { return ["en": ABPFilterLibWrapper()] }()
-    var currentLocaleCode: localeCode = "en" {
+    var currentLocaleCode: localeCode = defaultLocale {
         didSet {
             updateRegionalAdblockEnabledState()
         }
@@ -39,7 +40,7 @@ class AdBlocker {
         setDataVersionPreference()
         
         updateEnabledState()
-        networkLoaders["en"] = getNetworkLoader(forLocale: "en", name: "ABPFilterParserData")
+        networkLoaders[AdBlocker.defaultLocale] = getNetworkLoader(forLocale: AdBlocker.defaultLocale, name: "ABPFilterParserData")
 
         let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
         regional.components(separatedBy: "\n").forEach {
@@ -51,10 +52,10 @@ class AdBlocker {
             for i in 0..<parts.count-1 {
                 var twoLetterLocale = parts[i]
                 if let _ = regionToS3FileName[twoLetterLocale] {
-                    print("Duplicate regions not handled yet \(twoLetterLocale)")
+                    log.info("Duplicate regions not handled yet \(twoLetterLocale)")
                 }
-                if twoLetterLocale.characters.count > 2 {
-                    print("Only 2 letter locale codes are handled.")
+                if twoLetterLocale.count > 2 {
+                    log.info("Only 2 letter locale codes are handled.")
                     twoLetterLocale = (twoLetterLocale as NSString).substring(to: 2)
                 }
                 regionToS3FileName[twoLetterLocale] = filename // looks like: "cs": "7CCB6921-7FDA"
@@ -63,13 +64,9 @@ class AdBlocker {
         }
         
         updateRegionalAdblockEnabledState()
-        networkLoaders.forEach {
-            $0.1.loadData()
-        }
 
         defer { // so that didSet is called from init
-            let lang = Locale.preferredLanguages[0] as NSString
-            self.currentLocaleCode = lang.substring(to: 2)
+            currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale
         }
     }
     
@@ -117,7 +114,7 @@ class AdBlocker {
     }
 
     func isRegionalAdblockPossible() -> (hasRegionalFile: Bool, isDefaultSettingOn: Bool) {
-        return (hasRegionalFile: currentLocaleCode != "en" && regionToS3FileName[currentLocaleCode] != nil,
+        return (hasRegionalFile: currentLocaleCode != AdBlocker.defaultLocale && regionToS3FileName[currentLocaleCode] != nil,
                 isDefaultSettingOn: isRegionalAdblockEnabled)
    }
 
@@ -128,7 +125,7 @@ class AdBlocker {
     fileprivate func updateRegionalAdblockEnabledState() {
         isRegionalAdblockEnabled = BraveApp.getPrefs()?.boolForKey(AdBlocker.prefKeyUseRegional) ?? AdBlocker.prefKeyUseRegionalDefaultValue
 
-        if currentLocaleCode != "en" && isRegionalAdblockEnabled {
+        if currentLocaleCode != AdBlocker.defaultLocale && isRegionalAdblockEnabled {
             if let file = regionToS3FileName[currentLocaleCode] {
                 if networkLoaders[currentLocaleCode] == nil {
                     networkLoaders[currentLocaleCode] = getNetworkLoader(forLocale: currentLocaleCode, name: file)
@@ -136,7 +133,7 @@ class AdBlocker {
 
                 }
             } else {
-                NSLog("No custom adblock file for \(currentLocaleCode)")
+                log.warning("No custom adblock file for \(self.currentLocaleCode)")
             }
         }
     }
@@ -271,7 +268,7 @@ class AdBlocker {
 
             if isBlocked {
                 blockedByLocale = locale
-                if locale != "en" && AppConstants.IsRunningTest {
+                if locale != AdBlocker.defaultLocale && AppConstants.IsRunningTest {
                     messageUITest(identifier: "blocked-url", message:"\(blockedByLocale) \(url.absoluteString)")
                 }
                 break
