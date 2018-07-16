@@ -24,6 +24,8 @@ class AdBlocker {
     static let defaultLocale = "en"
 
     let adBlockDataFolderName = "abp-data"
+    let adblockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
+    
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     fileprivate var regionToS3FileName = [localeCode: String]()
@@ -38,13 +40,24 @@ class AdBlocker {
 
     fileprivate init() {
         setDataVersionPreference()
-        
         updateEnabledState()
         networkLoaders[AdBlocker.defaultLocale] = getNetworkLoader(forLocale: AdBlocker.defaultLocale, name: "ABPFilterParserData")
+        parseAdblockRegionsFile()
         
-        let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
+        defer { // so that didSet is called from init
+            currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale
+        }
+    }
+    
+    private func parseAdblockRegionsFile() {
+        guard let filePath = adblockRegionFilePath, 
+            let regional = try? String(contentsOfFile: filePath, encoding: String.Encoding.utf8) else {
+            log.error("Could not find adblock regions file")
+            return
+        }
+        
         regional.components(separatedBy: "\n").forEach {
-            let parts = String($0).components(separatedBy: ",")
+            let parts = $0.components(separatedBy: ",")
             guard let filename = parts.last, parts.count > 1 else {
                 return
             }
@@ -60,10 +73,6 @@ class AdBlocker {
                     regionToS3FileName[locale] = filename
                 }
             }
-        }
-
-        defer { // so that didSet is called from init
-            currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale
         }
     }
     
@@ -274,11 +283,9 @@ class AdBlocker {
         fifoCacheOfUrlsChecked.addItem(key, value: isBlocked as AnyObject)
 
 
-        #if LOG_AD_BLOCK
-            if isBlocked {
-                print("blocked \(url.absoluteString)")
-            }
-        #endif
+        if isBlocked {
+            log.debug("blocked \(url.absoluteString)")
+        }
 
         return isBlocked
     }
