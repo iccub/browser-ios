@@ -24,13 +24,16 @@ class AdBlocker {
     static let defaultLocale = "en"
 
     let adBlockDataFolderName = "abp-data"
-    let adblockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
+    let adBlockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
+    let adBlockDataUrlPath = "https://s3.amazonaws.com/adblock-data/"
     
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     fileprivate var regionToS3FileName = [localeCode: String]()
     fileprivate var networkLoaders = [localeCode: AdblockNetworkDataFileLoader]()
-    fileprivate lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { return ["en": ABPFilterLibWrapper()] }()
+    fileprivate lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { 
+        return [AdBlocker.defaultLocale : ABPFilterLibWrapper()] 
+    }()
     var currentLocaleCode: localeCode = defaultLocale {
         didSet {
             updateRegionalAdblockEnabledState()
@@ -44,13 +47,12 @@ class AdBlocker {
         networkLoaders[AdBlocker.defaultLocale] = getNetworkLoader(forLocale: AdBlocker.defaultLocale, name: "ABPFilterParserData")
         parseAdblockRegionsFile()
         
-        defer { // so that didSet is called from init
-            currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale
-        }
+        // so that didSet is called from init
+        defer { currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale }
     }
     
     private func parseAdblockRegionsFile() {
-        guard let filePath = adblockRegionFilePath, 
+        guard let filePath = adBlockRegionFilePath, 
             let regional = try? String(contentsOfFile: filePath, encoding: String.Encoding.utf8) else {
             log.error("Could not find adblock regions file")
             return
@@ -107,7 +109,7 @@ class AdBlocker {
     }
 
     fileprivate func getNetworkLoader(forLocale locale: localeCode, name: String) -> AdblockNetworkDataFileLoader {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(AdBlocker.dataVersion)/\(name).dat")!
+        let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlocker.dataVersion)/\(name).dat")!
         let dataFile = "abp-data-\(AdBlocker.dataVersion)-\(locale).dat"
         let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
         loader.lang = locale
