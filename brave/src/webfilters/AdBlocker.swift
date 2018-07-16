@@ -25,7 +25,7 @@ class AdBlocker {
 
     let adBlockDataFolderName = "abp-data"
     let adBlockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
-    let adBlockDataUrlPath = "https://s3.amazonaws.com/adblock-data/"
+    let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
     
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
