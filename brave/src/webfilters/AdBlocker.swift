@@ -41,29 +41,26 @@ class AdBlocker {
         
         updateEnabledState()
         networkLoaders[AdBlocker.defaultLocale] = getNetworkLoader(forLocale: AdBlocker.defaultLocale, name: "ABPFilterParserData")
-
+        
         let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
         regional.components(separatedBy: "\n").forEach {
             let parts = String($0).components(separatedBy: ",")
             guard let filename = parts.last, parts.count > 1 else {
                 return
             }
-
-            for i in 0..<parts.count-1 {
-                var twoLetterLocale = parts[i]
-                if let _ = regionToS3FileName[twoLetterLocale] {
-                    log.info("Duplicate regions not handled yet \(twoLetterLocale)")
-                }
-                if twoLetterLocale.count > 2 {
+            
+            for (_, locale) in parts.enumerated() {
+                if regionToS3FileName[locale] != nil { log.info("Duplicate regions not handled yet \(locale)") }
+                
+                if locale.count > 2 {
                     log.info("Only 2 letter locale codes are handled.")
-                    twoLetterLocale = (twoLetterLocale as NSString).substring(to: 2)
+                    let firstTwoLocaleCharacters = locale.substring(to: locale.index(locale.startIndex, offsetBy: 2))
+                    regionToS3FileName[firstTwoLocaleCharacters] = filename
+                } else { 
+                    regionToS3FileName[locale] = filename
                 }
-                regionToS3FileName[twoLetterLocale] = filename // looks like: "cs": "7CCB6921-7FDA"
             }
-
         }
-        
-        updateRegionalAdblockEnabledState()
 
         defer { // so that didSet is called from init
             currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale
