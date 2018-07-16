@@ -9,14 +9,19 @@ class AdblockNetworkDataFileLoader: NetworkDataFileLoader {
 
 typealias localeCode = String
 
+private let log = Logger.browserLogger
+
 class AdBlocker {
     static let singleton = AdBlocker()
+    let adBlockDataFolderName = "abp-data"
 
     static let prefKey = "braveBlockAdsAndTracking"
     static let prefKeyDefaultValue = true
     static let prefKeyUseRegional = "braveAdblockUseRegional"
     static let prefKeyUseRegionalDefaultValue = true
-    static let dataVersion = "4"
+    static let dataVersion: Int32 = 4
+    
+    static let dataVersionPrefKey = "dataVersionPrefKey"
 
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
@@ -31,10 +36,9 @@ class AdBlocker {
     fileprivate var isRegionalAdblockEnabled = prefKeyUseRegionalDefaultValue
 
     fileprivate init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(AdBlocker.prefsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
-
+        setDataVersionPreference()
+        
         updateEnabledState()
-
         networkLoaders["en"] = getNetworkLoader(forLocale: "en", name: "ABPFilterParserData")
 
         let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
@@ -57,17 +61,52 @@ class AdBlocker {
             }
 
         }
+        
+        updateRegionalAdblockEnabledState()
+        networkLoaders.forEach {
+            $0.1.loadData()
+        }
 
         defer { // so that didSet is called from init
             let lang = Locale.preferredLanguages[0] as NSString
             self.currentLocaleCode = lang.substring(to: 2)
         }
     }
+    
+    /// We want to avoid situations in which user still has downloaded old abp data version.
+    /// We remove all abp data after data version is updated, then the newest data is downloaded. 
+    private func setDataVersionPreference() {
+        guard let prefs = BraveApp.getPrefs() else {
+            log.error("No prefs found")
+            return
+        }
+        guard let dataVersionPref = prefs.intForKey(AdBlocker.dataVersionPrefKey), dataVersionPref == AdBlocker.dataVersion else { 
+            cleanDatFiles()
+            prefs.setInt(AdBlocker.dataVersion, forKey: AdBlocker.dataVersionPrefKey)
+
+            return
+        }
+    }
+    
+    private func cleanDatFiles() {
+        guard let dir = NetworkDataFileLoader.directoryPath else { return }
+        
+        let fm = FileManager.default
+        do {
+            let folderPath = dir + "/\(adBlockDataFolderName)"
+            let paths = try fm.contentsOfDirectory(atPath: folderPath)
+            for path in paths {
+                try fm.removeItem(atPath: "\(folderPath)/\(path)")
+            }
+        } catch {
+            log.error(error.localizedDescription)
+        }
+    }
 
     fileprivate func getNetworkLoader(forLocale locale: localeCode, name: String) -> AdblockNetworkDataFileLoader {
         let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(AdBlocker.dataVersion)/\(name).dat")!
         let dataFile = "abp-data-\(AdBlocker.dataVersion)-\(locale).dat"
-        let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "abp-data")
+        let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
         loader.lang = locale
         loader.delegate = self
         return loader
@@ -99,15 +138,6 @@ class AdBlocker {
             } else {
                 NSLog("No custom adblock file for \(currentLocaleCode)")
             }
-        }
-    }
-
-    @objc func prefsChanged(_ info: Notification) {
-        updateEnabledState()
-
-        updateRegionalAdblockEnabledState()
-        networkLoaders.forEach {
-            $0.1.loadData()
         }
     }
 
