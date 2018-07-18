@@ -48,6 +48,10 @@ class TopSitesPanel: UIViewController, HomePanel {
         view.isHidden = !PrivateBrowsing.singleton.isOn
         return view
     }()
+    
+    fileprivate lazy var privateTabGraphic: UIImageView = {
+        return UIImageView(image: UIImage(named: "private_glasses"))
+    }()
 
     fileprivate lazy var privateTabTitleLabel: UILabel = {
         let view = UILabel()
@@ -161,6 +165,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         ddgButton.addSubview(ddgLogo)
         ddgButton.addSubview(ddgLabel)
 
+        privateTabMessageContainer.addSubview(privateTabGraphic)
         privateTabMessageContainer.addSubview(privateTabTitleLabel)
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
         privateTabMessageContainer.addSubview(privateTabLinkButton)
@@ -233,10 +238,15 @@ class TopSitesPanel: UIViewController, HomePanel {
             }
             make.bottom.equalTo(collection)
         }
+        
+        privateTabGraphic.snp.makeConstraints { make in
+            make.top.equalTo(0)
+            make.centerX.equalTo(self.privateTabMessageContainer)
+        }
 
         if UIDevice.current.userInterfaceIdiom == .pad {
             privateTabTitleLabel.snp.makeConstraints { make in
-                make.top.equalTo(15)
+                make.top.equalTo(self.privateTabGraphic.snp.bottom).offset(15)
                 make.centerX.equalTo(self.privateTabMessageContainer)
                 make.left.right.equalTo(0)
             }
@@ -298,13 +308,18 @@ class TopSitesPanel: UIViewController, HomePanel {
         }
         
         let isLandscape = UIApplication.shared.statusBarOrientation.isLandscape
+        
+        UIView.animate(withDuration: 0.2, animations: {
+            self.privateTabGraphic.alpha = isLandscape ? 0 : 1
+        })
+        
         let offset = isLandscape ? 10 : 15
         
         privateTabTitleLabel.snp.remakeConstraints { make in
             if isLandscape {
                 make.top.equalTo(0)
             } else {
-                make.top.equalTo(offset)
+                make.top.equalTo(self.privateTabGraphic.snp.bottom).offset(offset)
             }
             make.centerX.equalTo(self.privateTabMessageContainer)
             make.left.right.equalTo(0)
