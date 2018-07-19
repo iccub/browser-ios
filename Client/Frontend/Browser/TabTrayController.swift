@@ -926,16 +926,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             }
             else {
                 postAsyncToMain {
-                    cell.placeholderFavicon.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        guard err == nil, let img = img else {
-                            // avoid retrying to find an icon when none can be found, hack skips FaviconFetch
-                            ImageCache.shared.cache(FaviconFetcher.defaultFavicon, url: cacheWithUrl, type: .square, callback: nil)
-                            cell.placeholderFavicon.image = FaviconFetcher.defaultFavicon
-                            return
-                        }
-                        ImageCache.shared.cache(img, url: cacheWithUrl, type: .square, callback: nil)
-                        cell.favicon.image = img
-                    })
+                    cell.favicon.setFaviconImage(with: iconUrl, cacheUrl: cacheWithUrl)
                 }
             }
         })
