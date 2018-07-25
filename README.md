@@ -4,7 +4,23 @@ Download in the [App Store](https://itunes.apple.com/app/brave-web-browser/id105
 
 Brave is based on Firefox iOS, most of the Brave-specific code is in the [brave dir](brave/)
 
-### Adding Brave to your app to open links
+## Deprecation Notice
+
+This project is currently being deprecated and is being replaced by a new codebase. Please see [brave-ios](https://github.com/brave/brave-ios) for our continued development work.
+
+As of today, this is still the App Store version of Brave. High priority issues will continue to be fixed until Brave 2.0 replaces this repo on the App Store.
+
+#### Labels
+
+When looking at [browser-ios issues](https://github.com/brave/browser-ios/issues) some issues have been labeled with:
+<br>`v2 Relevant`: Issues that might be relevant for the new codebase. Some of these will be fixed here, and others may not be.
+<br>`v2 Only`: Issues that will _not_ be fixed on this codebase, but will be addressed in the new repo.
+
+#### Why the Change?
+
+The primary reason for this project's deprecation is to support Apple's `WKWebView`. Brave iOS is still utilizing `UIWebView`, which contains many website comptability issues. Although it is possible to handle this upgrade on browser-ios, rebuilding from a new fork provides many useful advantages. The complexity of upgrading to `WKWebView` touches most of the current project, and this seemed like an obvious time to switch project bases.
+
+## Adding Brave to your app to open links
 
 Either ensure your app supports [opening urls in a share menu](https://github.com/brave/browser-ios/wiki) or use this project https://github.com/brave/ios-open-thirdparty-browser to open links directly.
 

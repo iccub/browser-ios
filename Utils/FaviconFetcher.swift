@@ -217,7 +217,7 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
             useFallback = true
         }
         
-        if useFallback, let host = url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
+        if let letter = cacheUrl.domainURL.host?.first, useFallback {
             let context = DataController.shared.mainThreadContext
             
             guard let domain = Domain.getOrCreateForUrl(cacheUrl, context: context) else {
