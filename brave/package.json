@@ -1,7 +1,7 @@
 {
   "name": "brave",
   "dependencies": {
-    "ad-block": "^4.1.1",
+    "ad-block": "git@github.com:brave/ad-block.git#b933cf5168c5284dc159735d8bcefb415d0cfc00",
     "node-gyp": "^3.7.0",
     "tracking-protection": "^1.2.0"
   }
