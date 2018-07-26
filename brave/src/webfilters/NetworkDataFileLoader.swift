@@ -14,6 +14,9 @@ class NetworkDataFileLoader {
     let dataUrl: URL
     let dataFile: String
     let nameOfDataDir: String
+    
+    static let directoryPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory,
+                                                                   FileManager.SearchPathDomainMask.userDomainMask, true).first
 
     weak var delegate: NetworkDataFileLoaderDelegate?
 
@@ -25,7 +28,7 @@ class NetworkDataFileLoader {
 
     // return the dir and a bool if the dir was created
     func createAndGetDataDirPath() -> (String, Bool) {
-        if let dir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true).first {
+        if let dir = NetworkDataFileLoader.directoryPath {
             let path = dir + "/" + nameOfDataDir
             var wasCreated = false
             if !FileManager.default.fileExists(atPath: path) {

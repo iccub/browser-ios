@@ -9,11 +9,12 @@ class SafeBrowsing {
     static let prefKey = "braveSafeBrowsing"
     static let prefKeyDefaultValue = true
     static let dataVersion = AdBlocker.dataVersion
+    static let safeBrowsingUrlPath = "https://adblock-data.s3.brave.com/"
 
     lazy var abpFilterLibWrapper: ABPFilterLibWrapper = { return ABPFilterLibWrapper() }()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(dataVersion)/SafeBrowsingData.dat")!
+        let dataUrl = URL(string: "\(safeBrowsingUrlPath)\(dataVersion)/SafeBrowsingData.dat")!
         let dataFile = "safe-browsing-data-\(dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "safe-browsing-data")
         loader.delegate = self
