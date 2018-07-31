@@ -392,7 +392,7 @@ class TopSitesPanel: UIViewController, HomePanel {
     }
     
     func showPrivateTabInfo() {
-        let url = URL(string: "https://github.com/brave/browser-laptop/wiki/What-a-Private-Tab-actually-does")!
+        let url = URL(string: "https://community.brave.com/t/what-does-a-private-tab/10043")!
         postAsyncToMain {
             let t = getApp().tabManager
             _ = t?.addTabAndSelect(URLRequest(url: url))
