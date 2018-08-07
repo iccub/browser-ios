@@ -111,7 +111,6 @@ class Browser: NSObject, BrowserWebViewDelegate {
             let context = DataController.shared.workerContext
             log.debug((self.color ?? FallbackIcon.color).toHexString())
             Domain.updateColor(color ?? FallbackIcon.color, forUrl: url, context: context)
-            DataController.saveContext(context: context)
         }
     }
     

@@ -200,9 +200,13 @@ class Domain: NSManagedObject {
     }
     
     class func updateColor(_ color: UIColor, forUrl url: URL, context: NSManagedObjectContext) {
-        guard let domain = Domain.getOrCreateForUrl(url, context: context) else { return }
+        // Needs to be done in a `perform` block to avoid race conditions.
+        context.perform {
+            guard let domain = Domain.getOrCreateForUrl(url, context: context) else { return }
+            
+            domain.color = color.toHexString()
+            DataController.saveContext(context: context)
+        }
         
-        domain.color = color.toHexString()
-        DataController.saveContext(context: context)
     }
 }
