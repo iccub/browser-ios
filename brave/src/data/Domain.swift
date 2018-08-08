@@ -203,8 +203,10 @@ class Domain: NSManagedObject {
         // Needs to be done in a `perform` block to avoid race conditions.
         context.perform {
             guard let domain = Domain.getOrCreateForUrl(url, context: context) else { return }
+            let colorHex = color.toHexString()
+            if domain.color == colorHex { return }
             
-            domain.color = color.toHexString()
+            domain.color = colorHex
             DataController.saveContext(context: context)
         }
         
