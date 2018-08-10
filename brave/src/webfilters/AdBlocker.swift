@@ -227,6 +227,11 @@ class AdBlocker {
         guard let url = request.url else {
             return false
         }
+        
+        // Do not block main frame urls
+        // e.g. user clicked on an ad intentionally (adblock could block redirect to requested site)
+        let currentTabUrl = getApp().browserViewController.tabManager.selectedTab?.url
+        if url == currentTabUrl { return false }
 
         if url.host?.contains("forbes.com") ?? false {
             setForbesCookie()
