@@ -228,7 +228,8 @@ class AdBlocker {
             return false
         }
         
-        // We do not block if a user clicked on an ad intentionally.
+        // Do not block main frame urls
+        // e.g. user clicked on an ad intentionally (adblock could block redirect to requested site)
         let currentTabUrl = getApp().browserViewController.tabManager.selectedTab?.url
         if url == currentTabUrl { return false }
 
