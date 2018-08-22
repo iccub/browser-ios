@@ -363,7 +363,8 @@ class TopSitesPanel: UIViewController, HomePanel {
     }
 
     func endEditing() {
-        (view.window as! BraveMainWindow).removeTouchFilter(self)
+        guard let window = view.window as? BraveMainWindow else { return }
+        window.removeTouchFilter(self)
         dataSource.isEditing = false
     }
 
