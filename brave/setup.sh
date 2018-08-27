@@ -47,8 +47,8 @@ echo GENERATED_BUILD_ID=`date +"%y.%m.%d.%H"` >> xcconfig/build-id.xcconfig
 
 npm update
 
-## setup adblock regional filters
-if ! g++ build-system/get_adblock_regions.cpp -Inode_modules/ad-block/lists/ -std=c++11 -o get_adblock_regions; then
+# setup adblock regional filters
+if ! g++ build-system/get_adblock_regions.cpp -Inode_modules/ad-block/ -std=c++11 -o get_adblock_regions; then
     echo "Error: could not setup adblock region file."
     exit 1
 fi
