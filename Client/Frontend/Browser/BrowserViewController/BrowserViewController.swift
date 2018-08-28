@@ -602,8 +602,9 @@ class BrowserViewController: UIViewController {
     
     var shouldShowDDGPromo: Bool {
         // We want to show ddg promo in most cases so guard returns true.
-        guard let region = Locale.current.regionCode else { return true } 
-        return region != "DE" && region != "FR" 
+        guard let region = Locale.current.regionCode else { return true }
+        
+        return SearchEngines.defaultRegionSearchEngines[region] != OpenSearchEngine.EngineNames.qwant
     }
     
     func presentDDGCallout(force: Bool = false) { 

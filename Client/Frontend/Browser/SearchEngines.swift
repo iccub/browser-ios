@@ -38,6 +38,12 @@ enum DefaultEngineType: String {
 
 class SearchEngines {
     let prefs: Prefs
+    
+    static let defaultRegionSearchEngines = [
+        "DE": OpenSearchEngine.EngineNames.qwant,
+        "FR": OpenSearchEngine.EngineNames.qwant,
+    ]
+    
     init(prefs: Prefs) {
         self.prefs = prefs
         // By default, show search suggestions opt-in and don't show search suggestions automatically.
@@ -60,15 +66,11 @@ class SearchEngines {
         let isFirstLaunch = prefs.arrayForKey(DAU.preferencesKey) == nil
         if !isFirstLaunch { return }
         
-        guard let region = Locale.current.regionCode else { return }
+        guard let region = Locale.current.regionCode,
+            let searchEngine = SearchEngines.defaultRegionSearchEngines[region] else { return }
         
-        switch region {
-        case "DE", "FR":
-            defaultEngine(OpenSearchEngine.EngineNames.qwant, forType: .standard)
-            defaultEngine(OpenSearchEngine.EngineNames.qwant, forType: .privateMode)
-        default:
-            return
-        }
+        defaultEngine(searchEngine, forType: .standard)
+        defaultEngine(searchEngine, forType: .privateMode)
     }
     
     func defaultEngine(forType type: DefaultEngineType = PrivateBrowsing.singleton.isOn ? .privateMode : .standard) -> OpenSearchEngine {
