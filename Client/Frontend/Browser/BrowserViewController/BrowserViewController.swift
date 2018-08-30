@@ -601,7 +601,7 @@ class BrowserViewController: UIViewController {
     }
     
     var shouldShowDDGPromo: Bool {
-        // We want to show ddg promo in most cases so guards return true.
+        // We want to show ddg promo in most cases so guard return true.
         guard let prefs = getApp().profile?.prefs else { return true }
         
         let regionalSearchEngine = prefs.boolForKey(OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
