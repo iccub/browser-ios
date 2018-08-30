@@ -172,9 +172,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             profile.prefs.setBool(true, forKey: FavoritesHelper.initPrefsKey)
         }
         
+        let isFirstLaunch = self.getProfile(application).prefs.arrayForKey(DAU.preferencesKey) == nil
+        
         // MARK: User referral program
         if let urp = UserReferralProgram() {
-            let isFirstLaunch = self.getProfile(application).prefs.arrayForKey(DAU.preferencesKey) == nil
             if isFirstLaunch {
                 urp.referralLookup { url in
                     guard let url = url else { return }
@@ -187,6 +188,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         } else {
             log.error("Failed to initialize user referral program")
             UrpLog.log("Failed to initialize user referral program")
+        }
+        
+        // MARK: Regional search engines
+        if isFirstLaunch {
+            profile.prefs.setBool(true, forKey: OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
         }
 
         log.debug("Adding observers…")
