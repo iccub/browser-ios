@@ -604,11 +604,10 @@ class BrowserViewController: UIViewController {
         // We want to show ddg promo in most cases so guards return true.
         guard let prefs = getApp().profile?.prefs else { return true }
         
-        if prefs.boolForKey(OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR) == true { return false }
+        let regionalSearchEngine = prefs.boolForKey(OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
         
-        guard let region = Locale.current.regionCode else { return true }
-        
-        return !SearchEngines.defaultRegionSearchEngines.keys.contains(region)
+        // Pref key can be either false or nil.
+        return regionalSearchEngine != true
     }
     
     func presentDDGCallout(force: Bool = false) { 
