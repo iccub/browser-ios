@@ -608,7 +608,10 @@ class BrowserViewController: UIViewController {
     }
     
     func presentDDGCallout(force: Bool = false) { 
-        if !shouldShowDDGPromo { return }
+        if !shouldShowDDGPromo {
+            presentBrowserLockCallout()
+            return
+        }
         
         let profile = getApp().profile
         if profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true && !force {
