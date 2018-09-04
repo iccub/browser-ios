@@ -190,11 +190,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             UrpLog.log("Failed to initialize user referral program")
         }
         
-        // MARK: Regional search engines
         if isFirstLaunch {
-            profile.prefs.setBool(true, forKey: OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
+            SearchEngines.regionalSearchEnginesFlagsSetup(prefs: getProfile(application).prefs)
         }
-
+        
         log.debug("Adding observers…")
         NotificationCenter.default.addObserver(forName: NSNotification.Name.FSReadingListAddReadingListItem, object: nil, queue: nil) { (notification) -> Void in
             if let userInfo = notification.userInfo, let url = userInfo["URL"] as? URL {
