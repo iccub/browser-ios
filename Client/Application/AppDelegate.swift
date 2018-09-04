@@ -191,15 +191,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
         }
         
         // MARK: Regional search engines
-        
         if let region = Locale.current.regionCode, SearchEngines.defaultRegionSearchEngines.keys.contains(region) {
             if isFirstLaunch {
                 profile.prefs.setBool(true, forKey: OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
             }
         }
         
-        
-
         log.debug("Adding observers…")
         NotificationCenter.default.addObserver(forName: NSNotification.Name.FSReadingListAddReadingListItem, object: nil, queue: nil) { (notification) -> Void in
             if let userInfo = notification.userInfo, let url = userInfo["URL"] as? URL {
