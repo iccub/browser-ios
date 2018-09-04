@@ -190,11 +190,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             UrpLog.log("Failed to initialize user referral program")
         }
         
-        // MARK: Regional search engines
-        if let region = Locale.current.regionCode, SearchEngines.defaultRegionSearchEngines.keys.contains(region) {
-            if isFirstLaunch {
-                profile.prefs.setBool(true, forKey: OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
-            }
+        if isFirstLaunch {
+            SearchEngines.regionalSearchEnginesFlagsSetup(prefs: getProfile(application).prefs)
         }
         
         log.debug("Adding observers…")

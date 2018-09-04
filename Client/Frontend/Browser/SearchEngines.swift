@@ -81,6 +81,16 @@ class SearchEngines {
         }
     }
     
+    class func regionalSearchEnginesFlagsSetup(prefs: Prefs) {
+        guard let region = Locale.current.regionCode,
+            SearchEngines.defaultRegionSearchEngines.keys.contains(region) else {
+            return
+        }
+        
+        // Include other regional specific flags here.
+        prefs.setBool(true, forKey: OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
+    }
+    
     func defaultEngine(_ engine: String, forType type: DefaultEngineType) {
         prefs.setString(engine, forKey: type.rawValue)
     }
