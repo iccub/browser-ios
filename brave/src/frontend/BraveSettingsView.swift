@@ -426,7 +426,7 @@ class UrpDebugSetting: Setting, XMLParserDelegate {
 class LocaleRegionSetting: Setting, XMLParserDelegate {
     
     override var title: NSAttributedString? {
-        let region = Locale.current.regionCode ?? ""
+        let region = Locale.current.regionCode ?? "nil"
         
         return NSAttributedString(string: "Region: \(region)", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
     }
