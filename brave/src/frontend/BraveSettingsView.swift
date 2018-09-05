@@ -175,7 +175,7 @@ class BraveSettingsView : AppSettingsTableViewController {
         ]
         
         if kIsDevelomentBuild {
-            supportChildren = [UrpDebugSetting(), LoadTabsDebugSettings(), CrashDebugSettings(), UserReferralSettings(prefs: profile?.prefs)]
+            supportChildren = [UrpDebugSetting(), LoadTabsDebugSettings(), CrashDebugSettings(), UserReferralSettings(prefs: profile?.prefs), LocaleRegionSetting()]
             settings += [
                 SettingSection(title: NSAttributedString(string: "DEBUG - BETA ONLY"), children: supportChildren)
             ]
@@ -420,6 +420,15 @@ class UrpDebugSetting: Setting, XMLParserDelegate {
 
     override func onClick(_ navigationController: UINavigationController?) {
         navigationController?.pushViewController(UrpLogsViewController(), animated: true)
+    }
+}
+
+class LocaleRegionSetting: Setting, XMLParserDelegate {
+    
+    override var title: NSAttributedString? {
+        let region = Locale.current.regionCode ?? "nil"
+        
+        return NSAttributedString(string: "Region: \(region)", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
     }
 }
 
