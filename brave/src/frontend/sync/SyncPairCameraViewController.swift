@@ -78,7 +78,7 @@ class SyncPairCameraViewController: SyncViewController {
         titleDescriptionStackView.axis = .vertical
         titleDescriptionStackView.spacing = 4
         titleDescriptionStackView.alignment = .center
-        titleDescriptionStackView.setContentCompressionResistancePriority(250, for: .vertical)
+        titleDescriptionStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .vertical)
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -141,7 +141,7 @@ class SyncPairCameraViewController: SyncViewController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: nil) { _ in
-            self.cameraView.videoPreviewLayer?.connection.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
+            self.cameraView.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
         }
     }
     

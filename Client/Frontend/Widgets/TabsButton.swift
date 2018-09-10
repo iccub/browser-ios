@@ -11,7 +11,7 @@ private let log = Logger.browserLogger
 
 struct TabsButtonUX {
     static let CornerRadius: CGFloat = 2
-    static let TitleFont: UIFont = UIFont.systemFont(ofSize: 10, weight: UIFontWeightSemibold)
+    static let TitleFont: UIFont = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.semibold)
     static let BorderStrokeWidth: CGFloat = 1.5
     static let BorderColor = UIColor.clear
     static let HighlightButtonColor = UIColor.clear

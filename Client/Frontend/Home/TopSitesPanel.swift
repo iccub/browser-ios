@@ -58,7 +58,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         view.lineBreakMode = .byWordWrapping
         view.textAlignment = .center
         view.numberOfLines = 0
-        view.font = UIFont.systemFont(ofSize: 18, weight: UIFontWeightSemibold)
+        view.font = UIFont.systemFont(ofSize: 18, weight: UIFont.Weight.semibold)
         view.textColor = UIColor(white: 1, alpha: 0.6)
         view.text = Strings.Private_Tab_Title
         return view
@@ -69,7 +69,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         view.lineBreakMode = .byWordWrapping
         view.textAlignment = .center
         view.numberOfLines = 0
-        view.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightMedium)
+        view.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.medium)
         view.textColor = UIColor(white: 1, alpha: 1.0)
         view.text = Strings.Private_Tab_Body
         return view
@@ -78,9 +78,9 @@ class TopSitesPanel: UIViewController, HomePanel {
     fileprivate lazy var privateTabLinkButton: UIButton = {
         let view = UIButton()
         let linkButtonTitle = NSAttributedString(string: Strings.Private_Tab_Link, attributes:
-            [NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue])
+            [NSAttributedStringKey.underlineStyle: NSUnderlineStyle.styleSingle.rawValue])
         view.setAttributedTitle(linkButtonTitle, for: .normal)
-        view.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
+        view.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.medium)
         view.titleLabel?.textColor = UIColor(white: 1, alpha: 0.25)
         view.titleLabel?.textAlignment = .center
         view.titleLabel?.lineBreakMode = .byWordWrapping
@@ -94,7 +94,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = BraveUX.GreyD
-        label.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)
+        label.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.regular)
         label.text = Strings.DDG_promotion
         return label
     }()
@@ -122,7 +122,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         NotificationCenter.default.addObserver(self, selector: #selector(TopSitesPanel.updateIphoneConstraints), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
 
-    func existingUserTopSitesConversion() {
+    @objc func existingUserTopSitesConversion() {
         dataSource.refetch()
         collection.reloadData()
     }
@@ -199,7 +199,7 @@ class TopSitesPanel: UIViewController, HomePanel {
     }
 
     /// Handles long press gesture for UICollectionView cells reorder.
-    func handleLongGesture(gesture: UILongPressGestureRecognizer) {
+    @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
             guard let selectedIndexPath = collection.indexPathForItem(at: gesture.location(in: collection)) else {
@@ -362,7 +362,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         self.view.setNeedsUpdateConstraints()
     }
 
-    func showDDGCallout() {
+    @objc func showDDGCallout() {
         getApp().browserViewController.presentDDGCallout(force: true)
     }
 
@@ -373,7 +373,7 @@ class TopSitesPanel: UIViewController, HomePanel {
     }
 
     // MARK: - Private browsing modde
-    func privateBrowsingModeChanged() {
+    @objc func privateBrowsingModeChanged() {
         let isPrivateBrowsing = PrivateBrowsing.singleton.isOn
         
         if isPrivateBrowsing {
@@ -399,7 +399,7 @@ class TopSitesPanel: UIViewController, HomePanel {
         collection.reloadData()
     }
     
-    func showPrivateTabInfo() {
+    @objc     func showPrivateTabInfo() {
         let url = URL(string: "https://github.com/brave/browser-laptop/wiki/What-a-Private-Tab-actually-does")!
         postAsyncToMain {
             let t = getApp().tabManager
@@ -524,7 +524,7 @@ extension TopSitesPanel: ThumbnailCellDelegate {
             actionSheet.popoverPresentationController?.sourceRect = thumbnailCell.bounds
             present(actionSheet, animated: true, completion: nil)
         } else {
-            present(actionSheet, animated: true) { _ in
+            present(actionSheet, animated: true) {
                 self.dataSource.isEditing = false
             }
         }

@@ -556,7 +556,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         return .delete
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
+    @objc func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
         guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return nil }
 
         let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete, handler: { (action, indexPath) in

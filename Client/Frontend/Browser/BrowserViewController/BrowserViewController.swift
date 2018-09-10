@@ -633,11 +633,11 @@ class BrowserViewController: UIViewController {
         popup.dismissHandler = {
             weakSelf?.presentBrowserLockCallout()
         }
-        popup.addButton(title: Strings.DDG_callout_no) { _ in
+        popup.addButton(title: Strings.DDG_callout_no) {
             weakSelf?.profile.prefs.setBool(true, forKey: kPrefKeyPopupForDDG)
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.DDG_callout_enable) { _ in
+        popup.addDefaultButton(title: Strings.DDG_callout_enable) {
             if getApp().profile == nil {
                 return .flyUp
             }

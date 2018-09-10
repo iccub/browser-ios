@@ -21,7 +21,7 @@ class SyncAddDeviceViewController: SyncViewController {
     
     lazy var codewordsView: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18.0, weight: UIFontWeightMedium)
+        label.font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.medium)
         label.textColor = BraveUX.GreyJ
         label.lineBreakMode = NSLineBreakMode.byWordWrapping
         label.numberOfLines = 0
@@ -162,7 +162,7 @@ class SyncAddDeviceViewController: SyncViewController {
         let textStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 32),
                                                            titleDescriptionStackView,
                                                            UIView.spacer(.horizontal, amount: 32)])
-        textStackView.setContentCompressionResistancePriority(100, for: .vertical)
+        textStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 100), for: .vertical)
 
         stackView.addArrangedSubview(textStackView)
         
@@ -201,7 +201,7 @@ class SyncAddDeviceViewController: SyncViewController {
         let buttonsStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 16),
                                                               doneEnterWordsStackView,
                                                               UIView.spacer(.horizontal, amount: 16)])
-        buttonsStackView.setContentCompressionResistancePriority(1000, for: .vertical)
+        buttonsStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .vertical)
 
 
         stackView.addArrangedSubview(buttonsStackView)

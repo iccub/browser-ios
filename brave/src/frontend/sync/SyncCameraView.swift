@@ -42,7 +42,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
             }
         }
 
-        switch AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) {
+        switch AVCaptureDevice.authorizationStatus(for: AVMediaType.video) {
         case .authorized:
             cameraAccessButton.isHidden = true
             openSettingsButton.isHidden = true
@@ -58,7 +58,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
 
     fileprivate func createCameraButton() -> RoundInterfaceButton {
         let button = RoundInterfaceButton(type: .roundedRect)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.bold)
         button.setTitleColor(UIColor.white, for: .normal)
         button.backgroundColor = UIColor.clear
         button.layer.borderColor = UIColor.white.withAlphaComponent(0.4).cgColor
@@ -82,7 +82,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         startCapture()
     }
 
-    func openSettings() {
+    @objc func openSettings() {
         UIApplication.shared.open(URL(string:UIApplicationOpenSettingsURLString)!)
     }
     
@@ -124,7 +124,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
         captureSession.startRunning()
         bringSubview(toFront: cameraOverlayView)
 
-        AVCaptureDevice.requestAccess(forMediaType: AVMediaType.video, completionHandler: { (granted :Bool) -> Void in
+        AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { (granted :Bool) -> Void in
             postAsyncToMain {
                 self.cameraAccessButton.isHidden = true
                 if granted {

@@ -78,7 +78,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
         ]
     }
 
-    func handleKeyCommand(sender: UIKeyCommand) {
+    @objc func handleKeyCommand(sender: UIKeyCommand) {
         switch sender.input {
         case UIKeyInputLeftArrow:
             if isSelectionActive {

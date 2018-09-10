@@ -15,7 +15,7 @@ class SafeBrowsing {
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
         let dataUrl = URL(string: "\(SafeBrowsing.safeBrowsingUrlPath)\(SafeBrowsing.dataVersion)/SafeBrowsingData.dat")!
-        let dataFile = "safe-browsing-data-\(dataVersion).dat"
+        let dataFile = "safe-browsing-data-\(SafeBrowsing.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "safe-browsing-data")
         loader.delegate = self
         return loader

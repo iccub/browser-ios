@@ -46,7 +46,7 @@ class SyncDeviceTypeButton: UIControl {
         addSubview(imageView)
         
         label.text = title
-        label.font = UIFont.systemFont(ofSize: 17.0, weight: UIFontWeightBold)
+        label.font = UIFont.systemFont(ofSize: 17.0, weight: UIFont.Weight.bold)
         label.textColor = BraveUX.GreyJ
         label.textAlignment = .center
         addSubview(label)
@@ -140,7 +140,7 @@ class SyncSelectDeviceTypeViewController: SyncViewController {
         }
     }
 
-    func addDevice(sender: SyncDeviceTypeButton) {
+    @objc func addDevice(sender: SyncDeviceTypeButton) {
         syncInitHandler?(sender.label.text ?? "", sender.type)
     }
 }

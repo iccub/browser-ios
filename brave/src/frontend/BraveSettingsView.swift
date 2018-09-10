@@ -415,7 +415,7 @@ class BraveTermsOfUseSetting: Setting {
 class UrpDebugSetting: Setting, XMLParserDelegate {
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "URP logs", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "URP logs", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -428,7 +428,7 @@ class LocaleRegionSetting: Setting, XMLParserDelegate {
     override var title: NSAttributedString? {
         let region = Locale.current.regionCode ?? "nil"
         
-        return NSAttributedString(string: "Region: \(region)", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "Region: \(region)", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 }
 
@@ -491,7 +491,7 @@ class UserReferralSettings: Setting {
     }
     
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "URP Code: \(UserReferralProgram.getReferralCode(prefs: prefs) ?? "--")", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "URP Code: \(UserReferralProgram.getReferralCode(prefs: prefs) ?? "--")", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 }
 

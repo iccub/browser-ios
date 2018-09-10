@@ -117,14 +117,14 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         return settings
     }
     
-    func reloadDevicesAndSettings() {
+    @objc func reloadDevicesAndSettings() {
         settings = []
         generateSettings()
         tableView.reloadData()
         refreshControl?.endRefreshing()
     }
     
-    func SEL_done() {
+    @objc func SEL_done() {
         navigationController?.popToRootViewController(animated: true)
     }
 }
@@ -141,7 +141,7 @@ class RemoveDeviceSetting: Setting {
     init(profile: Profile) {
         self.profile = profile
         let clearTitle = Strings.SyncRemoveThisDevice
-        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIColor.red, NSFontAttributeName: UIFont.systemFont(ofSize: 17, weight: UIFontWeightRegular)]))
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSAttributedStringKey.foregroundColor: UIColor.red, NSAttributedStringKey.font: UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)]))
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -169,7 +169,7 @@ class AddDeviceSetting: Setting {
         self.owner = owner
         let addDeviceString = Strings.SyncAddAnotherDevice
 
-        super.init(title: NSAttributedString(string: addDeviceString, attributes: [NSForegroundColorAttributeName: BraveUX.Blue, NSFontAttributeName: UIFont.systemFont(ofSize: 17, weight: UIFontWeightRegular)]))
+        super.init(title: NSAttributedString(string: addDeviceString, attributes: [NSAttributedStringKey.foregroundColor: BraveUX.Blue, NSAttributedStringKey.font: UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.regular)]))
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
