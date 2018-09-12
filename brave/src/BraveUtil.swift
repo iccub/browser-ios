@@ -2,9 +2,6 @@
 
 import Foundation
 import Storage
-import Mixpanel
-
-var mixpanelInstance: MixpanelInstance?
 
 let isRunningTests = ProcessInfo().environment["XCInjectBundleInto"] != nil
 
