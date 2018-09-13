@@ -598,12 +598,10 @@ class TabTrayController: UIViewController {
 
         let scaleDownTransform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         
-        
-        #if swift(>=4.1)
-        let toView = (privateTabsAreEmpty() ? emptyPrivateTabsView : collectionView)!
-        #else
+        // This needs to be unwrapped due to minor swift differences between 4.1 and 4.2
+        guard let collectionView = collectionView else { return }
         let toView = privateTabsAreEmpty() ? emptyPrivateTabsView : collectionView
-        #endif
+        
         toView.transform = scaleDownTransform
         toView.alpha = 0
 
