@@ -597,7 +597,13 @@ class TabTrayController: UIViewController {
         collectionView.layoutSubviews()
 
         let scaleDownTransform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        
+        
+        #if swift(>=4.1)
+        let toView = (privateTabsAreEmpty() ? emptyPrivateTabsView : collectionView)!
+        #else
         let toView = privateTabsAreEmpty() ? emptyPrivateTabsView : collectionView
+        #endif
         toView.transform = scaleDownTransform
         toView.alpha = 0
 
