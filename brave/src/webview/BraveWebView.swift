@@ -314,7 +314,7 @@ class BraveWebView: UIWebView {
             }
             jsBlockedStatLastUrl = request?.url?.absoluteString
 
-            shieldStatUpdate(.jsSetValue, increment: jsBlocked)
+            shieldStatUpdate(.jsSetValue, increment: Int32(jsBlocked))
         } else {
             shieldStatUpdate(.broadcastOnly)
         }
@@ -602,7 +602,7 @@ class BraveWebView: UIWebView {
     }
     var recentlyBlocked = RecentlyBlocked()
 
-    func shieldStatUpdate(_ stat: ShieldStatUpdate, increment: Int = 1, affectedUrl: String = "") {
+    func shieldStatUpdate(_ stat: ShieldStatUpdate, increment: Int32 = 1, affectedUrl: String = "") {
         if !affectedUrl.isEmpty {
             if recentlyBlocked.urls.contains(affectedUrl) {
                 return
@@ -619,18 +619,18 @@ class BraveWebView: UIWebView {
             recentlyBlocked = RecentlyBlocked()
         case .httpseIncrement:
             shieldStats.httpse += increment
-            BraveGlobalShieldStats.singleton.httpse = BraveGlobalShieldStats.singleton.httpse.advanced(by: increment)
+            BraveGlobalShieldStats.singleton.httpse += increment
         case .abIncrement:
             shieldStats.abAndTp += increment
-            BraveGlobalShieldStats.singleton.adblock = BraveGlobalShieldStats.singleton.adblock.advanced(by: increment)
+            BraveGlobalShieldStats.singleton.adblock += increment
         case .tpIncrement:
             shieldStats.abAndTp += increment
-            BraveGlobalShieldStats.singleton.trackingProtection = BraveGlobalShieldStats.singleton.trackingProtection.advanced(by: increment)
+            BraveGlobalShieldStats.singleton.trackingProtection += increment
         case .jsSetValue:
             shieldStats.js = increment
         case .fpIncrement:
             shieldStats.fp += increment
-            BraveGlobalShieldStats.singleton.fpProtection = BraveGlobalShieldStats.singleton.fpProtection.advanced(by: increment)
+            BraveGlobalShieldStats.singleton.fpProtection += increment
         }
 
         postAsyncToMain(0.2) { [weak self] in

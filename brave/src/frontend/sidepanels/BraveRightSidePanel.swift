@@ -5,10 +5,10 @@ import SnapKit
 import Shared
 
 struct ShieldBlockedStats {
-    var abAndTp = 0
-    var httpse = 0
-    var js = 0
-    var fp = 0
+    var abAndTp: Int32 = 0
+    var httpse: Int32 = 0
+    var js: Int32 = 0
+    var fp: Int32 = 0
 }
 
 class BraveRightSidePanelViewController : SidePanelBaseViewController {
