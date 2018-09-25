@@ -22,11 +22,8 @@ class Bookmark: NSManagedObject, WebsitePresentable, Syncable {
     @NSManaged var created: Date?
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
-<<<<<<< HEAD
     @NSManaged var color: String?
     @NSManaged var syncOrder: String?
-=======
->>>>>>> 0884b3f4e661732481ee67f3b84b47e153ca7d8b
     
     /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
     /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
