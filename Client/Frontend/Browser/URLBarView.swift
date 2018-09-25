@@ -132,8 +132,8 @@ class URLBarView: UIView {
         cancelButton.titleLabel?.font = UIConstants.DefaultChromeFont
         cancelButton.addTarget(self, action: #selector(URLBarView.SELdidClickCancel), for: UIControlEvents.touchUpInside)
         cancelButton.titleEdgeInsets = UIEdgeInsetsMake(10, 12, 10, 12)
-        cancelButton.setContentHuggingPriority(1000, for: UILayoutConstraintAxis.horizontal)
-        cancelButton.setContentCompressionResistancePriority(1000, for: UILayoutConstraintAxis.horizontal)
+        cancelButton.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
+        cancelButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
         cancelButton.alpha = 0
         return cancelButton
     }()
@@ -236,7 +236,7 @@ class URLBarView: UIView {
         locationTextField.font = UIConstants.DefaultChromeFont
         locationTextField.accessibilityIdentifier = "address"
         locationTextField.accessibilityLabel = Strings.Address_and_Search
-        locationTextField.attributedPlaceholder = NSAttributedString(string: self.locationView.placeholder.string, attributes: [NSForegroundColorAttributeName: UIColor.gray])
+        locationTextField.attributedPlaceholder = NSAttributedString(string: self.locationView.placeholder.string, attributes: [NSAttributedStringKey.foregroundColor: UIColor.gray])
 
         locationContainer.addSubview(locationTextField)
 
@@ -394,7 +394,7 @@ class URLBarView: UIView {
             removeLocationTextField()
         }
 
-        UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: { _ in
+        UIView.animate(withDuration: 0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: {
             self.transitionToSearch(cancel)
             self.setNeedsUpdateConstraints()
             self.layoutIfNeeded()
@@ -403,15 +403,15 @@ class URLBarView: UIView {
         })
     }
 
-    func SELdidClickAddTab() {
+    @objc func SELdidClickAddTab() {
         delegate?.urlBarDidPressTabs(self)
     }
 
-    func SELdidClickCancel() {
+    @objc func SELdidClickCancel() {
         leaveSearchMode(didCancel: true)
     }
 
-    func SELtappedScrollToTopArea() {
+    @objc func SELtappedScrollToTopArea() {
         delegate?.urlBarDidPressScrollToTop(self)
     }
 }
@@ -425,7 +425,7 @@ extension URLBarView: BrowserToolbarProtocol {
         forwardButton.isEnabled = canGoForward
     }
 
-    func updateBookmarkStatus(_ isBookmarked: Bool) {
+    @objc func updateBookmarkStatus(_ isBookmarked: Bool) {
         getApp().braveTopViewController.updateBookmarkStatus(isBookmarked)
     }
 
@@ -512,12 +512,12 @@ extension URLBarView: AutocompleteTextFieldDelegate {
 // MARK: UIAppearance
 extension URLBarView {
 
-    dynamic var cancelTextColor: UIColor? {
+    @objc dynamic var cancelTextColor: UIColor? {
         get { return cancelButton.titleColor(for: .normal) }
         set { return cancelButton.setTitleColor(newValue, for: .normal) }
     }
 
-    dynamic var actionButtonTintColor: UIColor? {
+    @objc dynamic var actionButtonTintColor: UIColor? {
         get { return helper?.buttonTintColor }
         set {
             guard let value = newValue else { return }
@@ -569,7 +569,7 @@ class ToolbarTextField: AutocompleteTextField {
         return themes
     }()
 
-    dynamic var clearButtonTintColor: UIColor? {
+    @objc dynamic var clearButtonTintColor: UIColor? {
         didSet {
             // Clear previous tinted image that's cache and ask for a relayout
             tintedClearImage = nil

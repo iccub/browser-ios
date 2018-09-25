@@ -12,7 +12,7 @@ class SyncPairWordsViewController: SyncViewController {
     
     lazy var wordCountLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 13, weight: UIFontWeightRegular)
+        label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.regular)
         label.textColor = BraveUX.GreyE
         label.text = String(format: Strings.WordCount, 0)
         return label
@@ -110,7 +110,7 @@ class SyncPairWordsViewController: SyncViewController {
         codewordsView.becomeFirstResponder()
     }
     
-    func SEL_paste() {
+    @objc func SEL_paste() {
         if let contents = UIPasteboard.general.string, !contents.isEmpty {
             // remove linebreaks and whitespace, split into codewords.
             codewordsView.setCodewords(data: contents.separatedBy(" "))
@@ -119,7 +119,7 @@ class SyncPairWordsViewController: SyncViewController {
         }
     }
     
-    func SEL_done() {
+    @objc func SEL_done() {
         checkCodes()
     }
     

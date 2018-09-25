@@ -7,10 +7,10 @@ import Foundation
 // MARK: - Common UITableView text styling
 extension NSAttributedString {
     static func tableRowTitle(_ string: String) -> NSAttributedString {
-        return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: string, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     static func disabledTableRowTitle(_ string: String) -> NSAttributedString {
-        return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewDisabledRowTextColor])
+        return NSAttributedString(string: string, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewDisabledRowTextColor])
     }
 }

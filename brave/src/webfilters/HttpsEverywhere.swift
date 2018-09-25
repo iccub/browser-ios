@@ -15,8 +15,8 @@ class HttpsEverywhere {
     var httpseDb = HttpsEverywhereObjC()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let targetsDataUrl = URL(string: "https://s3.amazonaws.com/https-everywhere-data/\(dataVersion)/httpse.leveldb.tgz")!
-        let dataFile = "httpse-\(dataVersion).leveldb.tgz"
+        let targetsDataUrl = URL(string: "https://s3.amazonaws.com/https-everywhere-data/\(HttpsEverywhere.dataVersion)/httpse.leveldb.tgz")!
+        let dataFile = "httpse-\(HttpsEverywhere.dataVersion).leveldb.tgz"
         let loader = NetworkDataFileLoader(url: targetsDataUrl, file: dataFile, localDirName: "https-everywhere-data")
         loader.delegate = self
         self.runtimeDebugOnlyTestVerifyResourcesLoaded()

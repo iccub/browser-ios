@@ -136,7 +136,7 @@ class TabWidget : UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func clicked() {
+    @objc func clicked() {
         delegate?.tabWidgetClose(self)
     }
 
@@ -148,12 +148,12 @@ class TabWidget : UIView {
         close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black
     }
 
-    func selected() {
+    @objc func selected() {
         delegate?.tabWidgetSelected(self)
     }
 
     func setStyleToSelected() {
-        title.titleLabel!.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightSemibold)
+        title.titleLabel!.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
         title.setTitleColor(PrivateBrowsing.singleton.isOn ? UIColor.white : UIColor.black, for: .normal)
         backgroundColor = UIColor.clear
         close.isHidden = false
@@ -231,7 +231,7 @@ extension TabWidget {
         }
     }
 
-    func longPress(_ g: UILongPressGestureRecognizer) {
+    @objc func longPress(_ g: UILongPressGestureRecognizer) {
         if g.state == .ended {
             postAsyncToMain(0.1) {
                 if let dragClone = self.dragClone, dragClone.lastLocation == nil {
@@ -259,7 +259,7 @@ extension TabWidget {
         alpha = 0
     }
 
-    func detectPan(_ recognizer:UIPanGestureRecognizer) {
+    @objc func detectPan(_ recognizer:UIPanGestureRecognizer) {
         if let dragClone = dragClone {
             dragClone.detectPan(recognizer)
             delegate?.tabWidgetDragMoved(self, distance: recognizer.translation(in: superview!).x, isEnding: recognizer.state == .ended)

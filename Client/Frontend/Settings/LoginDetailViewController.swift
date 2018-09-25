@@ -318,7 +318,7 @@ extension LoginDetailViewController {
         }
     }
 
-    func SELedit() {
+    @objc func SELedit() {
         editingInfo = true
 
         let cell = tableView.cellForRow(at: InfoItem.usernameItem.indexPath) as! LoginTableViewCell
@@ -327,7 +327,7 @@ extension LoginDetailViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(LoginDetailViewController.SELdoneEditing))
     }
 
-    func SELdoneEditing() {
+    @objc func SELdoneEditing() {
         editingInfo = false
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(LoginDetailViewController.SELedit))
 
@@ -349,7 +349,7 @@ extension LoginDetailViewController {
         }
     }
 
-    func SELwillShowMenuController() {
+    @objc func SELwillShowMenuController() {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIMenuControllerWillShowMenu, object: nil)
 
         let menuController = UIMenuController.shared
@@ -373,7 +373,7 @@ extension LoginDetailViewController {
         menuController.setMenuVisible(true, animated: true)
     }
 
-    func SELwillHideMenuController() {
+    @objc func SELwillHideMenuController() {
         menuControllerCell = nil
 
         // Re-add observer

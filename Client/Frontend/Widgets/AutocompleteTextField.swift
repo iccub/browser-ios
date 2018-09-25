@@ -78,7 +78,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
         ]
     }
 
-    func handleKeyCommand(sender: UIKeyCommand) {
+    @objc func handleKeyCommand(sender: UIKeyCommand) {
         switch sender.input {
         case UIKeyInputLeftArrow:
             if isSelectionActive {
@@ -175,7 +175,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
 
         let suggestionText = suggestion.substring(from: suggestion.index(suggestion.startIndex, offsetBy: normalized.count))
         let autocompleteText = NSMutableAttributedString(string: suggestionText)
-        autocompleteText.addAttribute(NSBackgroundColorAttributeName, value: highlightColor, range: NSRange(location: 0, length: suggestionText.count))
+        autocompleteText.addAttribute(NSAttributedStringKey.backgroundColor, value: highlightColor, range: NSRange(location: 0, length: suggestionText.count))
         autocompleteTextLabel?.removeFromSuperview() // should be nil. But just in case
         autocompleteTextLabel = createAutocompleteLabel(with: autocompleteText)
         if let label = autocompleteTextLabel {
@@ -231,7 +231,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
         super.setMarkedText(markedText, selectedRange: selectedRange)
     }
 
-    func textDidChange(_ textField: UITextField) {
+    @objc func textDidChange(_ textField: UITextField) {
         hideCursor = autocompleteTextLabel != nil
         removeCompletion()
 

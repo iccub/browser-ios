@@ -23,7 +23,7 @@ class SyncWelcomeViewController: SyncViewController {
     lazy var syncImage: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "sync-art"))
         // Shrinking image a bit on smaller devices.
-        imageView.setContentCompressionResistancePriority(250, for: .vertical)
+        imageView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .vertical)
         imageView.contentMode = .scaleAspectFit
 
         return imageView
@@ -39,7 +39,7 @@ class SyncWelcomeViewController: SyncViewController {
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+        label.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
         label.textColor = BraveUX.GreyJ
         label.text = Strings.BraveSync
         label.textAlignment = .center
@@ -49,13 +49,13 @@ class SyncWelcomeViewController: SyncViewController {
     lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        label.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
         label.textColor = BraveUX.GreyH
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         label.textAlignment = .center
         label.text = Strings.BraveSyncWelcome
-        label.setContentHuggingPriority(250, for: .horizontal)
+        label.setContentHuggingPriority(UILayoutPriority(rawValue: 250), for: .horizontal)
 
         return label
     }()
@@ -71,7 +71,7 @@ class SyncWelcomeViewController: SyncViewController {
         let button = RoundInterfaceButton(type: .roundedRect)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle(Strings.ScanSyncCode, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
         button.setTitleColor(UIColor.white, for: .normal)
         button.backgroundColor = BraveUX.BraveOrange
         button.addTarget(self, action: #selector(existingUserAction), for: .touchUpInside)
@@ -87,7 +87,7 @@ class SyncWelcomeViewController: SyncViewController {
         let button = RoundInterfaceButton(type: .roundedRect)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle(Strings.NewSyncCode, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         button.setTitleColor(BraveUX.GreyH, for: .normal)
         button.addTarget(self, action: #selector(newToSyncAction), for: .touchUpInside)
         return button
@@ -125,7 +125,7 @@ class SyncWelcomeViewController: SyncViewController {
         mainStackView.addArrangedSubview(buttonsStackView)
     }
     
-    func newToSyncAction() {
+    @objc func newToSyncAction() {
         let addDevice = SyncSelectDeviceTypeViewController()
         addDevice.syncInitHandler = { (title, type) in
             weak var weakSelf = self
@@ -158,7 +158,7 @@ class SyncWelcomeViewController: SyncViewController {
         navigationController?.pushViewController(addDevice, animated: true)
     }
     
-    func existingUserAction() {
+    @objc func existingUserAction() {
         let pairCamera = SyncPairCameraViewController()
         
         pairCamera.syncHandler = { bytes in

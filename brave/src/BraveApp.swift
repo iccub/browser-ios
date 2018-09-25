@@ -19,10 +19,6 @@ var kIsDevelomentBuild: Bool = {
     return isDev
 }()
 
-#if !NO_FABRIC
-    import Mixpanel
-#endif
-
 #if !DEBUG
     func print(_ items: Any..., separator: String = " ", terminator: String = "\n") {}
 #endif
@@ -94,53 +90,13 @@ class BraveApp {
     }
 
     class func didFinishLaunching() {
-        #if !NO_FABRIC
-            let telemetryOn = getApp().profile!.prefs.intForKey(BraveUX.PrefKeyUserAllowsTelemetry) ?? 1 == 1
-            if telemetryOn {
-                if let dict = Bundle.main.infoDictionary, let token = dict["MIXPANEL_TOKEN"] as? String {
-                    // note: setting this in willFinishLaunching is causing a crash, keep it in didFinish
-                    mixpanelInstance = Mixpanel.initialize(token: token)
-                    mixpanelInstance?.serverURL = "https://metric-proxy.brave.com"
-                    checkMixpanelGUID()
-                    
-                    // Eventually GCDWebServer `base` could be used with monitoring outgoing posts to /track endpoint
-                    //  this would allow data to be swapped out in realtime without the need for a full Mixpanel fork
-                }
-            }
-       #endif
-        
         UINavigationBar.appearance().tintColor = BraveUX.BraveOrange
-    }
-    
-    private class func checkMixpanelGUID() {
-        let calendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)
-        let unit: NSCalendar.Unit = [NSCalendar.Unit.month, NSCalendar.Unit.year]
-        guard let dateComps = calendar?.components(unit, from: Date()), let month = dateComps.month, let year = dateComps.year else {
-            print("Failed to pull date components for GUID rotation")
-            return
-        }
-        
-        // We only rotate on 'odd' months
-        let rotationMonth = Int(round(Double(month) / 2.0) * 2 - 1)
-        
-        // The key for the last reset date
-        let resetDate = "\(rotationMonth)-\(year)"
-        
-        let mixpanelGuidKey = "kMixpanelGuid"
-        let lastResetDate = getApp().profile!.prefs.stringForKey(mixpanelGuidKey)
-        
-        if lastResetDate != resetDate {
-            // We have not rotated for this iteration (do not care _how_ far off it is, just that it is not the same)
-            mixpanelInstance?.distinctId = UUID().uuidString
-            getApp().profile?.prefs.setString(resetDate, forKey: mixpanelGuidKey)
-        }
-        
     }
 
     // Be aware: the Prefs object has not been created yet
     class func willFinishLaunching_begin() {
         BraveApp.setupCacheDefaults()
-        Foundation.URLProtocol.registerClass(URLProtocol);
+        Foundation.URLProtocol.registerClass(URLProtocol.self)
 
         NotificationCenter.default.addObserver(BraveApp.singleton,
              selector: #selector(BraveApp.didEnterBackground(_:)), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)

@@ -78,18 +78,18 @@ class SyncPairCameraViewController: SyncViewController {
         titleDescriptionStackView.axis = .vertical
         titleDescriptionStackView.spacing = 4
         titleDescriptionStackView.alignment = .center
-        titleDescriptionStackView.setContentCompressionResistancePriority(250, for: .vertical)
+        titleDescriptionStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .vertical)
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
         titleLabel.textColor = BraveUX.GreyJ
         titleLabel.text = Strings.SyncToDevice
         titleDescriptionStackView.addArrangedSubview(titleLabel)
 
         descriptionLabel = UILabel()
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
         descriptionLabel.textColor = BraveUX.GreyH
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .byWordWrapping
@@ -106,7 +106,7 @@ class SyncPairCameraViewController: SyncViewController {
         enterWordsButton = RoundInterfaceButton(type: .roundedRect)
         enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.EnterCodeWords, for: .normal)
-        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
+        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         enterWordsButton.setTitleColor(BraveUX.GreyH, for: .normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), for: .touchUpInside)
         stackView.addArrangedSubview(enterWordsButton)
@@ -141,11 +141,11 @@ class SyncPairCameraViewController: SyncViewController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: nil) { _ in
-            self.cameraView.videoPreviewLayer?.connection.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
+            self.cameraView.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
         }
     }
     
-    func SEL_enterWords() {
+    @objc func SEL_enterWords() {
         let wordsVC = SyncPairWordsViewController()
         wordsVC.syncHandler = self.syncHandler
         navigationController?.pushViewController(wordsVC, animated: true)

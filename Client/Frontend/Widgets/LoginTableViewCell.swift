@@ -112,10 +112,10 @@ class LoginTableViewCell: UITableViewCell {
         }
 
         let attributes = [
-            NSFontAttributeName: LoginTableViewCellUX.descriptionLabelFont
+            NSAttributedStringKey.font: LoginTableViewCellUX.descriptionLabelFont
         ]
 
-        return descriptionText.size(attributes: attributes)
+        return descriptionText.size(withAttributes: attributes)
     }
 
     var displayDescriptionAsPassword: Bool = false {

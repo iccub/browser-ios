@@ -14,8 +14,8 @@ class SafeBrowsing {
     lazy var abpFilterLibWrapper: ABPFilterLibWrapper = { return ABPFilterLibWrapper() }()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let dataUrl = URL(string: "\(safeBrowsingUrlPath)\(dataVersion)/SafeBrowsingData.dat")!
-        let dataFile = "safe-browsing-data-\(dataVersion).dat"
+        let dataUrl = URL(string: "\(SafeBrowsing.safeBrowsingUrlPath)\(SafeBrowsing.dataVersion)/SafeBrowsingData.dat")!
+        let dataFile = "safe-browsing-data-\(SafeBrowsing.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "safe-browsing-data")
         loader.delegate = self
         return loader

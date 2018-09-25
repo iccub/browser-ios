@@ -133,7 +133,7 @@ class BraveTopViewController : UIViewController {
 //        return leftPanelShowing() || rightPanelShowing()
 //    }
 
-    func onClickLeftSlideOut(_ notification: Notification) {
+    @objc func onClickLeftSlideOut(_ notification: Notification) {
         leftSidePanelButtonAndUnderlay = notification.object as? ButtonWithUnderlayView
         if !rightSidePanel.view.isHidden {
             togglePanel(rightSidePanel)
@@ -144,7 +144,7 @@ class BraveTopViewController : UIViewController {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
     }
 
-    func onClickBraveButton(_ notification: Notification) {
+    @objc func onClickBraveButton(_ notification: Notification) {
         if !mainSidePanel.view.isHidden {
             togglePanel(mainSidePanel)
         }

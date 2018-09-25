@@ -3,39 +3,39 @@
 import Shared
 
 extension BrowserViewController {
-    func reloadTab(){
+    @objc func reloadTab(){
         if homePanelController == nil {
             tabManager.selectedTab?.reload()
         }
     }
 
-    func goBack(){
+    @objc func goBack(){
         if tabManager.selectedTab?.canGoBack == true && homePanelController == nil {
             tabManager.selectedTab?.goBack()
         }
     }
-    func goForward(){
+    @objc func goForward(){
         if tabManager.selectedTab?.canGoForward == true && homePanelController == nil {
             tabManager.selectedTab?.goForward()
         }
     }
 
-    func findOnPage(){
+    @objc func findOnPage(){
         if let tab = tabManager.selectedTab, homePanelController == nil {
             browser(tab, didSelectFindInPageForSelection: "")
         }
     }
 
-    func selectLocationBar() {
+    @objc func selectLocationBar() {
         urlBar.browserLocationViewDidTapLocation(urlBar.locationView)
     }
 
-    func newTab() {
+    @objc func newTab() {
         openBlankNewTabAndFocus(isPrivate: PrivateBrowsing.singleton.isOn)
         self.selectLocationBar()
     }
 
-    func newPrivateTab() {
+    @objc func newPrivateTab() {
         openBlankNewTabAndFocus(isPrivate: true)
         let profile = getApp().profile
         if PinViewController.isBrowserLockEnabled && profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true {
@@ -43,7 +43,7 @@ extension BrowserViewController {
         }
     }
 
-    func closeTab() {
+    @objc func closeTab() {
         guard let tab = tabManager.selectedTab else { return }
         let priv = tab.isPrivate
         nextOrPrevTabShortcut(false)
@@ -65,11 +65,11 @@ extension BrowserViewController {
         tabManager.selectTab(tabList[index])
     }
 
-    func nextTab() {
+    @objc func nextTab() {
         nextOrPrevTabShortcut(true)
     }
 
-    func previousTab() {
+    @objc func previousTab() {
         nextOrPrevTabShortcut(false)
     }
 

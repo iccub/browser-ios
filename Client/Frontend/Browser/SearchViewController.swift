@@ -41,9 +41,9 @@ private struct SearchViewControllerUX {
     static let SuggestionCellMaxRows = 2
 
     static let PromptColor = UIConstants.PanelBackgroundColor
-    static let PromptFont = UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)
-    static let PromptYesFont = UIFont.systemFont(ofSize: 15, weight: UIFontWeightBold)
-    static let PromptNoFont = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+    static let PromptFont = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+    static let PromptYesFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.bold)
+    static let PromptNoFont = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
     static let PromptInsets = UIEdgeInsets(top: 15, left: 12, bottom: 15, right: 12)
     static let PromptButtonColor = BraveUX.Blue
 }
@@ -153,7 +153,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         NotificationCenter.default.removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
     }
 
-    func SELDynamicFontChanged(_ notification: Notification) {
+    @objc func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
 
         reloadData()
@@ -287,7 +287,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         promptYesButton.titleEdgeInsets = SearchViewControllerUX.PromptInsets
         // If the prompt message doesn't fit, this prevents it from pushing the buttons
         // off the row and makes it wrap instead.
-        promptYesButton.setContentCompressionResistancePriority(1000, for: UILayoutConstraintAxis.horizontal)
+        promptYesButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
         promptYesButton.addTarget(self, action: #selector(SearchViewController.SELdidClickOptInYes), for: UIControlEvents.touchUpInside)
         prompt.addSubview(promptYesButton)
 
@@ -298,7 +298,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         promptNoButton.titleEdgeInsets = SearchViewControllerUX.PromptInsets
         // If the prompt message doesn't fit, this prevents it from pushing the buttons
         // off the row and makes it wrap instead.
-        promptNoButton.setContentCompressionResistancePriority(1000, for: UILayoutConstraintAxis.horizontal)
+        promptNoButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.horizontal)
         promptNoButton.addTarget(self, action: #selector(SearchViewController.SELdidClickOptInNo), for: UIControlEvents.touchUpInside)
         prompt.addSubview(promptNoButton)
 
@@ -432,7 +432,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         }
     }
 
-    func SELdidSelectEngine(_ sender: UIButton) {
+    @objc func SELdidSelectEngine(_ sender: UIButton) {
         // The UIButtons are the same cardinality and order as the array of quick search engines.
         // Subtract 1 from index to account for magnifying glass accessory.
         if let index = searchEngineScrollViewContent.subviews.index(of: sender),
@@ -441,11 +441,11 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         }
     }
 
-    func SELdidClickSearchButton() {
+    @objc func SELdidClickSearchButton() {
         self.searchDelegate?.presentSearchSettingsController()  
     }
 
-    func SELdidClickOptInYes() {
+    @objc func SELdidClickOptInYes() {
         searchEngines.shouldShowSearchSuggestions = true
         searchEngines.shouldShowSearchSuggestionsOptIn = false
         querySuggestClient()
@@ -453,7 +453,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         reloadSearchEngines()
     }
 
-    func SELdidClickOptInNo() {
+    @objc func SELdidClickOptInNo() {
         searchEngines.shouldShowSearchSuggestions = false
         searchEngines.shouldShowSearchSuggestionsOptIn = false
         layoutSuggestionsOptInPrompt()
@@ -530,22 +530,6 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         self.data = data
         tableView.reloadData()
     }
-}
-
-extension SearchViewController {
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
-        let section = SearchListSection(rawValue: indexPath.section)!
-        if section == SearchListSection.bookmarksAndHistory {
-            let site = data[indexPath.row]
-                if let url = URL(string: site.url) {
-                    searchDelegate?.searchViewController(self, didSelectURL: url)
-                }
-
-        }
-        else if section == SearchListSection.findInPage {
-            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
-        }
-    }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if let currentSection = SearchListSection(rawValue: indexPath.section) {
@@ -576,7 +560,7 @@ extension SearchViewController {
             return 0
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let currentSection = SearchListSection(rawValue: section) {
             switch currentSection {
@@ -594,9 +578,21 @@ extension SearchViewController {
         }
         return super.tableView(tableView, viewForHeaderInSection: section)
     }
-}
 
-extension SearchViewController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch SearchListSection(rawValue: section)! {
+        case .searchSuggestions:
+            return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !isPrivate ? 1 : 0
+        case .bookmarksAndHistory:
+            return data.count
+        case .findInPage:
+            if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
+                return 1
+            }
+            return 0
+        }
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch SearchListSection(rawValue: indexPath.section)! {
         case .searchSuggestions:
@@ -625,17 +621,17 @@ extension SearchViewController {
         }
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch SearchListSection(rawValue: section)! {
-        case .searchSuggestions:
-            return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !isPrivate ? 1 : 0
-        case .bookmarksAndHistory:
-            return data.count
-        case .findInPage:
-            if let sd = searchDelegate, sd.searchViewControllerAllowFindInPage() {
-                return 1
+    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+        let section = SearchListSection(rawValue: indexPath.section)!
+        if section == SearchListSection.bookmarksAndHistory {
+            let site = data[indexPath.row]
+            if let url = URL(string: site.url) {
+                searchDelegate?.searchViewController(self, didSelectURL: url)
             }
-            return 0
+
+        }
+        else if section == SearchListSection.findInPage {
+            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
         }
     }
 

@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
     // Swift Selectors hate class method on extensions, this just wraps the behavior
     // Also, must be public
-    func updateDauStatWrapper() {
+    @objc func updateDauStatWrapper() {
         guard let prefs = profile?.prefs else {
             log.warning("Couldn't find profile, unable to send dau stats!")
             return
@@ -438,14 +438,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         switch behavior {
         case .show:
-            UIView.animate(withDuration: 0.1, animations: { _ in
+            UIView.animate(withDuration: 0.1, animations: {
                 self.blurryLayout.alpha = 0
             }, completion: { _ in
                 self.blurryLayout.removeFromSuperview()
             })
         case .hide:
             window?.addSubview(blurryLayout)
-            UIView.animate(withDuration: 0.1, animations: { _ in
+            UIView.animate(withDuration: 0.1, animations: {
                 self.blurryLayout.alpha = 1
             })
         }

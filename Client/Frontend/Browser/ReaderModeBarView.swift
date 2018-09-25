@@ -66,7 +66,7 @@ class ReaderModeBarView: UIView {
     var delegate: ReaderModeBarViewDelegate?
     var settingsButton: UIButton!
 
-    dynamic var buttonTintColor: UIColor = UIColor.clear {
+    @objc dynamic var buttonTintColor: UIColor = UIColor.clear {
         didSet {
             settingsButton.tintColor = self.buttonTintColor
         }
@@ -109,7 +109,7 @@ class ReaderModeBarView: UIView {
         context!.strokePath()
     }
 
-    func SELtappedSettingsButton() {
+    @objc func SELtappedSettingsButton() {
         delegate?.readerModeBar(self, didSelectButton: .settings)
     }
 

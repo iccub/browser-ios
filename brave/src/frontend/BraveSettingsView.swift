@@ -213,7 +213,7 @@ class VersionSetting : Setting {
     }
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: String(format: Strings.Version_template, appVersion, buildNumber), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: String(format: Strings.Version_template, appVersion, buildNumber), attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
@@ -263,7 +263,7 @@ class PasswordManagerButtonSetting: PicklistSettingMainItem<String> {
     }
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: Strings.Password_manager_button, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: Strings.Password_manager_button, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 }
 
@@ -279,8 +279,8 @@ class CookieSetting: PicklistSettingMainItem<UInt> {
 
     static func setPolicyFromOptionId(_ optionId: Int) {
         for option in _options {
-            if option.item().optionId == optionId {
-                HTTPCookieStorage.shared.cookieAcceptPolicy = HTTPCookie.AcceptPolicy.init(rawValue: option.item().object)!
+            if option.item(()).optionId == optionId {
+                HTTPCookieStorage.shared.cookieAcceptPolicy = HTTPCookie.AcceptPolicy.init(rawValue: option.item(()).object)!
             }
         }
     }
@@ -357,7 +357,7 @@ class PasswordsClearable: Clearable {
 
 class BraveSupportLinkSetting: Setting {
     override var title: NSAttributedString? {
-        return NSAttributedString(string: Strings.Report_a_bug, attributes: [NSForegroundColorAttributeName: BraveUX.BraveOrange])
+        return NSAttributedString(string: Strings.Report_a_bug, attributes: [NSAttributedStringKey.foregroundColor: BraveUX.BraveOrange])
     }
 
     override var url: URL? {
@@ -382,7 +382,7 @@ class BravePrivacyPolicySetting: Setting {
     override var accessoryType: UITableViewCellAccessoryType { return .disclosureIndicator }
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: Strings.Privacy_Policy, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: Strings.Privacy_Policy, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override var url: URL? {
@@ -398,7 +398,7 @@ class BraveTermsOfUseSetting: Setting {
     override var accessoryType: UITableViewCellAccessoryType { return .disclosureIndicator }
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: Strings.Terms_of_Use, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: Strings.Terms_of_Use, attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override var url: URL? {
@@ -415,7 +415,7 @@ class BraveTermsOfUseSetting: Setting {
 class UrpDebugSetting: Setting, XMLParserDelegate {
 
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "URP logs", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "URP logs", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 
     override func onClick(_ navigationController: UINavigationController?) {
@@ -428,14 +428,14 @@ class LocaleRegionSetting: Setting, XMLParserDelegate {
     override var title: NSAttributedString? {
         let region = Locale.current.regionCode ?? "nil"
         
-        return NSAttributedString(string: "Region: \(region)", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "Region: \(region)", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 }
 
 class LoadTabsDebugSettings: Setting, XMLParserDelegate {
     
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "Load All QA Tabs", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "Load All QA Tabs", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
@@ -459,7 +459,7 @@ class LoadTabsDebugSettings: Setting, XMLParserDelegate {
 class CrashDebugSettings: Setting, XMLParserDelegate, UIAlertViewDelegate {
     
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "CRASH!!", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "CRASH!!", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
     
     override func onClick(_ navigationController: UINavigationController?) {
@@ -491,7 +491,7 @@ class UserReferralSettings: Setting {
     }
     
     override var title: NSAttributedString? {
-        return NSAttributedString(string: "URP Code: \(UserReferralProgram.getReferralCode(prefs: prefs) ?? "--")", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+        return NSAttributedString(string: "URP Code: \(UserReferralProgram.getReferralCode(prefs: prefs) ?? "--")", attributes: [NSAttributedStringKey.foregroundColor: UIConstants.TableViewRowTextColor])
     }
 }
 

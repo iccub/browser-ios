@@ -62,7 +62,7 @@ class SearchEnginePicker: UITableViewController {
         tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
     }
 
-    func SELcancel() {
+    @objc func SELcancel() {
         delegate?.searchEnginePicker(self, didSelectSearchEngine: nil, forType: nil)
     }
 }

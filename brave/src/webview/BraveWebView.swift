@@ -28,7 +28,7 @@ protocol WebPageStateDelegate : class {
 
 
 @objc class HandleJsWindowOpen : NSObject {
-    static func open(_ url: String) {
+    @objc static open func open(_ url: String) {
         postAsyncToMain(0) { // we now know JS callbacks can be off main
             guard let wv = BraveApp.getCurrentWebView() else { return }
             let current = wv.URL
@@ -299,7 +299,7 @@ class BraveWebView: UIWebView {
         NotificationCenter.default.addObserver(self, selector: #selector(firstLayoutPerformed), name: NSNotification.Name(rawValue: swizzledFirstLayoutNotification), object: nil)
     }
 
-    func firstLayoutPerformed() {
+    @objc func firstLayoutPerformed() {
         updateLocationFromHtml()
     }
 
@@ -314,13 +314,13 @@ class BraveWebView: UIWebView {
             }
             jsBlockedStatLastUrl = request?.url?.absoluteString
 
-            shieldStatUpdate(.jsSetValue, increment: jsBlocked)
+            shieldStatUpdate(.jsSetValue, increment: Int32(jsBlocked))
         } else {
             shieldStatUpdate(.broadcastOnly)
         }
     }
 
-    func internalProgressNotification(_ notification: Notification) {
+    @objc func internalProgressNotification(_ notification: Notification) {
         if let prog = notification.userInfo?["WebProgressEstimatedProgressKey"] as? Double {
             progress?.setProgress(prog)
             if prog > 0.99 {
@@ -602,7 +602,7 @@ class BraveWebView: UIWebView {
     }
     var recentlyBlocked = RecentlyBlocked()
 
-    func shieldStatUpdate(_ stat: ShieldStatUpdate, increment: Int = 1, affectedUrl: String = "") {
+    func shieldStatUpdate(_ stat: ShieldStatUpdate, increment: Int32 = 1, affectedUrl: String = "") {
         if !affectedUrl.isEmpty {
             if recentlyBlocked.urls.contains(affectedUrl) {
                 return

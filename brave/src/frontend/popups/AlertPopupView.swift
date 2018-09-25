@@ -34,7 +34,7 @@ class AlertPopupView: PopupView {
         titleLabel = UILabel(frame: CGRect.zero)
         titleLabel.textColor = BraveUX.GreyJ
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.systemFont(ofSize: 24, weight: UIFontWeightBold)
+        titleLabel.font = UIFont.systemFont(ofSize: 24, weight: UIFont.Weight.bold)
         titleLabel.text = title
         titleLabel.numberOfLines = 0
         containerView.addSubview(titleLabel)
@@ -42,7 +42,7 @@ class AlertPopupView: PopupView {
         messageLabel = UILabel(frame: CGRect.zero)
         messageLabel.textColor = BraveUX.GreyH
         messageLabel.textAlignment = .center
-        messageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        messageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
         messageLabel.text = message
         messageLabel.numberOfLines = 0
         containerView.addSubview(messageLabel)

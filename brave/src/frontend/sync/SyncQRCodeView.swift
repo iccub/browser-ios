@@ -13,7 +13,7 @@ class SyncQRCodeView: UIImageView {
             let scaleX = BarcodeSize / img.extent.size.width
             let scaleY = BarcodeSize / img.extent.size.height
             
-            let resultQrImage = img.applying(CGAffineTransform(scaleX: scaleX, y: scaleY))
+            let resultQrImage = img.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
             let barcode = UIImage(ciImage: resultQrImage, scale: UIScreen.main.scale, orientation: UIImageOrientation.down)
             image = barcode
         }

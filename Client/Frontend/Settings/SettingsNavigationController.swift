@@ -27,7 +27,7 @@ class SettingsNavigationController: UINavigationController {
         return UIInterfaceOrientation.portrait
     }
     
-    func SELdone() {
+    @objc func SELdone() {
         if let delegate = popoverDelegate {
             delegate.dismissPresentedModalViewController(self, animated: true)
             getApp().browserViewController.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray)

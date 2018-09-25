@@ -68,12 +68,12 @@ struct FavoritesHelper {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .center
             
-            let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: iconSize.height-90) ?? UIFont.systemFont(ofSize: iconSize.height-90, weight: UIFontWeightThin),
-                         NSParagraphStyleAttributeName: paragraphStyle,
-                         NSForegroundColorAttributeName: textColor]
+            let attrs = [NSAttributedStringKey.font: UIFont(name: "HelveticaNeue-Thin", size: iconSize.height-90) ?? UIFont.systemFont(ofSize: iconSize.height-90, weight: UIFont.Weight.thin),
+                         NSAttributedStringKey.paragraphStyle: paragraphStyle,
+                         NSAttributedStringKey.foregroundColor: textColor]
             
             let string: NSString = NSString(string: letter.uppercased())
-            let size = string.size(attributes: attrs)
+            let size = string.size(withAttributes: attrs)
             string.draw(at: CGPoint(x: (iconSize.width-size.width)/2, y: (iconSize.height-size.height)/2), withAttributes: attrs)
         }
     }
