@@ -36,7 +36,7 @@ class BackForwardListViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
 
-    func SELdidClickDone() {
+    @objc func SELdidClickDone() {
         dismiss(animated: true, completion: nil)
     }
 

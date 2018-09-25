@@ -8,8 +8,8 @@ import Shared
 struct ThumbnailCellUX {
     /// Ratio of width:height of the thumbnail image.
     static let ImageAspectRatio: Float = 1.0
-    static let BorderColor = BraveUX.GreyJ
-    static let BorderWidth: CGFloat = 0
+    static let BorderColor = BraveUX.GreyD
+    static let BorderWidth: CGFloat = 0.5
     static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? BraveUX.GreyJ : BraveUX.GreyH
     static let LabelAlignment: NSTextAlignment = .center
 
@@ -88,7 +88,7 @@ class ThumbnailCell: UICollectionViewCell {
 
     lazy var textLabel: UILabel = {
         let textLabel = UILabel()
-        textLabel.setContentHuggingPriority(1000, for: UILayoutConstraintAxis.vertical)
+        textLabel.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.vertical)
         textLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
         textLabel.textColor = ThumbnailCellUX.LabelColor
         textLabel.textAlignment = ThumbnailCellUX.LabelAlignment
@@ -103,7 +103,6 @@ class ThumbnailCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = ThumbnailCellUX.CornerRadius
         imageView.layer.borderColor = ThumbnailCellUX.BorderColor.cgColor
-        imageView.layer.borderWidth = ThumbnailCellUX.BorderWidth
         imageView.layer.minificationFilter = kCAFilterTrilinear
         imageView.layer.magnificationFilter = kCAFilterNearest
         return imageView
@@ -162,7 +161,7 @@ class ThumbnailCell: UICollectionViewCell {
         }
 
         // Prevents the textLabel from getting squished in relation to other view priorities.
-        textLabel.setContentCompressionResistancePriority(1000, for: UILayoutConstraintAxis.vertical)
+        textLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: UILayoutConstraintAxis.vertical)
 
         NotificationCenter.default.addObserver(self, selector: #selector(showEditMode), name: NotificationThumbnailEditOn,
                                                object: nil)
@@ -175,11 +174,11 @@ class ThumbnailCell: UICollectionViewCell {
         NotificationCenter.default.removeObserver(self, name: NotificationThumbnailEditOff, object: nil)
     }
 
-    func showEditMode() {
+    @objc func showEditMode() {
         toggleEditButton(true)
     }
 
-    func hideEditMode() {
+    @objc func hideEditMode() {
         toggleEditButton(false)
     }
 
@@ -203,7 +202,7 @@ class ThumbnailCell: UICollectionViewCell {
         self.imageView.alpha = activated ? 0.7 : 1.0
     }
 
-    func editButtonTapped() {
+    @objc func editButtonTapped() {
         delegate?.editThumbnail(self)
     }
 

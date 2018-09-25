@@ -13,6 +13,12 @@ import WebImage
 private let log = Logger.browserLogger
 private let queue = DispatchQueue(label: "FaviconFetcher", attributes: DispatchQueue.Attributes.concurrent)
 
+struct FallbackIcon {
+    static let minSize = CGSize(width: 120, height: 120)
+    static let size = CGSize(width: 250, height: 250)
+    static let color: UIColor = BraveUX.GreyE
+}
+
 class FaviconFetcherErrorType: MaybeErrorType {
     let description: String
     init(description: String) {
@@ -46,7 +52,7 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
 
         var oldIcons: [Favicon] = oldIcons
 
-        queue.async { _ in
+        queue.async {
             self.parseHTMLForFavicons(url).bind({ (result: Maybe<[Favicon]>) -> Deferred<[Maybe<Favicon>]> in
                 var deferreds = [Deferred<Maybe<Favicon>>]()
                 if let icons = result.successValue {
@@ -78,7 +84,7 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 5
 
-        return Alamofire.SessionManager.managerWithUserAgent(userAgent, configuration: configuration)
+        return Alamofire.SessionManager.managerWithUserAgent(FaviconFetcher.userAgent, configuration: configuration)
     }()
 
     fileprivate func fetchDataForURL(_ url: URL) -> Deferred<Maybe<NSData>> {
@@ -201,5 +207,56 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         
         return deferred
     }
+    
+    static func bestOrFallback(_ img: UIImage?, url: URL, cacheUrl: URL) -> (image: UIImage, shouldCache: Bool) {
+        var useFallback = false
+        
+        if img == nil {
+            useFallback = true
+        } else if let img = img, img.size.width < FallbackIcon.minSize.width && img.size.height < FallbackIcon.minSize.height {
+            useFallback = true
+        }
+        
+        if let letter = cacheUrl.domainURL.host?.first, useFallback {
+            let context = DataController.shared.mainThreadContext
+            
+            guard let domain = Domain.getOrCreateForUrl(cacheUrl, context: context) else {
+                return (FaviconFetcher.defaultFavicon, false)
+            }
+            
+            var bgColor = FallbackIcon.color
+            if let domainColor = domain.color {
+                bgColor = UIColor(colorString: domainColor)
+            }
+            
+            let fallback = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: bgColor, andSize: FallbackIcon.size)
+            return (fallback, false)
+        }
+        
+        if let img = img {
+            return (img, true)
+        } 
+        
+        return (FaviconFetcher.defaultFavicon, false)
+    }
 }
 
+extension UIImageView {
+    func setFaviconImage(with iconUrl: URL, cacheUrl: URL, completion: ((UIImage) -> ())? = nil) {
+        postAsyncToMain {
+            self.sd_setImage(with: iconUrl, completed: { img, _, _, _ in
+                let favicon = FaviconFetcher.bestOrFallback(img, url: iconUrl, cacheUrl: cacheUrl)
+                if favicon.shouldCache {
+                    ImageCache.shared.cache(favicon.image, url: cacheUrl, type: .square, callback: nil)
+                } else {
+                    // The only case where we want to return an image is fallback icon, we can then detect if its background
+                    // color is light enough to add borders.
+                    completion?(favicon.image)
+                }
+                
+                self.image = favicon.image
+                
+            })
+        }
+    }
+}

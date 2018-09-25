@@ -21,7 +21,7 @@ class SyncAddDeviceViewController: SyncViewController {
     
     lazy var codewordsView: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18.0, weight: UIFontWeightMedium)
+        label.font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.medium)
         label.textColor = BraveUX.GreyJ
         label.lineBreakMode = NSLineBreakMode.byWordWrapping
         label.numberOfLines = 0
@@ -145,12 +145,12 @@ class SyncAddDeviceViewController: SyncViewController {
         
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFontWeightSemibold)
+        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold)
         titleLabel.textColor = BraveUX.GreyJ
         titleDescriptionStackView.addArrangedSubview(titleLabel)
 
         descriptionLabel = UILabel()
-        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightRegular)
+        descriptionLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
         descriptionLabel.textColor = BraveUX.GreyH
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .byTruncatingTail
@@ -162,7 +162,7 @@ class SyncAddDeviceViewController: SyncViewController {
         let textStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 32),
                                                            titleDescriptionStackView,
                                                            UIView.spacer(.horizontal, amount: 32)])
-        textStackView.setContentCompressionResistancePriority(100, for: .vertical)
+        textStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 100), for: .vertical)
 
         stackView.addArrangedSubview(textStackView)
         
@@ -184,7 +184,7 @@ class SyncAddDeviceViewController: SyncViewController {
         doneButton = RoundInterfaceButton(type: .roundedRect)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.setTitle(Strings.Done, for: .normal)
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFontWeightBold)
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.bold)
         doneButton.setTitleColor(UIColor.white, for: .normal)
         doneButton.backgroundColor = BraveUX.BraveOrange
         doneButton.addTarget(self, action: #selector(SEL_done), for: .touchUpInside)
@@ -194,14 +194,14 @@ class SyncAddDeviceViewController: SyncViewController {
         enterWordsButton = RoundInterfaceButton(type: .roundedRect)
         enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.ShowCodeWords, for: .normal)
-        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFontWeightSemibold)
+        enterWordsButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
         enterWordsButton.setTitleColor(BraveUX.GreyH, for: .normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_showCodewords), for: .touchUpInside)
 
         let buttonsStackView = UIStackView(arrangedSubviews: [UIView.spacer(.horizontal, amount: 16),
                                                               doneEnterWordsStackView,
                                                               UIView.spacer(.horizontal, amount: 16)])
-        buttonsStackView.setContentCompressionResistancePriority(1000, for: .vertical)
+        buttonsStackView.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .vertical)
 
 
         stackView.addArrangedSubview(buttonsStackView)
@@ -254,13 +254,13 @@ class SyncAddDeviceViewController: SyncViewController {
         }
     }
     
-    func SEL_showCodewords() {
+    @objc func SEL_showCodewords() {
         modeControl.selectedSegmentIndex = 1
         enterWordsButton.isHidden = true
         SEL_changeMode()
     }
     
-    func SEL_copy() {
+    @objc func SEL_copy() {
         UIPasteboard.general.string = self.codewordsView.text
         didCopy = true
 
@@ -268,7 +268,7 @@ class SyncAddDeviceViewController: SyncViewController {
         clipboardClearTimer = UIPasteboard.general.clear(after: 30)
     }
     
-    func SEL_changeMode() {
+    @objc func SEL_changeMode() {
         let isFirstIndex = modeControl.selectedSegmentIndex == 0
         
         qrCodeView?.isHidden = !isFirstIndex
@@ -278,7 +278,7 @@ class SyncAddDeviceViewController: SyncViewController {
         updateLabels()
     }
     
-    func SEL_done() {
+    @objc func SEL_done() {
         doneHandler?()
     }
 }

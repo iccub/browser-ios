@@ -46,7 +46,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         NotificationCenter.default.removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
     }
 
-    func notificationReceived(_ notification: Notification) {
+    @objc func notificationReceived(_ notification: Notification) {
         switch notification.name {
         case NotificationDynamicFontChanged:
             if emptyStateOverlayView.superview != nil {
@@ -113,16 +113,17 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         cell.imageView?.layer.cornerRadius = 6
         cell.imageView?.layer.masksToBounds = true
         
-        if let faviconMO = site.domain?.favicon, let urlString = faviconMO.url, let url = URL(string: urlString) {
+        if let faviconMO = site.domain?.favicon,
+            let urlString = faviconMO.url,
+            let url = URL(string: urlString),
+            let cacheUrlString = site.domain?.url,
+            let cacheUrl = URL(string: cacheUrlString) {
+            
             ImageCache.shared.image(url, type: .square, callback: { (image) in
                 if image == nil {
                     postAsyncToMain {
                         cell.imageView?.contentMode = .scaleAspectFit
-                        cell.imageView?.sd_setImage(with: url, completed: { (img, err, type, url) in
-                            if let img = img, let url = url {
-                                ImageCache.shared.cache(img, url: url, type: .square, callback: nil)
-                            }
-                        })
+                        cell.imageView?.setFaviconImage(with: url, cacheUrl: cacheUrl)
                     }
                 }
                 else {
@@ -135,7 +136,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         }
     }
 
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    @objc func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
         let site = frc?.object(at: indexPath) as! History
 
         if let u = site.url, let url = URL(string: u) {
@@ -164,7 +165,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         return true
     }
 
-    func tableView(_ tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) {
+    @objc func tableView(_ tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) {
         if (editingStyle == UITableViewCellEditingStyle.delete) {
             if let obj = self.frc?.object(at: indexPath) as? History {
                 let context = DataController.shared.mainThreadContext
@@ -181,15 +182,15 @@ class HistoryPanel: SiteTableViewController, HomePanel {
 }
 
 extension HistoryPanel : NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    @objc func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.beginUpdates()
     }
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    @objc func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         tableView.endUpdates()
     }
 
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+    @objc func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         switch type {
         case .insert:
             let sectionIndexSet = IndexSet(integer: sectionIndex)
@@ -201,7 +202,7 @@ extension HistoryPanel : NSFetchedResultsControllerDelegate {
         }
     }
 
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    @objc func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch (type) {
         case .insert:
             if let indexPath = newIndexPath {

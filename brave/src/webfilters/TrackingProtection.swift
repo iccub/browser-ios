@@ -9,8 +9,8 @@ class TrackingProtection {
     var parser: TrackingProtectionCpp = TrackingProtectionCpp()
 
     lazy var networkFileLoader: NetworkDataFileLoader = {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/tracking-protection-data/\(dataVersion)/TrackingProtection.dat")!
-        let dataFile = "tp-data-\(dataVersion).dat"
+        let dataUrl = URL(string: "https://s3.amazonaws.com/tracking-protection-data/\(TrackingProtection.dataVersion)/TrackingProtection.dat")!
+        let dataFile = "tp-data-\(TrackingProtection.dataVersion).dat"
         let loader = NetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "tp-data")
         loader.delegate = self
         return loader

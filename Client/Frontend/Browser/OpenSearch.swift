@@ -13,6 +13,15 @@ private let SearchTermsAllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 
 class OpenSearchEngine {
     static let PreferredIconSize = 30
+    
+    struct EngineNames {
+        static let duckDuckGo = "DuckDuckGo"
+        static let qwant = "Qwant"
+    }
+    
+    struct RegionalSearchEnginesPrefKeys {
+        static let qwant_DE_FR = "qwant_DE_FR"
+    }
 
     let shortName: String
     let description: String?

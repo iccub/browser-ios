@@ -101,7 +101,7 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
         controllerContainerView.addGestureRecognizer(dismissKeyboardGestureRecognizer)
     }
 
-    func SELhandleDismissKeyboardGestureRecognizer(_ gestureRecognizer: UITapGestureRecognizer) {
+    @objc func SELhandleDismissKeyboardGestureRecognizer(_ gestureRecognizer: UITapGestureRecognizer) {
         view.window?.rootViewController?.view.endEditing(true)
     }
 

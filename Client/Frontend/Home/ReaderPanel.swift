@@ -165,7 +165,7 @@ class ReadingListTableViewCell: UITableViewCell {
             if !unread {
                 // mimic light gray visual dimming by "dimming" the speech by reducing pitch
                 let lowerPitchString = NSMutableAttributedString(string: string as String)
-                lowerPitchString.addAttribute(UIAccessibilitySpeechAttributePitch, value: NSNumber(value: ReadingListTableViewCellUX.ReadAccessibilitySpeechPitch), range: NSMakeRange(0, lowerPitchString.length))
+                lowerPitchString.addAttribute(NSAttributedStringKey(rawValue: UIAccessibilitySpeechAttributePitch), value: NSNumber(value: ReadingListTableViewCellUX.ReadAccessibilitySpeechPitch), range: NSMakeRange(0, lowerPitchString.length))
                 label = NSAttributedString(attributedString: lowerPitchString)
             } else {
                 label = string as AnyObject
@@ -230,7 +230,7 @@ class ReadingListPanel: UITableViewController, HomePanel {
         NotificationCenter.default.removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
     }
 
-    func notificationReceived(_ notification: Notification) {
+    @objc func notificationReceived(_ notification: Notification) {
         switch notification.name {
         case NotificationFirefoxAccountChanged:
             refreshReadingList()

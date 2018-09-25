@@ -166,7 +166,7 @@ class BrowserViewController: UIViewController {
     }
     
     var swipeScheduled = false
-    func leftSwipeToolbar() {
+    @objc func leftSwipeToolbar() {
         if !swipeScheduled {
             swipeScheduled = true
             postAsyncToMain(0.1) {
@@ -179,7 +179,7 @@ class BrowserViewController: UIViewController {
         }
     }
     
-    func rightSwipeToolbar() {
+    @objc func rightSwipeToolbar() {
         if !swipeScheduled {
             swipeScheduled = true
             postAsyncToMain(0.1) {
@@ -274,15 +274,15 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func SELappDidEnterBackgroundNotification() {
+    @objc func SELappDidEnterBackgroundNotification() {
         displayedPopoverController?.dismiss(animated: false, completion: nil)
     }
 
-    func SELtappedTopArea() {
+    @objc func SELtappedTopArea() {
         scrollController.showToolbars(animated: true)
     }
 
-    func SELappWillResignActiveNotification() {
+    @objc func SELappWillResignActiveNotification() {
         // If we are displying a private tab, hide any elements in the browser that we wouldn't want shown
         // when the app is in the home switcher
         guard let privateTab = tabManager.selectedTab, privateTab.isPrivate else {
@@ -294,7 +294,7 @@ class BrowserViewController: UIViewController {
         urlBar.locationView.alpha = 0
     }
 
-    func SELappDidBecomeActiveNotification() {
+    @objc func SELappDidBecomeActiveNotification() {
         // Re-show any components that might have been hidden because they were being displayed
         // as part of a private mode tab
         UIView.animate(withDuration: 0.2, delay: 0, options: UIViewAnimationOptions(), animations: {
@@ -600,9 +600,31 @@ class BrowserViewController: UIViewController {
         popup.showWithType(showType: .flyUp)
     }
     
-    func presentDDGCallout(force: Bool = false) {
+    var shouldShowDDGPromo: Bool {
+        // We want to show ddg promo in most cases so guard return true.
+        guard let prefs = getApp().profile?.prefs else { return true }
+        
+        let regionalSearchEngine = prefs.boolForKey(OpenSearchEngine.RegionalSearchEnginesPrefKeys.qwant_DE_FR)
+        
+        // Pref key can be either false or nil.
+        return regionalSearchEngine != true
+    }
+    
+    func presentDDGCallout(force: Bool = false) { 
+        if !shouldShowDDGPromo {
+            presentBrowserLockCallout()
+            return
+        }
+        
         let profile = getApp().profile
         if profile?.prefs.boolForKey(kPrefKeyPopupForDDG) == true && !force {
+            return
+        }
+        
+        // Do not show ddg popup if user already chose it for private browsing.
+        if profile?.searchEngines.defaultEngine(forType: .privateMode).shortName == OpenSearchEngine.EngineNames.duckDuckGo {
+            // Showing only pin code popup.
+            presentBrowserLockCallout()
             return
         }
         
@@ -611,17 +633,17 @@ class BrowserViewController: UIViewController {
         popup.dismissHandler = {
             weakSelf?.presentBrowserLockCallout()
         }
-        popup.addButton(title: Strings.DDG_callout_no) { _ in
+        popup.addButton(title: Strings.DDG_callout_no) {
             weakSelf?.profile.prefs.setBool(true, forKey: kPrefKeyPopupForDDG)
             return .flyDown
         }
-        popup.addDefaultButton(title: Strings.DDG_callout_enable) { _ in
+        popup.addDefaultButton(title: Strings.DDG_callout_enable) {
             if getApp().profile == nil {
                 return .flyUp
             }
             
             weakSelf?.profile.prefs.setBool(true, forKey: kPrefKeyPopupForDDG)
-            weakSelf?.profile.searchEngines.defaultEngine("DuckDuckGo", forType: .privateMode)
+            weakSelf?.profile.searchEngines.defaultEngine(OpenSearchEngine.EngineNames.duckDuckGo, forType: .privateMode)
             
             if let topSitesPanel = weakSelf?.homePanelController?.topSitesPanel as? TopSitesPanel {
                 topSitesPanel.ddgPrivateSearchCompletionBlock?()
@@ -1006,7 +1028,7 @@ class BrowserViewController: UIViewController {
         // We don't allow to have 2 same favorites.
         if !FavoritesHelper.isAlreadyAdded(url) {
             let addToFavoritesActivity = AddToFavoritesActivity() { [weak tab] in
-                FavoritesHelper.add(url: url, title: tab?.displayTitle, color: tab?.color)
+                FavoritesHelper.add(url: url, title: tab?.displayTitle)
             }
             activities.append(addToFavoritesActivity)
         }
@@ -1257,7 +1279,7 @@ extension BrowserViewController: IntroViewControllerDelegate {
     }
 
     func introViewControllerDidFinish(_ introViewController: IntroViewController) {
-        introViewController.dismiss(animated: true) { finished in
+        introViewController.dismiss(animated: true) {
             if self.navigationController?.viewControllers.count ?? 0 > 1 {
                 self.navigationController?.popToRootViewController(animated: true)
             }
@@ -1278,7 +1300,7 @@ extension BrowserViewController: KeyboardHelperDelegate {
 
         adjustFindInPageBar(safeArea: false)
 
-        if let loginsHelper = tabManager.selectedTab?.getHelper(LoginsHelper) {
+        if let loginsHelper = tabManager.selectedTab?.getHelper(LoginsHelper.self) {
             // keyboardWillShowWithState is called during a hide (brilliant), and because PW button setup is async make sure to exit here if already showing the button, or the show code will be called after kb hide
             if !urlBar.pwdMgrButton.isHidden || loginsHelper.getKeyboardAccessory() != nil {
                 return
@@ -1319,7 +1341,7 @@ extension BrowserViewController: KeyboardHelperDelegate {
             self.snackBars.layoutIfNeeded()
         }
         
-        if let loginsHelper = tabManager.selectedTab?.getHelper(LoginsHelper) {
+        if let loginsHelper = tabManager.selectedTab?.getHelper(LoginsHelper.self) {
             loginsHelper.hideKeyboardAccessory()
             urlBar.pwdMgrButton.isHidden = true
             urlBar.setNeedsUpdateConstraints()
@@ -1425,8 +1447,8 @@ class BlurWrapper: UIView {
     }
 }
 
-protocol Themeable {
-    func applyTheme(_ themeName: String)
+@objc protocol Themeable {
+    @objc func applyTheme(_ themeName: String)
 }
 
 extension BrowserViewController: JSPromptAlertControllerDelegate {

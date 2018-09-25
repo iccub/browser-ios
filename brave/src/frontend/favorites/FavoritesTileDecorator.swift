@@ -6,12 +6,6 @@ import Shared
 
 private let log = Logger.browserLogger
 
-struct FallbackIconUX {
-    static let minSize = CGSize(width: 120, height: 120)
-    static let size = CGSize(width: 250, height: 250)
-    static let color: UIColor = BraveUX.GreyE
-}
-
 enum FavoritesTileType {
     /// Predefinied tile color and custom icon, used for most popular websites.
     case preset
@@ -70,7 +64,6 @@ class FavoritesTileDecorator {
             cell.imageView.backgroundColor = website.backgroundColor
             cell.imageView.contentMode = .scaleAspectFit
             cell.imageView.layer.minificationFilter = kCAFilterTrilinear
-            cell.showBorder(!PrivateBrowsing.singleton.isOn)
 
             UIGraphicsBeginImageContextWithOptions(image.size, false, 0)
             image.draw(in: CGRect(origin: CGPoint(x: 3, y: 6), size: CGSize(width: image.size.width - 6, height: image.size.height - 6)))
@@ -99,7 +92,6 @@ class FavoritesTileDecorator {
                 // last resort - download the icon
                 downloadFaviconsAndUpdateForUrl(url, indexPath: indexPath)
             }
-            break
         }
     }
 
@@ -115,33 +107,10 @@ class FavoritesTileDecorator {
                 }
             }
             else {
-                postAsyncToMain {
-                    cell.imageView.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        var finalImage = img
-                        var useFallback = false
-
-                        if img == nil {
-                            useFallback = true
-                        } else if let img = img, img.size.width < FallbackIconUX.minSize.width && img.size.height < FallbackIconUX.minSize.height {
-                            useFallback = true
-                        }
-
-                        if useFallback, let host = self.url.host, let letter = host.replacingOccurrences(of: "www.", with: "").first {
-                            var tabColor = FallbackIconUX.color
-                            
-                            // Only use stored color if it's not too light.
-                            if let color = self.color, !color.isLight {
-                                tabColor = color
-                            }
-                            
-                            finalImage = FavoritesHelper.fallbackIcon(withLetter: String(letter), color: tabColor, andSize: FallbackIconUX.size)
-                        }
-
-                        if let finalImage = finalImage {
-                            ImageCache.shared.cache(finalImage, url: cacheWithUrl, type: .square, callback: nil)
-                            cell.imageView.image = finalImage
-                        }
-                    })
+                cell.imageView.setFaviconImage(with: iconUrl, cacheUrl: cacheWithUrl) { image in
+                    if image.getPixelColor(of: CGPoint(x: 10, y: 10)).isVeryLight {
+                        cell.showBorder(true)
+                    }
                 }
             }
         })

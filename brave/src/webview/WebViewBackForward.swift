@@ -82,7 +82,7 @@ class WebViewBackForwardList {
         var i = 0
         var foundCurrent = false
         for match in result {
-            var extractedUrl = nsHistory.substring(with: match.rangeAt(1))
+            var extractedUrl = nsHistory.substring(with: match.range(at: 1))
             let parts = extractedUrl.components(separatedBy: " ")
             if parts.count > 1 {
                 extractedUrl = parts[0]

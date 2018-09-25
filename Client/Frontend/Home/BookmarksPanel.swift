@@ -223,7 +223,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let navBar = self.navigationController?.navigationBar
         navBar?.barTintColor = BraveUX.BackgroundColorForSideToolbars
         navBar?.isTranslucent = false
-        navBar?.titleTextAttributes = [NSFontAttributeName : UIFont.systemFont(ofSize: UIConstants.DefaultChromeSize, weight: UIFontWeightMedium), NSForegroundColorAttributeName : BraveUX.GreyJ]
+        navBar?.titleTextAttributes = [NSAttributedStringKey.font : UIFont.systemFont(ofSize: UIConstants.DefaultChromeSize, weight: UIFont.Weight.medium), NSAttributedStringKey.foregroundColor : BraveUX.GreyJ]
         navBar?.clipsToBounds = true
         
         let width = self.view.bounds.size.width
@@ -254,7 +254,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         reloadData()
     }
 
-    override func reloadData() {
+    @objc override func reloadData() {
 
         do {
             try self.bookmarksFRC?.performFetch()
@@ -329,7 +329,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         self.navigationController?.popViewController(animated: true)
     }
 
-    func onAddBookmarksFolderButton() {
+    @objc func onAddBookmarksFolderButton() {
         
         let alert = UIAlertController.userTextInputAlert(title: Strings.NewFolder, message: Strings.EnterFolderName) {
             input, _ in
@@ -345,7 +345,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         tableView.setContentOffset(CGPoint.zero, animated: true)
     }
     
-    func onEditBookmarksButton() {
+    @objc func onEditBookmarksButton() {
         switchTableEditingMode()
     }
 
@@ -366,7 +366,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             break
         case NSNotification.Name.UITextFieldTextDidChange:
             if let okAction = addBookmarksFolderOkAction, let textField = notification.object as? UITextField {
-                okAction.isEnabled = (textField.text?.characters.count ?? 0) > 0
+                okAction.isEnabled = (textField.text?.count ?? 0) > 0
             }
             break
         default:
@@ -487,17 +487,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 }
             }
             else {
-                postAsyncToMain {
-                    cell.imageView?.sd_setImage(with: iconUrl, completed: { (img, err, type, url) in
-                        guard let img = img else {
-                            // avoid retrying to find an icon when none can be found, hack skips FaviconFetch
-                            ImageCache.shared.cache(FaviconFetcher.defaultFavicon, url: cacheWithUrl, type: .square, callback: nil)
-                            cell.imageView?.image = FaviconFetcher.defaultFavicon
-                            return
-                        }
-                        ImageCache.shared.cache(img, url: cacheWithUrl, type: .square, callback: nil)
-                    })
-                }
+                cell.imageView?.setFaviconImage(with: iconUrl, cacheUrl: cacheWithUrl)
             }
         })
     }
@@ -524,13 +514,13 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         return indexPath
     }
 
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    @objc func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return false }
 
         return !bookmark.isFavorite
     }
 
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    @objc func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
 
         guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
@@ -567,7 +557,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         return .delete
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
+    @objc func tableView(_ tableView: UITableView, editActionsForRowAtIndexPath indexPath: IndexPath) -> [AnyObject]? {
         guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return nil }
 
         let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete, handler: { (action, indexPath) in

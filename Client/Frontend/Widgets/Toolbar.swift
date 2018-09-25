@@ -37,7 +37,7 @@ class Toolbar : UIView {
     }
     
     var previousX: CGFloat = 0
-    func handleSwipes(gesture: UIPanGestureRecognizer) {
+    @objc func handleSwipes(gesture: UIPanGestureRecognizer) {
         if gesture.state == .began {
             let velocity: CGPoint = gesture.velocity(in: self)
             if velocity.x > 100 {

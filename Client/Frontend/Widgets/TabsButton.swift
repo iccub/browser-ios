@@ -11,7 +11,7 @@ private let log = Logger.browserLogger
 
 struct TabsButtonUX {
     static let CornerRadius: CGFloat = 2
-    static let TitleFont: UIFont = UIFont.systemFont(ofSize: 10, weight: UIFontWeightSemibold)
+    static let TitleFont: UIFont = UIFont.systemFont(ofSize: 10, weight: UIFont.Weight.semibold)
     static let BorderStrokeWidth: CGFloat = 1.5
     static let BorderColor = UIColor.clear
     static let HighlightButtonColor = UIColor.clear
@@ -143,40 +143,8 @@ class TabsButton: UIControl {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override func clone() -> UIView {
-        let button = TabsButton()
-        
-        imageView.tintColor = borderView.color
-
-        button.accessibilityLabel = accessibilityLabel
-        button.titleLabel.text = titleLabel.text
-
-        // Copy all of the styable properties over to the new TabsButton
-        button.titleLabel.font = titleLabel.font
-        button.titleLabel.textColor = titleLabel.textColor
-        button.titleLabel.layer.cornerRadius = titleLabel.layer.cornerRadius
-
-        button.labelBackground.backgroundColor = labelBackground.backgroundColor
-        button.labelBackground.layer.cornerRadius = labelBackground.layer.cornerRadius
-
-        button.borderView.strokeWidth = borderView.strokeWidth
-        button.borderView.color = borderView.color
-        button.borderView.cornerRadius = borderView.cornerRadius
-
-        // BRAVE added
-        for target in allTargets {
-          if let actions = actions(forTarget: target, forControlEvent: .touchUpInside) {
-             for action in actions {
-              button.addTarget(target, action: Selector(action), for: .touchUpInside)
-            }
-          }
-      }
-
-        return button
-    }
     
-    func tabsButtonHold() {
+    @objc func tabsButtonHold() {
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         let closeAllTitle = String(format: Strings.CloseAllTabsTitle, getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count)
         let closeAllTabsAction =  UIAlertAction(title: closeAllTitle, style: UIAlertActionStyle.destructive) { (action: UIAlertAction) in
@@ -239,7 +207,7 @@ extension TabsButton: Themeable {
 // MARK: UIAppearance
 extension TabsButton {
     
-    dynamic var borderColor: UIColor {
+    @objc dynamic var borderColor: UIColor {
         get { return borderView.color }
         set {
             borderView.color = newValue
@@ -247,27 +215,27 @@ extension TabsButton {
         }
     }
 
-    dynamic var borderWidth: CGFloat {
+    @objc dynamic var borderWidth: CGFloat {
         get { return borderView.strokeWidth }
         set { borderView.strokeWidth = newValue }
     }
 
-    dynamic var textColor: UIColor? {
+    @objc dynamic var textColor: UIColor? {
         get { return titleLabel.textColor }
         set { titleLabel.textColor = newValue }
     }
 
-    dynamic var titleFont: UIFont? {
+    @objc dynamic var titleFont: UIFont? {
         get { return titleLabel.font }
         set { titleLabel.font = newValue }
     }
 
-    dynamic var titleBackgroundColor: UIColor? {
+    @objc dynamic var titleBackgroundColor: UIColor? {
         get { return labelBackground.backgroundColor }
         set { labelBackground.backgroundColor = newValue }
     }
 
-    dynamic var insets : UIEdgeInsets {
+    @objc dynamic var insets : UIEdgeInsets {
         get { return buttonInsets }
         set {
             buttonInsets = newValue

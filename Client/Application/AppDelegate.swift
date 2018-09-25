@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
     // Swift Selectors hate class method on extensions, this just wraps the behavior
     // Also, must be public
-    func updateDauStatWrapper() {
+    @objc func updateDauStatWrapper() {
         guard let prefs = profile?.prefs else {
             log.warning("Couldn't find profile, unable to send dau stats!")
             return
@@ -172,9 +172,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             profile.prefs.setBool(true, forKey: FavoritesHelper.initPrefsKey)
         }
         
+        let isFirstLaunch = self.getProfile(application).prefs.arrayForKey(DAU.preferencesKey) == nil
+        
         // MARK: User referral program
         if let urp = UserReferralProgram() {
-            let isFirstLaunch = self.getProfile(application).prefs.arrayForKey(DAU.preferencesKey) == nil
             if isFirstLaunch {
                 urp.referralLookup { url in
                     guard let url = url else { return }
@@ -188,7 +189,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
             log.error("Failed to initialize user referral program")
             UrpLog.log("Failed to initialize user referral program")
         }
-
+        
+        if isFirstLaunch {
+            SearchEngines.regionalSearchEnginesFlagsSetup(prefs: getProfile(application).prefs)
+        }
+        
         log.debug("Adding observers…")
         NotificationCenter.default.addObserver(forName: NSNotification.Name.FSReadingListAddReadingListItem, object: nil, queue: nil) { (notification) -> Void in
             if let userInfo = notification.userInfo, let url = userInfo["URL"] as? URL {
@@ -433,14 +438,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIViewControllerRestorati
 
         switch behavior {
         case .show:
-            UIView.animate(withDuration: 0.1, animations: { _ in
+            UIView.animate(withDuration: 0.1, animations: {
                 self.blurryLayout.alpha = 0
             }, completion: { _ in
                 self.blurryLayout.removeFromSuperview()
             })
         case .hide:
             window?.addSubview(blurryLayout)
-            UIView.animate(withDuration: 0.1, animations: { _ in
+            UIView.animate(withDuration: 0.1, animations: {
                 self.blurryLayout.alpha = 1
             })
         }

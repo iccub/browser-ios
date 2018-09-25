@@ -84,26 +84,26 @@ open class BrowserToolbarHelper: NSObject {
         
     }
 
-    func SELdidClickBack() {
+    @objc func SELdidClickBack() {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressBack(toolbar, button: toolbar.backButton)
     }
 
-    func SELdidClickShare() {
+    @objc func SELdidClickShare() {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressShare(toolbar, button: toolbar.shareButton)
     }
 
-    func SELdidClickForward() {
+    @objc func SELdidClickForward() {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressForward(toolbar, button: toolbar.forwardButton)
     }
     
-    func SELdidClickAddTab() {
+    @objc func SELdidClickAddTab() {
         let app = UIApplication.shared.delegate as! AppDelegate
 
         app.tabManager.addTabAndSelect()
         app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
     }
     
-    func SELdidClickPwdMgr() {
+    @objc func SELdidClickPwdMgr() {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressPwdMgr(browserToolbar: toolbar, button: toolbar.pwdMgrButton)
     }
 }
@@ -186,7 +186,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
 // MARK: UIAppearance
 extension BrowserToolbar {
-    dynamic var actionButtonTintColor: UIColor? {
+    @objc dynamic var actionButtonTintColor: UIColor? {
         get { return helper?.buttonTintColor }
         set {
             guard let value = newValue else { return }

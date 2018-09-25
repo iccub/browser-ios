@@ -45,7 +45,7 @@ class OpenPdfInHelper: NSObject, OpenInHelper, UIDocumentInteractionControllerDe
     fileprivate var docController: UIDocumentInteractionController? = nil
     fileprivate var openInURL: URL?
 
-    lazy var openInView: OpenInView = getOpenInView(self)()
+    lazy var openInView: OpenInView = getOpenInView()
 
     init(url: URL) {
         self.url = url
@@ -107,7 +107,7 @@ class OpenPdfInHelper: NSObject, OpenInHelper, UIDocumentInteractionControllerDe
         }
     }
 
-    func open() {
+    @objc func open() {
         createLocalCopyOfPDF()
         guard let _parentView = self.openInView.superview, let docController = self.docController else { log.error("view doesn't have a superview so can't open anything"); return }
         // iBooks should be installed by default on all devices we care about, so regardless of whether or not there are other pdf-capable

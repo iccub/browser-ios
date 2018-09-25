@@ -593,7 +593,7 @@ class TabManager : NSObject {
         return tabs.internalTabList.filter { $0.webView?.URL == url } .first
     }
 
-    func prefsDidChange() {
+    @objc func prefsDidChange() {
 #if !BRAVE
         DispatchQueue.main.async {
             let allowPopups = !(self.prefs.boolForKey("blockPopups") ?? true)
@@ -649,15 +649,15 @@ extension TabManager : WKCompatNavigationDelegate {
 
 #if BRAVE
         var hider: ((Void) -> Void)!
-        hider = {
+    hider = {_ in
             postAsyncToMain(1) {
                 self.hideNetworkActivitySpinner()
                 if UIApplication.shared.isNetworkActivityIndicatorVisible {
-                    hider()
+                    hider(())
                 }
             }
         }
-        hider()
+        hider(())
 #endif
     }
 

@@ -73,7 +73,7 @@ class BraveShieldStatsView: UIView, Themeable {
         }
     }
     
-    func update() {
+    @objc func update() {
         adsStatView.stat = BraveGlobalShieldStats.singleton.adblock.abbreviation
         trackersStatView.stat = BraveGlobalShieldStats.singleton.trackingProtection.abbreviation
         httpsStatView.stat = BraveGlobalShieldStats.singleton.httpse.abbreviation
@@ -138,7 +138,7 @@ class StatView: UIView {
         let label = UILabel()
         label.textAlignment = .center
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 24, weight: UIFontWeightBold)
+        label.font = UIFont.systemFont(ofSize: 24, weight: UIFont.Weight.bold)
         return label
     }()
     
@@ -147,7 +147,7 @@ class StatView: UIView {
         label.textColor = BraveUX.TopSitesStatTitleColor
         label.textAlignment = .center
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightMedium)
+        label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.medium)
         return label
     }()
     

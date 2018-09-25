@@ -11,7 +11,7 @@ struct SiteTableViewControllerUX {
     static let HeaderBorderColor = UIColor(rgb: 0xCFD5D9).withAlphaComponent(0.8)
     static let HeaderTextColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.black : UIColor(rgb: 0x232323)
     static let HeaderBackgroundColor = UIColor(rgb: 0xECF0F3).withAlphaComponent(0.3)
-    static let HeaderFont = UIFont.systemFont(ofSize: 12, weight: UIFontWeightMedium)
+    static let HeaderFont = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.medium)
     static let HeaderTextMargin = CGFloat(10)
 }
 

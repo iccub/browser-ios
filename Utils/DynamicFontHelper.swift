@@ -48,25 +48,25 @@ class DynamicFontHelper: NSObject {
         return deviceFontSize
     }
     var DeviceFont: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize, weight: UIFontWeightMedium)
+        return UIFont.systemFont(ofSize: deviceFontSize, weight: UIFont.Weight.medium)
     }
     var DeviceFontLight: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize, weight: UIFontWeightLight)
+        return UIFont.systemFont(ofSize: deviceFontSize, weight: UIFont.Weight.light)
     }
     var DeviceFontSmall: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFontWeightMedium)
+        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFont.Weight.medium)
     }
     var DeviceFontSmallLight: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFontWeightLight)
+        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFont.Weight.light)
     }
     var DeviceFontSmallHistoryPanel: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize - 3, weight: UIFontWeightLight)
+        return UIFont.systemFont(ofSize: deviceFontSize - 3, weight: UIFont.Weight.light)
     }
     var DeviceFontHistoryPanel: UIFont {
         return UIFont.systemFont(ofSize: deviceFontSize)
     }
     var DeviceFontSmallBold: UIFont {
-        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFontWeightBold)
+        return UIFont.systemFont(ofSize: deviceFontSize - 1, weight: UIFont.Weight.bold)
     }
     
     /**
@@ -77,7 +77,7 @@ class DynamicFontHelper: NSObject {
         return extraSmallFontSize
     }
     var ExtraSmallFont: UIFont {
-        return UIFont.systemFont(ofSize: extraSmallFontSize, weight: UIFontWeightRegular)
+        return UIFont.systemFont(ofSize: extraSmallFontSize, weight: UIFont.Weight.regular)
     }
     var ExtraSmallFontBold: UIFont {
         return UIFont.boldSystemFont(ofSize: extraSmallFontSize)
@@ -91,7 +91,7 @@ class DynamicFontHelper: NSObject {
         return defaultSmallFontSize
     }
     var DefaultSmallFont: UIFont {
-        return UIFont.systemFont(ofSize: defaultSmallFontSize, weight: UIFontWeightRegular)
+        return UIFont.systemFont(ofSize: defaultSmallFontSize, weight: UIFont.Weight.regular)
     }
     var DefaultSmallFontBold: UIFont {
         return UIFont.boldSystemFont(ofSize: defaultSmallFontSize)
@@ -105,7 +105,7 @@ class DynamicFontHelper: NSObject {
         return defaultMediumFontSize
     }
     var DefaultMediumFont: UIFont {
-        return UIFont.systemFont(ofSize: defaultMediumFontSize, weight: UIFontWeightRegular)
+        return UIFont.systemFont(ofSize: defaultMediumFontSize, weight: UIFont.Weight.regular)
     }
     var DefaultMediumBoldFont: UIFont {
         return UIFont.boldSystemFont(ofSize: defaultMediumFontSize)
@@ -119,7 +119,7 @@ class DynamicFontHelper: NSObject {
         return defaultStandardFontSize
     }
     var DefaultStandardFont: UIFont {
-        return UIFont.systemFont(ofSize: defaultStandardFontSize, weight: UIFontWeightRegular)
+        return UIFont.systemFont(ofSize: defaultStandardFontSize, weight: UIFont.Weight.regular)
     }
     var DefaultStandardFontBold: UIFont {
         return UIFont.boldSystemFont(ofSize: defaultStandardFontSize)
@@ -153,7 +153,7 @@ class DynamicFontHelper: NSObject {
         extraSmallFontSize = UIFontDescriptor.preferredFontDescriptor(withTextStyle: UIFontTextStyle.caption2).pointSize - 2
     }
 
-    func SELcontentSizeCategoryDidChange(_ notification: Notification) {
+    @objc func SELcontentSizeCategoryDidChange(_ notification: Notification) {
         refreshFonts()
         let notification = Notification(name: NotificationDynamicFontChanged, object: nil)
         NotificationCenter.default.post(notification)

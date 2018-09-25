@@ -4,10 +4,12 @@ import Foundation
 import Shared
 
 class AdblockNetworkDataFileLoader: NetworkDataFileLoader {
-    var lang = "en"
+    var lang = AdBlocker.defaultLocale
 }
 
 typealias localeCode = String
+
+private let log = Logger.browserLogger
 
 class AdBlocker {
     static let singleton = AdBlocker()
@@ -16,14 +18,23 @@ class AdBlocker {
     static let prefKeyDefaultValue = true
     static let prefKeyUseRegional = "braveAdblockUseRegional"
     static let prefKeyUseRegionalDefaultValue = true
-    static let dataVersion = "3"
+    static let dataVersion: Int32 = 4
+    
+    static let dataVersionPrefKey = "dataVersionPrefKey"
+    static let defaultLocale = "en"
 
+    let adBlockDataFolderName = "abp-data"
+    let adBlockRegionFilePath = Bundle.main.path(forResource: "adblock-regions", ofType: "txt")
+    let adBlockDataUrlPath = "https://adblock-data.s3.brave.com/"
+    
     var isNSPrefEnabled = true
     fileprivate var fifoCacheOfUrlsChecked = FifoDict()
     fileprivate var regionToS3FileName = [localeCode: String]()
     fileprivate var networkLoaders = [localeCode: AdblockNetworkDataFileLoader]()
-    fileprivate lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { return ["en": ABPFilterLibWrapper()] }()
-    var currentLocaleCode: localeCode = "en" {
+    fileprivate lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { 
+        return [AdBlocker.defaultLocale : ABPFilterLibWrapper()] 
+    }()
+    var currentLocaleCode: localeCode = defaultLocale {
         didSet {
             updateRegionalAdblockEnabledState()
         }
@@ -31,43 +42,76 @@ class AdBlocker {
     fileprivate var isRegionalAdblockEnabled = prefKeyUseRegionalDefaultValue
 
     fileprivate init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(AdBlocker.prefsChanged(_:)), name: UserDefaults.didChangeNotification, object: nil)
-
+        setDataVersionPreference()
         updateEnabledState()
-
-        networkLoaders["en"] = getNetworkLoader(forLocale: "en", name: "ABPFilterParserData")
-
-        let regional = try! NSString(contentsOfFile: Bundle.main.path(forResource: "adblock-regions", ofType: "txt")!, encoding: String.Encoding.utf8.rawValue) as String
+        networkLoaders[AdBlocker.defaultLocale] = getNetworkLoader(forLocale: AdBlocker.defaultLocale, name: "ABPFilterParserData")
+        parseAdblockRegionsFile()
+        
+        // so that didSet is called from init
+        defer { currentLocaleCode = Locale.current.languageCode ?? AdBlocker.defaultLocale }
+    }
+    
+    private func parseAdblockRegionsFile() {
+        guard let filePath = adBlockRegionFilePath, 
+            let regional = try? String(contentsOfFile: filePath, encoding: String.Encoding.utf8) else {
+            log.error("Could not find adblock regions file")
+            return
+        }
+        
         regional.components(separatedBy: "\n").forEach {
-            let parts = String($0).components(separatedBy: ",")
+            let parts = $0.components(separatedBy: ",")
             guard let filename = parts.last, parts.count > 1 else {
                 return
             }
-
-            for i in 0..<parts.count-1 {
-                var twoLetterLocale = parts[i]
-                if let _ = regionToS3FileName[twoLetterLocale] {
-                    print("Duplicate regions not handled yet \(twoLetterLocale)")
+            
+            for (_, locale) in parts.enumerated() {
+                if regionToS3FileName[locale] != nil { log.info("Duplicate regions not handled yet \(locale)") }
+                
+                if locale.count > 2 {
+                    log.info("Only 2 letter locale codes are handled.")
+                    let firstTwoLocaleCharacters = locale.substring(to: locale.index(locale.startIndex, offsetBy: 2))
+                    regionToS3FileName[firstTwoLocaleCharacters] = filename
+                } else { 
+                    regionToS3FileName[locale] = filename
                 }
-                if twoLetterLocale.characters.count > 2 {
-                    print("Only 2 letter locale codes are handled.")
-                    twoLetterLocale = (twoLetterLocale as NSString).substring(to: 2)
-                }
-                regionToS3FileName[twoLetterLocale] = filename // looks like: "cs": "7CCB6921-7FDA"
             }
-
         }
+    }
+    
+    /// We want to avoid situations in which user still has downloaded old abp data version.
+    /// We remove all abp data after data version is updated, then the newest data is downloaded. 
+    private func setDataVersionPreference() {
+        guard let prefs = BraveApp.getPrefs() else {
+            log.error("No prefs found")
+            return
+        }
+        guard let dataVersionPref = prefs.intForKey(AdBlocker.dataVersionPrefKey), dataVersionPref == AdBlocker.dataVersion else { 
+            cleanDatFiles()
+            prefs.setInt(AdBlocker.dataVersion, forKey: AdBlocker.dataVersionPrefKey)
 
-        defer { // so that didSet is called from init
-            let lang = Locale.preferredLanguages[0] as NSString
-            self.currentLocaleCode = lang.substring(to: 2)
+            return
+        }
+    }
+    
+    private func cleanDatFiles() {
+        guard let dir = NetworkDataFileLoader.directoryPath else { return }
+        
+        let fm = FileManager.default
+        do {
+            let folderPath = dir + "/\(adBlockDataFolderName)"
+            let paths = try fm.contentsOfDirectory(atPath: folderPath)
+            for path in paths {
+                try fm.removeItem(atPath: "\(folderPath)/\(path)")
+            }
+        } catch {
+            log.error(error.localizedDescription)
         }
     }
 
     fileprivate func getNetworkLoader(forLocale locale: localeCode, name: String) -> AdblockNetworkDataFileLoader {
-        let dataUrl = URL(string: "https://s3.amazonaws.com/adblock-data/\(AdBlocker.dataVersion)/\(name).dat")!
+        let dataUrl = URL(string: "\(adBlockDataUrlPath)\(AdBlocker.dataVersion)/\(name).dat")!
         let dataFile = "abp-data-\(AdBlocker.dataVersion)-\(locale).dat"
-        let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: "abp-data")
+        let loader = AdblockNetworkDataFileLoader(url: dataUrl, file: dataFile, localDirName: adBlockDataFolderName)
         loader.lang = locale
         loader.delegate = self
         return loader
@@ -78,7 +122,7 @@ class AdBlocker {
     }
 
     func isRegionalAdblockPossible() -> (hasRegionalFile: Bool, isDefaultSettingOn: Bool) {
-        return (hasRegionalFile: currentLocaleCode != "en" && regionToS3FileName[currentLocaleCode] != nil,
+        return (hasRegionalFile: currentLocaleCode != AdBlocker.defaultLocale && regionToS3FileName[currentLocaleCode] != nil,
                 isDefaultSettingOn: isRegionalAdblockEnabled)
    }
 
@@ -89,7 +133,7 @@ class AdBlocker {
     fileprivate func updateRegionalAdblockEnabledState() {
         isRegionalAdblockEnabled = BraveApp.getPrefs()?.boolForKey(AdBlocker.prefKeyUseRegional) ?? AdBlocker.prefKeyUseRegionalDefaultValue
 
-        if currentLocaleCode != "en" && isRegionalAdblockEnabled {
+        if currentLocaleCode != AdBlocker.defaultLocale && isRegionalAdblockEnabled {
             if let file = regionToS3FileName[currentLocaleCode] {
                 if networkLoaders[currentLocaleCode] == nil {
                     networkLoaders[currentLocaleCode] = getNetworkLoader(forLocale: currentLocaleCode, name: file)
@@ -97,17 +141,8 @@ class AdBlocker {
 
                 }
             } else {
-                NSLog("No custom adblock file for \(currentLocaleCode)")
+                log.warning("No custom adblock file for \(self.currentLocaleCode)")
             }
-        }
-    }
-
-    @objc func prefsChanged(_ info: Notification) {
-        updateEnabledState()
-
-        updateRegionalAdblockEnabledState()
-        networkLoaders.forEach {
-            $0.1.loadData()
         }
     }
 
@@ -192,6 +227,11 @@ class AdBlocker {
         guard let url = request.url else {
             return false
         }
+        
+        // Do not block main frame urls
+        // e.g. user clicked on an ad intentionally (adblock could block redirect to requested site)
+        let currentTabUrl = getApp().browserViewController.tabManager.selectedTab?.url
+        if url == currentTabUrl { return false }
 
         if url.host?.contains("forbes.com") ?? false {
             setForbesCookie()
@@ -241,7 +281,7 @@ class AdBlocker {
 
             if isBlocked {
                 blockedByLocale = locale
-                if locale != "en" && AppConstants.IsRunningTest {
+                if locale != AdBlocker.defaultLocale && AppConstants.IsRunningTest {
                     messageUITest(identifier: "blocked-url", message:"\(blockedByLocale) \(url.absoluteString)")
                 }
                 break
@@ -250,11 +290,9 @@ class AdBlocker {
         fifoCacheOfUrlsChecked.addItem(key, value: isBlocked as AnyObject)
 
 
-        #if LOG_AD_BLOCK
-            if isBlocked {
-                print("blocked \(url.absoluteString)")
-            }
-        #endif
+        if isBlocked {
+            log.debug("blocked \(url.absoluteString)")
+        }
 
         return isBlocked
     }

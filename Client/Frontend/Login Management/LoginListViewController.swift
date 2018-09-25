@@ -194,11 +194,11 @@ class LoginListViewController: UIViewController {
 // MARK: - Selectors
 extension LoginListViewController {
 
-    func SELreloadLogins() {
+    @objc func SELreloadLogins() {
         loadLogins()
     }
 
-    func SELedit() {
+    @objc func SELedit() {
         navigationItem.rightBarButtonItem = nil
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(LoginListViewController.SELcancel))
         selectionButtonHeightConstraint?.update(offset: UIConstants.ToolbarHeight)
@@ -206,7 +206,7 @@ extension LoginListViewController {
         tableView.setEditing(true, animated: true)
     }
 
-    func SELcancel() {
+    @objc func SELcancel() {
         // Update selection and select all button
         loginSelectionController.deselectAll()
         toggleSelectionTitle()
@@ -218,7 +218,7 @@ extension LoginListViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(LoginListViewController.SELedit))
     }
 
-    func SELdelete() {
+    @objc func SELdelete() {
         profile.logins.hasSyncedLogins().uponQueue(DispatchQueue.main) { yes in
             let deleteAlert = UIAlertController.deleteLoginAlertWithDeleteCallback({ [unowned self] _ in
                 // Delete here
@@ -236,7 +236,7 @@ extension LoginListViewController {
         }
     }
 
-    func SELdidTapSelectionButton() {
+    @objc func SELdidTapSelectionButton() {
         // If we haven't selected everything yet, select all
         if loginSelectionController.selectedCount < loginDataSource.count {
             // Find all unselected indexPaths

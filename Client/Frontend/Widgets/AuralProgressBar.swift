@@ -133,7 +133,11 @@ class AuralProgressBar {
             let duration = Double(Int(duration * 2*pitch)) / (2*pitch)
             let pitchFrames = Int(duration * format.sampleRate)
             let frames = Int((period ?? duration) * format.sampleRate)
-            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frames))
+            guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frames)) else {
+                print("AVAudioPCMBuffer is nil")
+                // TODO: Better error handling than just throwing empty buffer?
+                return AVAudioPCMBuffer()
+            }
             buffer.frameLength = buffer.frameCapacity
             for channel in 0..<Int(format.channelCount) {
                 let channelData = buffer.floatChannelData?[channel]

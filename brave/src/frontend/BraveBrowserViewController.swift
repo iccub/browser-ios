@@ -197,45 +197,11 @@ extension BraveBrowserViewController: BraveTermsViewControllerDelegate {
         profile.prefs.setInt(0, forKey: BraveUX.PrefKeyUserAllowsTelemetry)
         profile.prefs.setInt(1, forKey: BraveUX.PrefKeyOptInDialogWasSeen)
     }
-
-    func dismissed() {
-        let optedIn = self.profile.prefs.intForKey(BraveUX.PrefKeyUserAllowsTelemetry) ?? 1
-        if optedIn != 1 {
-            return
-        }
-
-        func showHiddenSafariViewController(_ controller:SFSafariViewController) {
-            controller.view.isUserInteractionEnabled = false
-            controller.view.alpha = 0.0
-            controller.view.frame = CGRect.zero
-            self.addChildViewController(controller)
-            self.view.addSubview(controller.view)
-            controller.didMove(toParentViewController: self)
-        }
-
-        func removeHiddenSafariViewController(_ controller:SFSafariViewController) {
-            controller.willMove(toParentViewController: nil)
-            controller.view.removeFromSuperview()
-            controller.removeFromParentViewController()
-        }
-
-        let mixpanelToken = Bundle.main.infoDictionary?["MIXPANEL_TOKEN"] ?? "no-token"
-        let callbackData = "{'event':'install','properties':{'product':'brave-ios','token':'\(mixpanelToken)','version':'/\(getApp().appVersion)'}}".addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "no-data"
-        let base64Encoded = callbackData.data(using: String.Encoding.utf8)?.base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0)) ?? "no-base64"
-        let callbackUrl = "https://metric-proxy.brave.com/track?data=" + base64Encoded
-
-        let sf = SFSafariViewController(url: URL(string: callbackUrl)!)
-        showHiddenSafariViewController(sf)
-
-        postAsyncToMain(15) {
-            removeHiddenSafariViewController(sf)
-        }
-    }
 }
 
 weak var _firstResponder:UIResponder?
 extension UIResponder {
-    func findFirstResponder() {
+    @objc func findFirstResponder() {
         _firstResponder = self
     }
 

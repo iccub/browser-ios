@@ -11,6 +11,8 @@ class Domain: NSManagedObject {
     @NSManaged var visits: Int32
     @NSManaged var topsite: Bool // not currently used. Should be used once proper frecency code is in.
     @NSManaged var blockedFromTopSites: Bool // don't show ever on top sites
+    @NSManaged var color: String?
+    
     @NSManaged var favicon: FaviconMO?
 
     @NSManaged var shield_allOff: NSNumber?
@@ -22,6 +24,7 @@ class Domain: NSManagedObject {
 
     @NSManaged var historyItems: NSSet?
     @NSManaged var bookmarks: NSSet?
+    
 
     // Currently required, because not `syncable`
     static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
@@ -194,5 +197,18 @@ class Domain: NSManagedObject {
                 completionOnMain()
             }
         }
+    }
+    
+    class func updateColor(_ color: UIColor, forUrl url: URL, context: NSManagedObjectContext) {
+        // Needs to be done in a `perform` block to avoid race conditions.
+        context.perform {
+            guard let domain = Domain.getOrCreateForUrl(url, context: context) else { return }
+            let colorHex = color.toHexString()
+            if domain.color == colorHex { return }
+            
+            domain.color = colorHex
+            DataController.saveContext(context: context)
+        }
+        
     }
 }

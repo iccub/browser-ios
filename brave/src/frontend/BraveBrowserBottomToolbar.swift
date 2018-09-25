@@ -32,7 +32,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
 
     lazy var tabsButton: TabsButton = {
         let tabsButton = TabsButton()
-        tabsButton.titleLabel.text = "\(tabsCount)"
+        tabsButton.titleLabel.text = "\(BraveBrowserBottomToolbar.tabsCount)"
         tabsButton.addTarget(self, action: #selector(BraveBrowserBottomToolbar.onClickShowTabs), for: UIControlEvents.touchUpInside)
         tabsButton.accessibilityLabel = Strings.Show_Tabs
         tabsButton.accessibilityIdentifier = "Toolbar.ShowTabs"
@@ -93,7 +93,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
                                   clonedTabsButton: &instance.clonedTabsButton, count: count, animated: animated)
     }
     
-    func longPressForPrivateTab(gestureRecognizer: UILongPressGestureRecognizer) {
+    @objc func longPressForPrivateTab(gestureRecognizer: UILongPressGestureRecognizer) {
         let alertController = UIAlertController(title: nil,
                                                 message: nil,
                                                 preferredStyle: .actionSheet)
@@ -124,7 +124,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         actionButtons.forEach { $0.alpha = alpha }
     }
 
-    func onClickShowTabs() {
+    @objc func onClickShowTabs() {
         setAlphaOnAllExceptTabButton(0)
         BraveURLBarView.tabButtonPressed()
     }

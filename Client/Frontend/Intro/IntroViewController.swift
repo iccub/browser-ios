@@ -78,8 +78,8 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         view.backgroundColor = UIColor.white
 
         bgColors.append(BraveUX.BraveButtonMessageInUrlBarColor)
-        bgColors.append(UIColor(colorLiteralRed: 69/255.0, green: 155/255.0, blue: 255/255.0, alpha: 1.0))
-        bgColors.append(UIColor(colorLiteralRed: 254/255.0, green: 202/255.0, blue: 102/255.0, alpha: 1.0))
+        bgColors.append(UIColor(red: 69/255.0, green: 155/255.0, blue: 255/255.0, alpha: 1.0))
+        bgColors.append(UIColor(red: 254/255.0, green: 202/255.0, blue: 102/255.0, alpha: 1.0))
         bgColors.append(BraveUX.BraveButtonMessageInUrlBarColor)
         bgColors.append(BraveUX.BraveButtonMessageInUrlBarColor)
 
@@ -206,7 +206,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 
-    func SELDynamicFontChanged(_ notification: Notification) {
+    @objc func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
         setupDynamicFonts()
     }
@@ -243,7 +243,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         return UIInterfaceOrientationMask.portrait
     }
 
-    func SELstartBrowsing() {
+    @objc func SELstartBrowsing() {
         delegate?.introViewControllerDidFinish(self)
     }
 
@@ -281,7 +281,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         return String(format: Strings.IntroductorySlideXofX_template, NumberFormatter.localizedString(from: NSNumber(value: pageControl.currentPage+1), number: .decimal), NumberFormatter.localizedString(from: NSNumber(value: IntroViewControllerUX.NumberOfCards), number: .decimal))
     }
 
-    func changePage() {
+    @objc func changePage() {
         let swipeCoordinate = CGFloat(pageControl.currentPage) * scrollView.frame.size.width
         scrollView.setContentOffset(CGPoint(x: swipeCoordinate, y: 0), animated: true)
     }
@@ -331,7 +331,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
         paragraphStyle.alignment = .center
 
         let string = NSMutableAttributedString(string: text)
-        string.addAttribute(NSParagraphStyleAttributeName, value: paragraphStyle, range: NSMakeRange(0, string.length))
+        string.addAttribute(NSAttributedStringKey.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, string.length))
         return string
     }
 
@@ -382,7 +382,7 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
 
 
         for titleLabel in titleLabels {
-            titleLabel.font = UIFont.systemFont(ofSize: DynamicFontHelper.defaultHelper.IntroBigFontSize + biggerIt, weight: UIFontWeightBold)
+            titleLabel.font = UIFont.systemFont(ofSize: DynamicFontHelper.defaultHelper.IntroBigFontSize + biggerIt, weight: UIFont.Weight.bold)
         }
 
         for label in textLabels {

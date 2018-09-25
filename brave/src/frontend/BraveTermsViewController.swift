@@ -6,7 +6,6 @@ import Foundation
 protocol BraveTermsViewControllerDelegate {
     func braveTermsAcceptedTermsAndOptIn() -> Void
     func braveTermsAcceptedTermsAndOptOut() -> Void
-    func dismissed()
 }
 
 class BraveTermsViewController: UIViewController {
@@ -39,16 +38,16 @@ class BraveTermsViewController: UIViewController {
         paragraphStyle.alignment = .center
         
         let fontAttributes = [
-            NSForegroundColorAttributeName: UIColor.white,
-            NSFontAttributeName: UIFont.systemFont(ofSize: 18.0, weight: UIFontWeightMedium),
-            NSParagraphStyleAttributeName: paragraphStyle ]
+            NSAttributedStringKey.foregroundColor: UIColor.white,
+            NSAttributedStringKey.font: UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.medium),
+            NSAttributedStringKey.paragraphStyle: paragraphStyle ]
         
         attributedString.addAttributes(fontAttributes, range: NSMakeRange(0, (attributedString.string.characters.count - 1)))
-        attributedString.addAttribute(NSLinkAttributeName, value: "https://brave.com/terms_of_use.html", range: linkRange)
+        attributedString.addAttribute(NSAttributedStringKey.link, value: "https://brave.com/terms_of_use.html", range: linkRange)
         
         let linkAttributes = [
-            NSForegroundColorAttributeName: UIColor(red: 255/255.0, green: 80/255.0, blue: 0/255.0, alpha: 1.0) ]
-        
+            NSAttributedStringKey.foregroundColor.rawValue: UIColor(red: 255/255.0, green: 80/255.0, blue: 0/255.0, alpha: 1.0) ]
+
         termsLabel.linkTextAttributes = linkAttributes
         termsLabel.attributedText = attributedString
         termsLabel.delegate = self
@@ -56,7 +55,7 @@ class BraveTermsViewController: UIViewController {
         
         optLabel = UILabel()
         optLabel.text = NSLocalizedString("Help make Brave better by sending usage statistics and crash reports to us.", comment: "")
-        optLabel.font = UIFont.systemFont(ofSize: 18.0, weight: UIFontWeightMedium)
+        optLabel.font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.medium)
         optLabel.textColor = UIColor(white: 1.0, alpha: 0.5)
         optLabel.numberOfLines = 0
         optLabel.lineBreakMode = .byWordWrapping
@@ -70,7 +69,7 @@ class BraveTermsViewController: UIViewController {
         view.addSubview(checkButton)
         
         continueButton = UIButton(type: .system)
-        continueButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0, weight: UIFontWeightMedium)
+        continueButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight.medium)
         continueButton.setTitle(NSLocalizedString("Accept & Continue", comment: ""), for: .normal)
         continueButton.setTitleColor(UIColor.white, for: .normal)
         continueButton.addTarget(self, action: #selector(acceptAndContinue(_:)), for: .touchUpInside)
@@ -156,11 +155,11 @@ class BraveTermsViewController: UIViewController {
     
     // MARK: Actions
     
-    func checkUncheck(_ sender: UIButton) {
+    @objc func checkUncheck(_ sender: UIButton) {
         sender.isSelected = !sender.isSelected
     }
     
-    func acceptAndContinue(_ sender: UIButton) {
+    @objc func acceptAndContinue(_ sender: UIButton) {
         if checkButton.isSelected {
             delegate?.braveTermsAcceptedTermsAndOptIn()
         }
@@ -172,7 +171,6 @@ class BraveTermsViewController: UIViewController {
 
     override func dismiss(animated flag: Bool, completion: (() -> Void)?) {
         super.dismiss(animated: flag, completion: completion)
-        delegate?.dismissed()
     }
 }
 

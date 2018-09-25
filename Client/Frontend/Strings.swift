@@ -79,7 +79,7 @@ extension Strings {
     public static let SyncUnableCreateGroup = NSLocalizedString("Unable to create new sync group.", comment: "Description on popup when setting up a sync group fails")
 
     public static let ShowTour = NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings")
-    public static let DefaultSearchEngine = NSLocalizedString("Search Engine", comment: "Open search section of settings")
+    public static let DefaultSearchEngine = NSLocalizedString("Search Engines", comment: "Open search section of settings")
     public static let StandardTabSearch = NSLocalizedString("Standard Tab", comment: "Open search section of settings")
     public static let PrivateTabSearch = NSLocalizedString("Private Tab", comment: "Open search section of settings")
     public static let Logins = NSLocalizedString("Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
