@@ -143,41 +143,6 @@ class TabsButton: UIControl {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // fix swift4 
-    /*
-    override func clone() -> UIView {
-        let button = TabsButton()
-        
-        imageView.tintColor = borderView.color
-
-        button.accessibilityLabel = accessibilityLabel
-        button.titleLabel.text = titleLabel.text
-
-        // Copy all of the styable properties over to the new TabsButton
-        button.titleLabel.font = titleLabel.font
-        button.titleLabel.textColor = titleLabel.textColor
-        button.titleLabel.layer.cornerRadius = titleLabel.layer.cornerRadius
-
-        button.labelBackground.backgroundColor = labelBackground.backgroundColor
-        button.labelBackground.layer.cornerRadius = labelBackground.layer.cornerRadius
-
-        button.borderView.strokeWidth = borderView.strokeWidth
-        button.borderView.color = borderView.color
-        button.borderView.cornerRadius = borderView.cornerRadius
-
-        // BRAVE added
-        for target in allTargets {
-          if let actions = actions(forTarget: target, forControlEvent: .touchUpInside) {
-             for action in actions {
-              button.addTarget(target, action: Selector(action), for: .touchUpInside)
-            }
-          }
-      }
-
-        return button
-    }
-    */
     
     @objc func tabsButtonHold() {
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
