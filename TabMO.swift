@@ -44,8 +44,6 @@ public final class TabMO: NSManagedObject, CRUD {
     @NSManaged public var urlHistoryCurrentIndex: Int16
     @NSManaged public var screenshot: Data?
     @NSManaged public var isSelected: Bool
-    @NSManaged public var color: String?
-    @NSManaged public var screenshotUUID: UUID?
     
     public var imageUrl: URL? {
         if let objectId = self.syncUUID, let url = URL(string: "https://imagecache.mo/\(objectId).png") {
@@ -98,13 +96,6 @@ public final class TabMO: NSManagedObject, CRUD {
         DataController.save(context: context)
         
         return tab
-    }
-    
-    public class func saveScreenshotUUID(_ uuid: UUID?, tabId: String?) {
-        let context = DataController.newBackgroundContext()
-        let tabMO = TabMO.get(fromId: tabId, context: context)
-        tabMO?.screenshotUUID = uuid
-        DataController.save(context: context)
     }
 
     public class func getAll() -> [TabMO] {
