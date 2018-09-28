@@ -45,10 +45,10 @@ extension BrowserViewController: WebPageStateDelegate {
         
         if !urlChanged.contains("localhost") {
             if let data = TabMO.savedTabData(tab: tab, urlOverride: urlChanged) {
-                let context = DataController.shared.workerContext
+                let context = DataController.newBackgroundContext()
                 context.perform {
-                    TabMO.add(data, context: context)
-                    DataController.saveContext(context: context)
+                    TabMO.update(tabData: data)
+                    DataController.save(context: context)
                 }
             }
         }

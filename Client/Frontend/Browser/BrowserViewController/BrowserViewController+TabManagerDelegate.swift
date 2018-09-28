@@ -66,7 +66,7 @@ extension BrowserViewController: TabManagerDelegate {
                 if AboutUtils.isAboutURL(url) {
                     // Indeed, because we don't show the toolbar at all, don't even blank the star.
                 } else {
-                    let isBookmarked = Bookmark.contains(url: url, context: DataController.shared.mainThreadContext)
+                    let isBookmarked = Bookmark.contains(url: url)
                     self.urlBar.updateBookmarkStatus(isBookmarked)
                 }
             } else {

@@ -84,12 +84,12 @@ class MigrateData: NSObject {
                 let domain = String(cString: sqlite3_column_text(results, 1))
                 let showOnTopSites = sqlite3_column_int(results, 2)
                 
-                if let d = Domain.getOrCreateForUrl(URL(string: domain)!, context: DataController.shared.workerContext) {
+                if let d = Domain.getOrCreateForUrl(URL(string: domain)!, context: DataController.newBackgroundContext()) {
                     d.topsite = (showOnTopSites == 1)
                     domainHash[id] = d
                 }
             }
-            DataController.saveContext(context: DataController.shared.workerContext)
+            DataController.save(context: DataController.newBackgroundContext())
         }
         
         if sqlite3_finalize(results) != SQLITE_OK {
@@ -220,7 +220,7 @@ class MigrateData: NSObject {
                     bk.parentFolder = parent
                     bk.syncParentUUID = parent?.syncUUID
                     if let baseUrl = URL(string: url)?.baseURL {
-                        bk.domain = Domain.getOrCreateForUrl(baseUrl, context: DataController.shared.workerContext)
+                        bk.domain = Domain.getOrCreateForUrl(baseUrl, context: DataController.newBackgroundContext())
                     }
                     
                     if let order = bookmarkOrderHash[guid] {
@@ -243,7 +243,7 @@ class MigrateData: NSObject {
     fileprivate func migrateTabs(_ completed: (_ success: Bool) -> Void) {
         let query: String = "SELECT url, title, history FROM tabs ORDER BY last_used"
         var results: OpaquePointer? = nil
-        let context = DataController.shared.mainThreadContext
+        let context = DataController.viewContext
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             var order: Int16 = 0
@@ -254,15 +254,15 @@ class MigrateData: NSObject {
                 let historyData = history.replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "").replacingOccurrences(of: "\"", with: "").replacingOccurrences(of: "\\", with: "")
                 let historyList: [String] = historyData.characters.split{$0 == ","}.map(String.init)
                 
-                guard let tabId = TabMO.freshTab().syncUUID else { continue }
+                guard let tabId = TabMO.create().syncUUID else { continue }
                 let tab = SavedTab(id: tabId, title: title, url: url, isSelected: false, order: order, screenshot: nil, history: historyList, historyIndex: Int16(historyList.count-1))
                 
                 debugPrint("History restored [\(historyList)]")
                 
-                TabMO.add(tab, context: context)
+                TabMO.update(tabData: tab)
                 order = order + 1
             }
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
         
         if sqlite3_finalize(results) != SQLITE_OK {

@@ -247,26 +247,26 @@ extension BrowserViewController: ContextMenuHelperDelegate {
     }
     
     private func createOpenAllBookmarksAction(using elements: ContextMenuHelper.Elements) -> UIAlertAction? {
-        guard let folder = elements.folder, let bookmarks = Bookmark.getChildren(forFolderUUID: folder, ignoreFolders: true, context: DataController.shared.mainThreadContext) else {
+        guard let folder = elements.folder, let bookmarks = Bookmark.getChildren(forFolderUUID: folder, ignoreFolders: true) else {
             return nil
         }
         let openTitle = String(format: Strings.Open_All_Bookmarks, bookmarks.count)
         return UIAlertAction(title: openTitle, style: UIAlertActionStyle.default) { (action: UIAlertAction) -> Void in
-            let context = DataController.shared.workerContext
+            let context = DataController.newBackgroundContext()
             context.perform {
                 for bookmark in bookmarks {
                     guard let urlString = bookmark.url else { continue }
                     guard let url = URL(string: urlString) else { continue }
-                    guard let tabID = TabMO.freshTab().syncUUID else { continue }
+                    guard let tabID = TabMO.create().syncUUID else { continue }
                     let data = SavedTab(id: tabID, title: urlString, url: url.absoluteString, isSelected: false, order: -1, screenshot: nil, history: [url.absoluteString], historyIndex: 0)
-                    TabMO.add(data, context: .mainThreadContext)
+                    TabMO.update(tabData: data)
                     
                     postAsyncToMain {
                         let request = URLRequest(url: url)
                         getApp().tabManager.addTab(request, zombie: true, id: tabID, createWebview: (bookmarks.count == 1))
                     }
                 }
-                DataController.saveContext(context: context)
+                DataController.save(context: context)
             }
         }
     }
