@@ -169,7 +169,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         let keyboardHeight = KeyboardHelper.defaultHelper.currentState?.intersectionHeightForView(self.view) ?? 0
         searchEngineScrollView.snp.remakeConstraints { make in
             
-            if #available(iOS 11, *), DeviceDetector.iPhoneX {
+            if #available(iOS 11, *) {
                 make.left.equalTo(self.view.safeAreaLayoutGuide.snp.left)
                 make.right.equalTo(self.view.safeAreaLayoutGuide.snp.right)
                 
@@ -192,7 +192,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     }
     
     override func viewSafeAreaInsetsDidChange() {
-        if #available(iOS 11, *), DeviceDetector.iPhoneX {
+        if #available(iOS 11, *) {
             searchButton.snp.updateConstraints { make in
                 make.left.equalTo(self.view.safeAreaInsets).offset(searchButtonLeftOffset)
             }
@@ -337,7 +337,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
 
         prompt.snp.makeConstraints { make in
             make.top.equalTo(self.view)
-            if #available(iOS 11, *), DeviceDetector.iPhoneX {
+            if #available(iOS 11, *) {
                 make.leading.equalTo(self.view.safeAreaLayoutGuide.snp.leading)
                 make.trailing.equalTo(self.view.safeAreaLayoutGuide.snp.trailing)
             } else {
@@ -376,7 +376,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
     
     /// Returns custom offset on ipX horizontal to get search button nicely aligned.
     var searchButtonLeftOffset: CGFloat {
-        if #available(iOS 11, *), DeviceDetector.iPhoneX, BraveApp.isIPhoneLandscape() {
+        if #available(iOS 11, *), BraveApp.isIPhoneLandscape() {
             return 8
         } else {
             return SearchViewControllerUX.PromptInsets.left

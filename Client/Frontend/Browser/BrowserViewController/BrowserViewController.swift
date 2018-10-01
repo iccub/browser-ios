@@ -463,7 +463,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC done.")
 
         // Updating footer contraints in viewSafeAreaInsetsDidChange, doesn't work when view is loaded so we do it here.
-        if #available(iOS 11.0, *), DeviceDetector.iPhoneX {
+        if #available(iOS 11.0, *) {
             footerBackground?.snp.updateConstraints { make in
                 make.bottom.equalTo(self.footer).inset(self.view.safeAreaInsets.bottom)
             }
@@ -471,7 +471,7 @@ class BrowserViewController: UIViewController {
     }
     
     override func viewSafeAreaInsetsDidChange() {
-        if #available(iOS 11.0, *), DeviceDetector.iPhoneX {
+        if #available(iOS 11.0, *) {
             let keyboardHeight = keyboardState?.intersectionHeightForView(self.view) ?? 0
             adjustFindInPageBar(safeArea: keyboardHeight == 0)
         }
@@ -748,7 +748,7 @@ class BrowserViewController: UIViewController {
         urlBar.setNeedsUpdateConstraints()
         
         webViewContainer.snp.remakeConstraints { make in
-            if #available(iOS 11.0, *), DeviceDetector.iPhoneX {
+            if #available(iOS 11.0, *) {
                 make.left.equalTo(self.view.safeAreaLayoutGuide.snp.left)
                 make.right.equalTo(self.view.safeAreaLayoutGuide.snp.right)
             } else {
@@ -1141,9 +1141,9 @@ class BrowserViewController: UIViewController {
     }
     
     /// There is only one case when search bar needs additional bottom inset:
-    /// iPhoneX horizontal with keyboard hidden.
+    /// iPhoneX* horizontal with keyboard hidden.
     fileprivate func adjustFindInPageBar(safeArea: Bool) {
-        if #available(iOS 11, *), DeviceDetector.iPhoneX, let bar = findInPageBar {
+        if #available(iOS 11, *), let bar = findInPageBar {
             bar.snp.updateConstraints { make in
                 if safeArea && BraveApp.isIPhoneLandscape() {
                     make.bottom.equalTo(findInPageContainer).inset(self.view.safeAreaInsets.bottom)
