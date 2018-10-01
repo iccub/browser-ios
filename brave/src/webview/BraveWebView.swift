@@ -162,7 +162,7 @@ class BraveWebView: UIWebView {
     override func safeAreaInsetsDidChange() {
         // On Safari, scroll view indicator is next to the edge when ipX is in landscape and notch is on the left
         // We need to adjust inset for this only screen configuration.
-        if #available(iOS 11, *), DeviceDetector.iPhoneX {
+        if #available(iOS 11, *) {
             let isLandscapeLeft = UIDevice.current.orientation == UIDeviceOrientation.landscapeLeft
             // No easy way to get right inset, using hardcoded value
             scrollView.scrollIndicatorInsets.right = isLandscapeLeft ? -44 : 0
