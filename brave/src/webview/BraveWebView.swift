@@ -737,7 +737,7 @@ extension BraveWebView: UIWebViewDelegate {
         }
 
         let locationChanged = BraveWebView.isTopFrameRequest(request) && url.absoluteString != URL?.absoluteString
-        if locationChanged {
+        if locationChanged && url.port == nil {
             blankTargetLinkDetectionOn = true
             // TODO Maybe separate page unload from link clicked.
             NotificationCenter.default.post(name: Notification.Name(rawValue: kNotificationPageUnload), object: self)
