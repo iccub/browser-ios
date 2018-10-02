@@ -77,11 +77,25 @@ class BrowserLocationView: UIView {
 
     var url: URL? {
         didSet {
+            guard let host = url?.host else { return }
+            
+            if nonSecureWebsitesAllowed.contains(host) {
+                lockImageView.image = UIImage(named: "lock_unverified")?.withRenderingMode(.alwaysTemplate)
+                lockImageView.tintColor = BraveUX.Red
+                return
+            }
+            
             let wasHidden = lockImageView.isHidden
             lockImageView.isHidden = url?.scheme != "https"
             if wasHidden != lockImageView.isHidden {
                 UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
             }
+            
+            if !lockImageView.isHidden {
+                lockImageView.image = UIImage(named: "lock_verified")?.withRenderingMode(.alwaysTemplate)
+                lockImageView.tintColor = BraveUX.Green
+            }
+            
             updateTextWithURL()
             setNeedsUpdateConstraints()
         }

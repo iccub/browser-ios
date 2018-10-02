@@ -18,6 +18,8 @@ class ContainerWebView : WKWebView {
 
 var globalContainerWebView = ContainerWebView()
 
+var nonSecureWebsitesAllowed = Set<String>()
+
 protocol WebPageStateDelegate : class {
     func webView(_ webView: UIWebView, progressChanged: Float)
     func webView(_ webView: UIWebView, isLoading: Bool)
@@ -835,7 +837,17 @@ extension BraveWebView: UIWebViewDelegate {
             alert.addAction(UIAlertAction(title: "Continue", style: UIAlertActionStyle.default) {
                 handler in
                 self.loadingUnvalidatedHTTPSPage = true;
-                self.loadRequest(URLRequest(url: errorUrl))
+                if let host = errorUrl.host {
+                    // Per https://developer.apple.com/library/archive/qa/qa1727/_index.html
+                    // auth challenge happens only once per host, we need to preserve it
+                    // in order to show that the host is not secure.
+                    // The auth challenge is reset after the app is relaunched.
+                    nonSecureWebsitesAllowed.insert(host)
+                    
+                    guard let tab = getApp().tabManager.selectedTab else { return }
+                    getApp().browserViewController.updateURLBarDisplayURL(tab: tab)
+                    self.loadRequest(URLRequest(url: errorUrl))
+                }
                 })
 
             window?.rootViewController?.present(alert, animated: true, completion: nil)
@@ -885,5 +897,5 @@ extension BraveWebView : NSURLConnectionDelegate, NSURLConnectionDataDelegate {
         loadingUnvalidatedHTTPSPage = false
         loadRequest(URLRequest(url: url))
         certificateInvalidConnection?.cancel()
-    }    
+    }
 }
