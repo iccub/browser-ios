@@ -82,7 +82,7 @@ class FavoritesTileDecorator {
             setDefaultTile()
 
             // attempt to resolove domain problem
-            let context = DataController.shared.mainThreadContext
+            let context = DataController.viewContext
             if let domain = Domain.getOrCreateForUrl(url, context: context), let faviconMO = domain.favicon, let urlString = faviconMO.url, let iconUrl = URL(string: urlString) {
                 postAsyncToMain {
                     self.setCellImage(self.cell, iconUrl: iconUrl, cacheWithUrl: self.url)

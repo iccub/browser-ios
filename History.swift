@@ -35,14 +35,14 @@ public func isIgnoredURL(_ url: String) -> Bool {
     return false
 }
 
-class History: NSManagedObject, WebsitePresentable {
+public final class History: NSManagedObject, WebsitePresentable, CRUD {
 
-    @NSManaged var title: String?
-    @NSManaged var url: String?
-    @NSManaged var visitedOn: Date?
-    @NSManaged var syncUUID: UUID?
-    @NSManaged var domain: Domain?
-    @NSManaged var sectionIdentifier: String?
+    @NSManaged public var title: String?
+    @NSManaged public var url: String?
+    @NSManaged public var visitedOn: Date?
+    @NSManaged public var syncUUID: UUID?
+    @NSManaged public var domain: Domain?
+    @NSManaged public var sectionIdentifier: String?
     
     static let Today = getDate(0)
     static let Yesterday = getDate(-1)
@@ -54,8 +54,8 @@ class History: NSManagedObject, WebsitePresentable {
         return NSEntityDescription.entity(forEntityName: "History", in: context)!
     }
 
-    class func add(_ title: String, url: URL) {
-        let context = DataController.shared.workerContext
+    public class func add(_ title: String, url: URL) {
+        let context = DataController.newBackgroundContext()
         context.perform {
             var item = History.getExisting(url, context: context)
             if item == nil {
@@ -68,13 +68,13 @@ class History: NSManagedObject, WebsitePresentable {
             item?.visitedOn = Date()
             item?.sectionIdentifier = Strings.Today
 
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
     }
 
-    class func frc() -> NSFetchedResultsController<NSFetchRequestResult> {
+    public class func frc() -> NSFetchedResultsController<NSFetchRequestResult> {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        let context = DataController.shared.mainThreadContext
+        let context = DataController.viewContext
         
         fetchRequest.entity = History.entity(context)
         fetchRequest.fetchBatchSize = 20
@@ -85,7 +85,7 @@ class History: NSManagedObject, WebsitePresentable {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:context, sectionNameKeyPath: "sectionIdentifier", cacheName: nil)
     }
 
-    override func awakeFromFetch() {
+    public override func awakeFromFetch() {
         if sectionIdentifier != nil {
             return
         }
@@ -102,71 +102,32 @@ class History: NSManagedObject, WebsitePresentable {
     }
 
     class func getExisting(_ url: URL, context: NSManagedObjectContext) -> History? {
-        assert(!Thread.isMainThread)
-
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = History.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "url == %@", url.absoluteString)
-        var result: History? = nil
-        do {
-            let results = try context.fetch(fetchRequest) as? [History]
-            if let item = results?.first {
-                result = item
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return result
+        let urlKeyPath = #keyPath(History.url)
+        let predicate = NSPredicate(format: "\(urlKeyPath) == %@", url.absoluteString)
+        
+        return first(where: predicate, context: context)
     }
 
     class func frecencyQuery(_ context: NSManagedObjectContext, containing:String? = nil) -> [History] {
-        assert(!Thread.isMainThread)
+        let urlKeyPath = #keyPath(History.url)
+        let visitedOnKeyPath = #keyPath(History.visitedOn) 
 
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.fetchLimit = 100
-        fetchRequest.entity = History.entity(context)
-        
-        var predicate = NSPredicate(format: "visitedOn > %@", History.ThisWeek as CVarArg)
+        var predicate = NSPredicate(format: "\(visitedOnKeyPath) > %@", History.ThisWeek as CVarArg)
         if let query = containing {
-            predicate = NSPredicate(format: predicate.predicateFormat + " AND url CONTAINS %@", query)
+            predicate = NSPredicate(format: predicate.predicateFormat + " AND \(urlKeyPath) CONTAINS %@", query)
         }
         
-        fetchRequest.predicate = predicate
-
-        do {
-            if let results = try context.fetch(fetchRequest) as? [History] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return []
+        return all(where: predicate, fetchLimit: 100) ?? []
     }
     
-    class func deleteAll(_ completionOnMain: @escaping ()->()) {
-        let context = DataController.shared.workerContext
-        context.perform {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-            fetchRequest.entity = History.entity(context)
-            fetchRequest.includesPropertyValues = false
-            do {
-                let results = try context.fetch(fetchRequest)
-                for result in results {
-                    context.delete(result as! NSManagedObject)
-                }
-
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
-            }
-
-            // No save, save in Domain
-
-            Domain.deleteNonBookmarkedAndClearSiteVisits {
-                completionOnMain()
-            }
+    public class func deleteAll(_ completionOnMain: @escaping () -> Void) {
+        let context = DataController.newBackgroundContext()
+        
+        // No save, save in Domain
+        History.deleteAll(context: context, includesPropertyValues: false, save: false)
+        
+        Domain.deleteNonBookmarkedAndClearSiteVisits(context: context) {
+            completionOnMain()
         }
     }
 

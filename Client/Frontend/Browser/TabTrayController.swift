@@ -644,7 +644,7 @@ class TabTrayController: UIViewController {
         self.collectionView.performBatchUpdates({
             // TODO: This logic seems kind of finicky
             var tab: Browser?
-            let id = TabMO.freshTab().syncUUID
+            let id = TabMO.create().syncUUID
             tab = self.tabManager.addTab(request, id: id)
             tab?.tabID = id
             
@@ -861,7 +861,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             tabCell.favicon.isHidden = true
         } else {
             // Fetching favicon
-            if let tabMO = TabMO.get(byId: tab.tabID, context: .workerThreadContext), let urlString = tabMO.url, let url = URL(string: urlString) {
+            if let tabMO = TabMO.get(fromId: tab.tabID, context: DataController.newBackgroundContext()), let urlString = tabMO.url, let url = URL(string: urlString) {
                 weak var weakSelf = self
                 if ImageCache.shared.hasImage(url, type: .square) {
                     // no relationship - check cache for icon which may have been stored recently for url.
@@ -874,7 +874,7 @@ fileprivate class TabManagerDataSource: NSObject, UICollectionViewDataSource {
                 }
                 else {
                     // no relationship - attempt to resolove domain problem
-                    let context = DataController.shared.mainThreadContext
+                    let context = DataController.viewContext
                     if let domain = Domain.getOrCreateForUrl(url, context: context), let faviconMO = domain.favicon, let urlString = faviconMO.url, let faviconurl = URL(string: urlString) {
                         postAsyncToMain {
                             weakSelf?.setCellImage(tabCell, iconUrl: faviconurl, cacheWithUrl: url)

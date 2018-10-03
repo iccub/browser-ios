@@ -133,7 +133,7 @@ class BraveApp {
         
         // Be careful, running it in production will result in destroying all bookmarks
         if args.contains("BRAVE-DELETE-BOOKMARKS") {
-            Bookmark.removeAll()
+            Bookmark.deleteAll()
         }
         if args.contains("BRAVE-UI-TEST") || AppConstants.IsRunningTest {
             // Maybe we will need a specific flag to keep tabs for restoration testing

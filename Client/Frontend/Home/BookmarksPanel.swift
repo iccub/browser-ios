@@ -114,7 +114,7 @@ class BookmarkEditingViewController: FormViewController {
         self.bookmarkIndexPath = indexPath
 
         // get top-level folders
-        folders = Bookmark.getFolders(bookmark: nil, context: DataController.shared.mainThreadContext)
+        folders = Bookmark.getFolders(bookmark: nil, context: DataController.viewContext)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -436,7 +436,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 }
                 else {
                     // no relationship - attempt to resolove domain problem
-                    let context = DataController.shared.mainThreadContext
+                    let context = DataController.viewContext
                     if let domain = Domain.getOrCreateForUrl(bookmarkUrl, context: context), let faviconMO = domain.favicon, let urlString = faviconMO.url, let url = URL(string: urlString) {
                         postAsyncToMain {
                             self.setCellImage(cell, iconUrl: url, cacheWithUrl: bookmarkUrl)

@@ -218,7 +218,7 @@ open class FaviconFetcher : NSObject, XMLParserDelegate {
         }
         
         if let letter = cacheUrl.domainURL.host?.first, useFallback {
-            let context = DataController.shared.mainThreadContext
+            let context = DataController.viewContext
             
             guard let domain = Domain.getOrCreateForUrl(cacheUrl, context: context) else {
                 return (FaviconFetcher.defaultFavicon, false)

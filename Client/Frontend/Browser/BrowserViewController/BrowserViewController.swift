@@ -677,7 +677,7 @@ class BrowserViewController: UIViewController {
     fileprivate func topSitesQuery() -> Deferred<[Site]> {
         let result = Deferred<[Site]>()
 
-        let context = DataController.shared.workerContext
+        let context = DataController.newBackgroundContext()
         context.perform {
             var sites = [Site]()
 
@@ -878,9 +878,8 @@ class BrowserViewController: UIViewController {
     }
 
     func removeBookmark(_ url: URL) {
-        if Bookmark.remove(forUrl: url, context: DataController.shared.mainThreadContext) {
-            self.urlBar.updateBookmarkStatus(false)
-        }
+        Bookmark.remove(forUrl: url)
+        urlBar.updateBookmarkStatus(false)
     }
 
     override func accessibilityPerformEscape() -> Bool {
@@ -929,7 +928,7 @@ class BrowserViewController: UIViewController {
             return
         }
 
-        let isBookmarked = Bookmark.contains(url: url, context: DataController.shared.mainThreadContext)
+        let isBookmarked = Bookmark.contains(url: url)
         self.urlBar.updateBookmarkStatus(isBookmarked)
     }
     // Mark: Opening New Tabs
