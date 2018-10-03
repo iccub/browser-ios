@@ -1374,6 +1374,7 @@
 		5DB199141E859F9100A851B6 /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
 		5DC5CFBD1F0D4126009553C4 /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GeometryExtensions.swift; path = Client/Extensions/GeometryExtensions.swift; sourceTree = "<group>"; };
 		5DC93C70E9DA3485A2FD2BD3 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ./ThirdParty/Result/Error.swift; sourceTree = "<group>"; };
+		5DDFB1A521654AF5001E684A /* Model8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model8.xcdatamodel; sourceTree = "<group>"; };
 		5E2DD2C9767F04D79BD241B0 /* port_posix.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = port_posix.h; path = ./brave/ThirdParty/leveldb/port/port_posix.h; sourceTree = "<group>"; };
 		5ED8720B8C08231F6A2FC090 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsTableViewController.swift; path = ./Client/Frontend/Settings/SettingsTableViewController.swift; sourceTree = "<group>"; };
 		603F85E39F9E018441B742A3 /* amazondotcom.xml */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = amazondotcom.xml; path = ./Client/Assets/Search/SearchOverrides/en/amazondotcom.xml; sourceTree = "<group>"; };
@@ -5978,6 +5979,7 @@
 		5D3892531E98108F00F959E6 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5DDFB1A521654AF5001E684A /* Model8.xcdatamodel */,
 				5C94D93020A0E8D300414AC1 /* Model7.xcdatamodel */,
 				0A3316501FFD4C6B00BFC542 /* Model6.xcdatamodel */,
 				5C062FD91F76583900D51BC7 /* Model5.xcdatamodel */,
@@ -5986,7 +5988,7 @@
 				5D3892561E9810B400F959E6 /* Model2.xcdatamodel */,
 				5D3892541E98108F00F959E6 /* Model.xcdatamodel */,
 			);
-			currentVersion = 5C94D93020A0E8D300414AC1 /* Model7.xcdatamodel */;
+			currentVersion = 5DDFB1A521654AF5001E684A /* Model8.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = brave/src/data/Model.xcdatamodeld;
 			sourceTree = "<group>";
