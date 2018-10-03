@@ -109,8 +109,7 @@ public final class TabMO: NSManagedObject, CRUD {
     }
     
     class func clearAllPrivate() {
-        let predicate = NSPredicate(format: "isPrivate == true")
-        deleteAll(predicate: predicate)
+        deleteAll()
     }
     
     class func savedTabData(tab: Browser, context: NSManagedObjectContext = DataController.viewContext, urlOverride: String? = nil) -> SavedTab? {
