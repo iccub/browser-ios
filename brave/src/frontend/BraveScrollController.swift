@@ -210,7 +210,8 @@ private extension BraveScrollController {
                     scrollWithDelta(delta)
                 }
                 
-                if headerTopOffset == -topScrollHeight && footerBottomOffset == footerHeight { // Need to check both heights since on iPhone X footer may be taller
+                // Need to check both heights since on iPhone X* footer may be taller
+                if headerTopOffset == -topScrollHeight && footerBottomOffset == footerHeight {
                     toolbarState = .collapsed
                 } else if headerTopOffset == 0 {
                     toolbarState = .visible

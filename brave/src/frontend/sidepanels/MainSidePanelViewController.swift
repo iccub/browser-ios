@@ -140,7 +140,7 @@ class MainSidePanelViewController : SidePanelBaseViewController {
         topButtonsView.snp.remakeConstraints {
             make in
             make.right.equalTo(containerView)
-            if #available(iOS 11.0, *), DeviceDetector.iPhoneX {
+            if #available(iOS 11.0, *) {
                 make.left.equalTo(containerView.safeAreaLayoutGuide.snp.left)
                 make.top.equalTo(containerView.safeAreaLayoutGuide.snp.top)
             } else {
