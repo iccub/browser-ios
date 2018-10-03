@@ -448,7 +448,7 @@ extension Sync {
                     
                 // TODO: Needs favicon
                 if clientRecord == nil {
-                    recordType.coredataModelType?.add(rootObject: fetchedRoot, save: false, sendToSync: false, context: context)
+                    _ = recordType.coredataModelType?.add(rootObject: fetchedRoot, save: false, sendToSync: false, context: context)
                 } else {
                     // TODO: use Switch with `fallthrough`
                     action = .update
