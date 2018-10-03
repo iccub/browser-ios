@@ -3925,7 +3925,6 @@
 				28CE83DE1A1D1E7C00576538 /* Frameworks */,
 				E6639F191BF11E3A002D0853 /* Conditionally Add Settings Bundle */,
 				EB28B5DE1C9A5CCE00B237A3 /* copy app extension */,
-				9F10EC9C4185C51DEFF0215E /* Fabric key setup */,
 				80137CC4D49C3401448559D3 /* Headers */,
 				5C10DFC81EEAFAEE00203C93 /* CopyFiles */,
 			);
@@ -4392,20 +4391,6 @@
 			shellPath = /bin/sh;
 			shellScript = "echo COPYING ${SCRIPT_INPUT_FILE_COUNT}\n/usr/local/bin/carthage copy-frameworks";
 			showEnvVarsInLog = 0;
-		};
-		9F10EC9C4185C51DEFF0215E /* Fabric key setup */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Fabric key setup";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "sh ./brave/build-system/.fabric-key-setup.sh";
 		};
 		E6639F191BF11E3A002D0853 /* Conditionally Add Settings Bundle */ = {
 			isa = PBXShellScriptBuildPhase;
