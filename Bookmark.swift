@@ -172,12 +172,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             bk = Bookmark(entity: Bookmark.entity(context: context), insertInto: context)
         }
         
-        // BRAVE TODO:
-        // Should probably have visual indication before reaching this point
-        //        if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
-        //            return nil
-        //        }
-        
+        if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
+            return nil
+        }
+    
         // Use new values, fallback to previous values
         bk.url = site?.location ?? bk.url
         bk.title = site?.title ?? bk.title

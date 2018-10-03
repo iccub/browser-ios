@@ -66,8 +66,7 @@ public final class History: NSManagedObject, WebsitePresentable, CRUD {
             item?.title = title
             item?.domain?.visits += 1
             item?.visitedOn = Date()
-            // BRAVE TODO:
-//            item?.sectionIdentifier = BraveStrings.Today
+            item?.sectionIdentifier = Strings.Today
 
             DataController.save(context: context)
         }

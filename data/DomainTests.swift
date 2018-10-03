@@ -29,6 +29,4 @@ class DomainTests: CoreDataTestCase {
         XCTAssertNotNil(Domain.getOrCreateForUrl(url2, context: context))
         XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 2)
     }
-
-    // BRAVE TODO: Add shields unit tests after they are finished.
 }

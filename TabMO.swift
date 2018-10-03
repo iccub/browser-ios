@@ -55,11 +55,9 @@ public final class TabMO: NSManagedObject, CRUD {
     public override func prepareForDeletion() {
         super.prepareForDeletion()
 
-        // BRAVE TODO: check, if we still need it for restoring website screenshots.
-        // Remove cached image
-//        if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
-//            ImageCache.shared.remove(url, type: .portrait)
-//        }
+        if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
+            ImageCache.shared.remove(url, type: .portrait)
+        }
     }
 
     // Currently required, because not `syncable`

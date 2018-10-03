@@ -507,7 +507,7 @@ extension Sync {
 
         guard let fetchedRecords = recordType.fetchedModelType?.syncRecords(recordJSON) else { return }
 
-        let ids = fetchedRecords.map { $0.objectId }.flatMap { $0 }
+        let ids = fetchedRecords.map { $0.objectId }.compactMap { $0 }
         let localbookmarks = recordType.coredataModelType?.get(syncUUIDs: ids, context: DataController.newBackgroundContext()) as? [Bookmark]
         
         
