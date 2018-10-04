@@ -20,7 +20,6 @@ class FavoritesTileDecorator {
     let normalizedHost: String
     let cell: ThumbnailCell
     let indexPath: IndexPath
-    let color: UIColor?
     weak var collection: UICollectionView?
 
     /// Returns SuggestedSite for given tile or nil if no suggested sites found.
@@ -46,7 +45,6 @@ class FavoritesTileDecorator {
         self.url = url
         self.cell = cell
         self.indexPath = indexPath
-        self.color = color
         normalizedHost = url.normalizedHost ?? ""
     }
 
