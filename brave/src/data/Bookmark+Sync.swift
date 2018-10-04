@@ -20,7 +20,7 @@ extension Bookmark {
         
         let sort = [orderSort, createdSort]
         
-        let context = DataController.shared.workerContext
+        let context = DataController.newBackgroundContext()
         guard let allBookmarks = get(predicate: predicate, sortDescriptors: sort,  context: context) as? [Bookmark] else {
             return
         }
@@ -49,7 +49,7 @@ extension Bookmark {
             }
         }
         
-        DataController.saveContext(context: context)
+        DataController.save(context: context)
     }
     
     private class func maxBookmarkSyncOrder(parent: Bookmark?, context: NSManagedObjectContext) -> String? {
@@ -88,11 +88,11 @@ extension Bookmark {
             syncOrder = Sync.shared.getBookmarkOrder(previousOrder: lastBookmarkOrder, nextOrder: nil)
         }
         
-        DataController.saveContext(context: context)
+        DataController.save(context: context)
     }
     
     class func removeSyncOrders() {
-        let context = DataController.shared.workerContext
+        let context = DataController.newBackgroundContext()
         let allBookmarks = getAllBookmarks(context: context)
         
         allBookmarks.forEach { bookmark in
@@ -101,7 +101,7 @@ extension Bookmark {
 //            bookmark.syncUUID = nil
         }
         
-        DataController.saveContext(context: context)
+        DataController.save(context: context)
         Sync.shared.baseSyncOrder = nil
     }
 }

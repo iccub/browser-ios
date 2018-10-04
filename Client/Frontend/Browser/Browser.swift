@@ -108,7 +108,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
     var color: UIColor? {
         didSet {
             guard let url = url else { return }
-            let context = DataController.shared.workerContext
+            let context = DataController.newBackgroundContext()
             log.debug((self.color ?? FallbackIcon.color).toHexString())
             Domain.updateColor(color ?? FallbackIcon.color, forUrl: url, context: context)
         }
@@ -166,7 +166,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
         }
         
         guard let callback = callback else { return }
-        if let tab = TabMO.get(byId: tabID, context: .workerThreadContext), let url = tab.imageUrl {
+        if let tab = TabMO.get(fromId: tabID, context: DataController.newBackgroundContext()), let url = tab.imageUrl {
             weak var weakSelf = self
             ImageCache.shared.image(url, type: .portrait, callback: { (image) in
                 if let image = image {
@@ -382,7 +382,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             if let title = displayURL?.absoluteString {
                 return title
             }
-            else if let tab = TabMO.get(byId: tabID, context: .mainThreadContext) {
+            else if let tab = TabMO.get(fromId: tabID, context: DataController.viewContext) {
                 return tab.title ?? tab.url ?? ""
             }
             return ""
@@ -591,7 +591,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             screenshotUUID = UUID()
         }
         
-        if let tab = TabMO.get(byId: tabID, context: .workerThreadContext), let url = tab.imageUrl {
+        if let tab = TabMO.get(fromId: tabID, context: DataController.newBackgroundContext()), let url = tab.imageUrl {
             if !PrivateBrowsing.singleton.isOn {
                 ImageCache.shared.cache(screenshot, url: url, type: .portrait, callback: {
                     debugPrint("Cached screenshot.")

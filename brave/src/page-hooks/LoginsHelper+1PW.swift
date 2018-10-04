@@ -70,7 +70,7 @@ enum ThirdPartyPasswordManagerType: Int {
         .showPicker : Strings.ShowPicker,
         .onePassword : "1Password",
         .lastPass : "LastPass",
-        .bitwarden : "bitwarden",
+        .bitwarden : "Bitwarden",
         .trueKey : "True Key"
     ]
     

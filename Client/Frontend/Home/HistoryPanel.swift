@@ -166,11 +166,10 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     }
 
     @objc func tableView(_ tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) {
-        if (editingStyle == UITableViewCellEditingStyle.delete) {
+        if editingStyle == UITableViewCellEditingStyle.delete {
             if let obj = self.frc?.object(at: indexPath) as? History {
-                let context = DataController.shared.mainThreadContext
-                context.delete(obj)
-                DataController.saveContext(context: context)
+                obj.delete()
+
             }
         }
     }
