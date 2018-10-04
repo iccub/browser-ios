@@ -12,7 +12,7 @@ public final class Domain: NSManagedObject, CRUD {
     @NSManaged public var topsite: Bool // not currently used. Should be used once proper frecency code is in.
     @NSManaged public var blockedFromTopSites: Bool // don't show ever on top sites
     @NSManaged public var favicon: FaviconMO?
-    @NSManaged var color: String?
+    @NSManaged public var color: String?
 
     @NSManaged public var shield_allOff: NSNumber?
     @NSManaged public var shield_adblockAndTp: NSNumber?
@@ -191,6 +191,5 @@ public final class Domain: NSManagedObject, CRUD {
             domain.color = colorHex
             DataController.save(context: context)
         }
-        
     }
 }
