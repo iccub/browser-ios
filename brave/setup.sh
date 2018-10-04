@@ -13,30 +13,17 @@ echo CUSTOM_BUNDLE_ID=$app_id > xcconfig/local-def.xcconfig
 
 sed -e "s/APPGROUP_PLACEHOLDER/group.$app_id/" Brave.entitlements.template > Brave.entitlements
 
-# if a brave build, setup fabric and mixpanel
+# if a brave build, setup configurations
 if [[ $app_id == com.brave.ios.browser* ]]; then
-    if [ ! -f ~/.brave-fabric-keys ]; then
-       echo "Missing ~/.brave-fabric-keys"
-       exit 1
-    fi
-    if [ ! -f ~/.brave-mixpanel-key ]; then
-       echo "Missing ~/.brave-mixpanel-key"
-       exit 1
-    fi
     dev_team_id="KL8N8XSYF4"
     sed -i '' -e "s/KEYCHAIN_PLACEHOLDER/$dev_team_id.$app_id/" Brave.entitlements
     echo "DEVELOPMENT_TEAM=$dev_team_id" >> xcconfig/local-def.xcconfig
-    echo adding fabric
-    echo "./Fabric.framework/run $(head -1 ~/.brave-fabric-keys) $(tail -1 ~/.brave-fabric-keys)" > build-system/.fabric-key-setup.sh
 
     # using comma delimiter to escape forward slashes properly
-    sed -e s/FABRIC_KEY_REMOVED/$(head -1 ~/.brave-fabric-keys)/  BraveInfo.plist.template |
-    sed -e s/MIXPANEL_TOKEN_REMOVED/$(head -1 ~/.brave-mixpanel-key)/ |
-    sed -e s,https://laptop-updates-staging.herokuapp.com,$(head -1 ~/.brave-urp-host-key), |
+    sed -e s,https://laptop-updates-staging.herokuapp.com,$(head -1 ~/.brave-urp-host-key), BraveInfo.plist.template |
     sed -e s,\<string\>key\</string\>,\<string\>$(head -1 ~/.brave-api-key)\</string\>, > BraveInfo.plist
 else
     sed -i '' -e "s/KEYCHAIN_PLACEHOLDER/\$\(AppIdentifierPrefix\)$app_id/" Brave.entitlements
-    >build-system/.fabric-key-setup.sh
     cat BraveInfo.plist.template > BraveInfo.plist
     echo "Please edit xcconfig/local-def.xcconfig to add your DEVELOPMENT_TEAM id (or else you will need to set this in Xcode)"
     echo "  It is found here: https://developer.apple.com/account/#/membership"
