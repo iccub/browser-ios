@@ -55,11 +55,6 @@ open Client.xcodeproj
 #### Note: building your own ad-hoc builds is supported [see user device build](brave/docs/USER-DEPLOYING.md)
 You will need a Apple developer account to run on your device.
 
-
-## Crash reporting using Fabric
-
-To enable, add ~/.brave-fabric-keys with 2 lines, the API key and build secret. Re-run setup.sh and the project will be generated to use Fabric and Crashlytics frameworks.
-
 ## Tests
 
 Run Product>Test in Xcode to do so. Not all Firefox tests are passing yet.
