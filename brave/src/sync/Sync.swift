@@ -166,8 +166,10 @@ class Sync: JSInjector {
         
         // Check to not override deviceName with `nil` on sync init, which happens every app launch
         if let deviceName = deviceName {
-            Device.currentDevice()?.name = deviceName
-            DataController.save(context: Device.currentDevice()?.managedObjectContext)
+            let newDevice = Device.currentDevice()
+            
+            newDevice?.name = deviceName
+            DataController.save(context: newDevice?.managedObjectContext)
         }
         
         // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
