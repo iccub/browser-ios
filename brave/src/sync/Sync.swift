@@ -182,8 +182,10 @@ class Sync: JSInjector {
             return
         }
         
-        Device.currentDevice()?.name = name
-        DataController.save(context: Device.currentDevice()?.managedObjectContext)
+        let newDevice = Device.currentDevice()
+        
+        newDevice?.name = name
+        DataController.save(context: newDevice?.managedObjectContext)
         
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }

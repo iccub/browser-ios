@@ -64,7 +64,7 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         // No save currently
     }
     
-    public static func currentDevice() -> Device? {
+    @discardableResult public static func currentDevice() -> Device? {
         
         if sharedCurrentDevice == nil {
             var device: Device?
@@ -78,7 +78,9 @@ public final class Device: NSManagedObject, Syncable, CRUD {
             } else {
                 let newDevice = add(context: DataController.newBackgroundContext())
                 newDevice?.isCurrentDevice = true
-                device = newDevice
+                newDevice?.name = UIDevice.current.name
+                // Getting device on view context(but saving on background).
+                device = first(where: predicate)
             }
             
             sharedCurrentDevice = device
@@ -93,10 +95,12 @@ public final class Device: NSManagedObject, Syncable, CRUD {
     
     class func deviceSettings(profile: Profile) -> [SyncDeviceSetting]? {
         // Building settings off of device objects
-        let deviceSettings: [SyncDeviceSetting]? = (Device.get(predicate: nil, context: DataController.newBackgroundContext()) as? [Device])?.map {
+        
+        let deviceSettings = Device.all()?.compactMap {
             // Even if no 'real' title, still want it to show up in list
             return SyncDeviceSetting(profile: profile, device: $0)
         }
+        
         return deviceSettings
     }
 }
