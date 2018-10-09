@@ -64,31 +64,27 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         // No save currently
     }
     
+    /// Returns a current device and assings it to a shared variable.
     public static func currentDevice() -> Device? {
+        let predicate = NSPredicate(format: "isCurrentDevice = YES")
         
         if sharedCurrentDevice == nil {
-            var device: Device?
-            
-            let predicate = NSPredicate(format: "isCurrentDevice = YES")
-            
-            let existingDevice = first(where: predicate)
-            
-            if existingDevice != nil {
-                device = existingDevice
-            } else {
-                let context = DataController.newBackgroundContext()
-                let newDevice = add(context: context)
-                newDevice?.isCurrentDevice = true
-                // View context returns nil for new device here, we need to refresh the context.
-                DataController.viewContext.refreshAllObjects()
-                // Getting device on view context(but saving on background).
-                device = first(where: predicate)
-                DataController.save(context: context)
-            }
-            
-            sharedCurrentDevice = device
+            sharedCurrentDevice = first(where: predicate)
         }
+        
         return sharedCurrentDevice
+    }
+    
+    public static func createDevice(name: String?, isCurrent: Bool = false) {
+        let context = DataController.newBackgroundContext()
+        
+        let device = Device(entity: Device.entity(context: context), insertInto: context)
+        device.created = Date()
+        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
+        device.name = name
+        device.isCurrentDevice = isCurrent
+        
+        DataController.save(context: context)
     }
     
     public class func deleteAll() {
