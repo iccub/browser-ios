@@ -52,8 +52,16 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         return device
     }
     
-    public class func add(save: Bool = true, context: NSManagedObjectContext) -> Device? {
-        return add(rootObject: nil, save: save, sendToSync: false, context: context) as? Device
+    public class func add(name: String?, isCurrent: Bool = false) {
+        let context = DataController.newBackgroundContext()
+        
+        let device = Device(entity: Device.entity(context: context), insertInto: context)
+        device.created = Date()
+        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
+        device.name = name
+        device.isCurrentDevice = isCurrent
+        
+        DataController.save(context: context)
     }
     
     func update(syncRecord record: SyncRecord?) {
@@ -66,25 +74,12 @@ public final class Device: NSManagedObject, Syncable, CRUD {
     
     /// Returns a current device and assings it to a shared variable.
     public static func currentDevice() -> Device? {
-        let predicate = NSPredicate(format: "isCurrentDevice = YES")
-        
         if sharedCurrentDevice == nil {
+            let predicate = NSPredicate(format: "isCurrentDevice == true")
             sharedCurrentDevice = first(where: predicate)
         }
         
         return sharedCurrentDevice
-    }
-    
-    public static func createDevice(name: String?, isCurrent: Bool = false) {
-        let context = DataController.newBackgroundContext()
-        
-        let device = Device(entity: Device.entity(context: context), insertInto: context)
-        device.created = Date()
-        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
-        device.name = name
-        device.isCurrentDevice = isCurrent
-        
-        DataController.save(context: context)
     }
     
     public class func deleteAll() {
