@@ -153,7 +153,11 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     }
 
     static func add(rootObject root: SyncRecord?, save: Bool, sendToSync: Bool, context: NSManagedObjectContext) -> Syncable? {
-        add(rootObject: root as? SyncBookmark, save: save, sendToSync: sendToSync, parentFolder: nil)
+        add(rootObject: root as? SyncBookmark,
+            save: save,
+            sendToSync: sendToSync,
+            parentFolder: nil,
+            context: context)
         
         // TODO: Saving is done asynchronously, we should return a completion handler. 
         // Will probably need a refactor in Syncable protocol.
@@ -162,9 +166,11 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     }
     
     // Should not be used for updating, modify to increase protection
-    class func add(rootObject root: SyncBookmark?, save: Bool = false, sendToSync: Bool = false,
-                   parentFolder: Bookmark? = nil) -> Bookmark? {
-        let context = DataController.newBackgroundContext()
+    class func add(rootObject root: SyncBookmark?,
+                   save: Bool = false,
+                   sendToSync: Bool = false,
+                   parentFolder: Bookmark? = nil,
+                   context: NSManagedObjectContext = DataController.newBackgroundContext()) -> Bookmark? {
         
         let bookmark = root
         let site = bookmark?.site

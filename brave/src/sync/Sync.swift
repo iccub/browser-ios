@@ -200,8 +200,7 @@ class Sync: JSInjector {
         
         // Check to not override deviceName with `nil` on sync init, which happens every app launch
         if let deviceName = deviceName {
-            Device.currentDevice()?.name = deviceName
-            DataController.save(context: Device.currentDevice()?.managedObjectContext)
+            Device.add(name: deviceName, isCurrent: true)
         }
         
         // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
@@ -216,8 +215,7 @@ class Sync: JSInjector {
             return
         }
         
-        Device.currentDevice()?.name = name
-        DataController.save(context: Device.currentDevice()?.managedObjectContext)
+        Device.add(name: name, isCurrent: true)
         
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
