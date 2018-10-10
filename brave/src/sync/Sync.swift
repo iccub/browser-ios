@@ -145,9 +145,10 @@ class Sync: JSInjector {
         
         do {
             let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            // bookmark_util script is loaded for later use.
             _ = context?.evaluateScript(scriptAsString)
             
-        } catch (let error) {
+        } catch {
             log.error("Failed to parse script file: \(error)")
             return nil
         }
@@ -389,7 +390,8 @@ extension Sync {
             return
         }
         
-        if let syncBookmark = records.first?.recordType, syncBookmark == .bookmark, baseSyncOrder == nil {
+        if recordType == .bookmark && baseSyncOrder == nil {
+            log.error("Base sync order is nil.")
             completion?(nil)
             return
         }
@@ -620,15 +622,16 @@ extension Sync {
         let prev = previousOrder ?? ""
         let next = nextOrder ?? ""
         
-        let function = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
-        return function?.call(withArguments: [prev, next]).toString()
+        let getBookmarkOrderFunction = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
+        return getBookmarkOrderFunction?.call(withArguments: [prev, next]).toString()
     }
     
     fileprivate func setBaseBookmarkOrder() {
         guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
-        let function = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
+        let getBaseBookmarksOrderFunction = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
         
-        guard let baseOrder = function?.call(withArguments: [deviceId, "ios"]).toString() else { return } 
+        guard let baseOrder =
+            getBaseBookmarksOrderFunction?.call(withArguments: [deviceId, "ios"]).toString() else { return }
         
         if baseOrder != "undefined" {
             baseSyncOrder = baseOrder
