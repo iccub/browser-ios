@@ -11,7 +11,11 @@ private let log = Logger.browserLogger
 // Sync related methods for Bookmark model.
 extension Bookmark {
     /// Sets order for all bookmarks. Needed after user joins sync group for the first time.
-    class func setSyncOrderForAll(parentFolder: Bookmark? = nil) {
+    /// Returns an array of bookmarks with updated `syncOrder`.
+    class func updateBookmarksWithNewSyncOrder(parentFolder: Bookmark? = nil) -> [Bookmark]? {
+        let context = DataController.newBackgroundContext()
+        
+        var bookmarksToSend = [Bookmark]()
         
         let predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
         
@@ -20,9 +24,8 @@ extension Bookmark {
         
         let sort = [orderSort, createdSort]
         
-        let context = DataController.newBackgroundContext()
         guard let allBookmarks = get(predicate: predicate, sortDescriptors: sort,  context: context) as? [Bookmark] else {
-            return
+            return nil
         }
         
         // Sync ordering starts with 1.
@@ -41,15 +44,19 @@ extension Bookmark {
                 bookmark.syncOrder = order
             }
             
+            bookmarksToSend.append(bookmark)
             counter += 1
             
             // Calling this method recursively to get ordering for nested bookmarks
             if bookmark.isFolder {
-                setSyncOrderForAll(parentFolder: bookmark)
+                if let updatedNestedBookmarks = updateBookmarksWithNewSyncOrder(parentFolder: bookmark) {
+                    bookmarksToSend.append(contentsOf: updatedNestedBookmarks)
+                }
             }
         }
         
         DataController.save(context: context)
+        return bookmarksToSend
     }
     
     private class func maxBookmarkSyncOrder(parent: Bookmark?, context: NSManagedObjectContext) -> String? {

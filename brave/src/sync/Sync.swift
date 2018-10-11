@@ -351,16 +351,36 @@ class Sync: JSInjector {
             // Use proper variable and store in defaults
             if lastSuccessfulSync == 0 {
                 // Sync local bookmarks, then proceed with fetching
-                // Pull all local bookmarks
-                // Insane .map required for mapping obj-c class to Swift, in order to use protocol instead of class for array param
-                self.sendSyncRecords(action: .create, records: Bookmark.getAllBookmarks(context: DataController.newBackgroundContext()).map{$0}) { error in
-                    startFetching()
+                // Pull all local bookmarks and update their order with newly aquired device id.
+                
+                if let updatedBookmarks = bookmarksWithUpdatedOrder() {
+                    // Insane, .map required for mapping obj-c class to Swift,
+                    // in order to use protocol instead of class for array param.
+                    sendSyncRecords(action: .create, records: updatedBookmarks.map{ $0 }) { _ in
+                        startFetching()
+                    }
                 }
+                
             } else {
                 startFetching()
             }
         }
         return ready
+    }
+    
+    fileprivate func bookmarksWithUpdatedOrder() -> [Bookmark]? {
+        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return [] }
+        let getBaseBookmarksOrderFunction = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
+        
+        guard let baseOrder =
+            getBaseBookmarksOrderFunction?.call(withArguments: [deviceId, "ios"]).toString() else { return nil }
+        
+        if baseOrder != "undefined" {
+            baseSyncOrder = baseOrder
+            return Bookmark.updateBookmarksWithNewSyncOrder()
+        }
+        
+        return nil
     }
     
     // Required since fetch is wrapped in extension and timer hates that.
@@ -625,19 +645,6 @@ extension Sync {
         let getBookmarkOrderFunction = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
         return getBookmarkOrderFunction?.call(withArguments: [prev, next]).toString()
     }
-    
-    fileprivate func setBaseBookmarkOrder() {
-        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return }
-        let getBaseBookmarksOrderFunction = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
-        
-        guard let baseOrder =
-            getBaseBookmarksOrderFunction?.call(withArguments: [deviceId, "ios"]).toString() else { return }
-        
-        if baseOrder != "undefined" {
-            baseSyncOrder = baseOrder
-            Bookmark.setSyncOrderForAll(parentFolder: nil)
-        }
-    }
 }
 
 extension Sync: WKScriptMessageHandler {
@@ -674,7 +681,6 @@ extension Sync: WKScriptMessageHandler {
             print("---- Sync Debug: \(data)")
         case "sync-ready":
             self.isSyncFullyInitialized.syncReady = true
-            setBaseBookmarkOrder()
         case "fetch-sync-records":
             self.isSyncFullyInitialized.fetchReady = true
         case "send-sync-records":

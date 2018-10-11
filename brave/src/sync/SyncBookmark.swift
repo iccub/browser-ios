@@ -49,8 +49,8 @@ final class SyncBookmark: SyncRecord {
         site.location = bm?.url
         site.creationTime = unixCreated
         site.lastAccessedTime = unixAccessed
-        // TODO: Does this work?
-        site.favicon = bm?.domain?.favicon?.url
+        // FIXME: This sometimes crashes the app.
+        // site.favicon = bm?.domain?.favicon?.url
 
         self.isFavorite = bm?.isFavorite ?? false
         self.isFolder = bm?.isFolder
