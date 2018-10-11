@@ -671,6 +671,9 @@ extension Sync: WKScriptMessageHandler {
             // (e.g. arg2 is [Int])
             let data = JSON(parseJSON: message.body as? String ?? "")
             self.saveInitData(data)
+            // We clear current sync order after joining a new sync group.
+            // syncOrder algorithm is also used for local ordering, even if we are not connected to sync group.
+            // After joining a new sync group, new sync order with proper device id must be used.
             Bookmark.removeSyncOrders()
         case "get-existing-objects":
             self.getExistingObjects(syncResponse)
