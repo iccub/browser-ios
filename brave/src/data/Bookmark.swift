@@ -10,7 +10,6 @@ import Storage
 private let log = Logger.browserLogger
 
 public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD {
-
     // Favorite bookmarks are shown only on homepanel as a tile, they are not visible on bookmarks panel.
     @NSManaged public var isFavorite: Bool
     @NSManaged public var isFolder: Bool
@@ -22,6 +21,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     @NSManaged public var created: Date?
     @NSManaged public var order: Int16
     @NSManaged public var tags: [String]?
+    @NSManaged var syncOrder: String?
     
     /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
     /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
@@ -59,6 +59,12 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         // Want to return nil so less checking on frontend
         return nil
     }
+
+    /// If sync is not used, we still utilize its syncOrder algorithm to determine order of bookmarks.
+    /// Base order is needed to distinguish between bookmarks on different devices and platforms.
+    static var baseOrder: String {
+        return Sync.shared.baseSyncOrder ?? "0.0."
+    }
     
     override public func awakeFromInsert() {
         super.awakeFromInsert()
@@ -70,23 +76,19 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return SyncBookmark(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
 
-    public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<NSFetchRequestResult> {
+    public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        let fetchRequest = NSFetchRequest<Bookmark>()
         
         fetchRequest.entity = Bookmark.entity(context: context)
         fetchRequest.fetchBatchSize = 20
 
+        let syncOrderSort = NSSortDescriptor(key:"syncOrder", ascending: true) 
         let orderSort = NSSortDescriptor(key:"order", ascending: true)
-        let folderSort = NSSortDescriptor(key:"isFolder", ascending: false)
         let createdSort = NSSortDescriptor(key:"created", ascending: true)
-        fetchRequest.sortDescriptors = [orderSort, folderSort, createdSort]
-
-        if let parentFolder = parentFolder {
-            fetchRequest.predicate = NSPredicate(format: "parentFolder == %@ AND isFavorite == NO", parentFolder)
-        } else {
-            fetchRequest.predicate = NSPredicate(format: "parentFolder == nil AND isFavorite == NO")
-        }
+        fetchRequest.sortDescriptors = [syncOrderSort, orderSort, createdSort]
+         
+        fetchRequest.predicate = allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
 
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:context,
                                           sectionNameKeyPath: nil, cacheName: nil)
@@ -96,13 +98,13 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
     func update(syncRecord record: SyncRecord?) {
         guard let bookmark = record as? SyncBookmark, let site = bookmark.site else { return }
         title = site.title
-        update(customTitle: site.customTitle, url: site.location)
+        update(customTitle: site.customTitle, url: site.location, newSyncOrder: bookmark.syncOrder)
         lastVisited = Date(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bookmark.parentFolderObjectId
         // No auto-save, must be handled by caller if desired
     }
     
-    public func update(customTitle: String?, url: String?, save: Bool = false) {
+    public func update(customTitle: String?, url: String?, newSyncOrder: String? = nil, save: Bool = false) {
         var contextToUpdate: NSManagedObjectContext?
         
         // Syncable.update() doesn't save to CD at the moment, we need to use managedObjectContext here.
@@ -120,7 +122,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         }
         
         // See if there has been any change
-        if self.customTitle == customTitle && self.url == url {
+        if self.customTitle == customTitle && self.url == url && syncOrder == newSyncOrder {
             return
         }
         
@@ -135,6 +137,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             } else {
                 bookmarkToUpdate.domain = nil
             }
+        }
+        
+        if newSyncOrder != nil {
+            syncOrder = newSyncOrder
         }
         
         if save {
@@ -189,6 +195,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bk.isFavorite = bookmark?.isFavorite ?? bk.isFavorite
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder
         bk.syncUUID = root?.objectId ?? bk.syncUUID ?? SyncCrypto.uniqueSerialBytes(count: 16)
+        bk.syncOrder = root?.syncOrder
         
         if let location = site?.location, let url = URL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: context)
@@ -208,6 +215,10 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             }
         }
         
+        if !bk.isFavorite && bk.syncOrder == nil {
+            bk.newBookmarkSyncOrder(context: context)
+        }
+        
         if save {
             DataController.save(context: context)
         }
@@ -219,7 +230,17 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         
         return bk
     }
-  
+    
+    class func allBookmarksOfAGivenLevelPredicate(parent: Bookmark?) -> NSPredicate {
+        let isFavoriteKP = #keyPath(Bookmark.isFavorite)
+        let parentFolderKP = #keyPath(Bookmark.parentFolder)
+        
+        // A bit hacky but you can't just pass 'nil' string to %@.
+        let nilArgumentForPredicate = 0
+        return NSPredicate(
+            format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
+    }
+    
     public class func add(url: URL?,
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
@@ -246,27 +267,79 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return count > 0
     }
 
-    public class func reorderBookmarks(frc: NSFetchedResultsController<NSFetchRequestResult>?, sourceIndexPath: IndexPath,
+    public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
                                 destinationIndexPath: IndexPath) {
         guard let frc = frc else { return }
         
-        let dest = frc.object(at: destinationIndexPath) as! Bookmark
-        let src = frc.object(at: sourceIndexPath) as! Bookmark
+        let dest = frc.object(at: destinationIndexPath)
+        let src = frc.object(at: sourceIndexPath)
         
         if dest === src {
             return
         }
         
+        // Favorites use regular ordering algorithm.
+        if src.isFavorite {
+            reorderFavorites(frc: frc, sourceBookmark: src, destinationBookmark: dest,
+                             sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+            return
+        }
+        
+        let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
+        
+        // Depending on drag direction, all other bookmarks are pushed up or down.
+        if isMovingUp {
+            var prev: String?
+            
+            // Bookmark at the top has no previous bookmark.
+            if destinationIndexPath.row > 0 {
+                let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
+                prev = frc.object(at: index).syncOrder
+            }
+            
+            let next = dest.syncOrder
+            src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+        } else {
+            let prev = dest.syncOrder
+            var next: String?
+            
+            // Bookmark at the bottom has no next bookmark.
+            if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
+                let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
+                next = frc.object(at: index).syncOrder
+            }
+            
+            src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
+        }
+        
+        DataController.save(context: frc.managedObjectContext)
+        Sync.shared.sendSyncRecords(action: .update, records: [src])
+    }
+    
+    private class func reorderFavorites(frc: NSFetchedResultsController<Bookmark>,
+                                  sourceBookmark src: Bookmark,
+                                  destinationBookmark dest: Bookmark,
+                                  sourceIndexPath: IndexPath,
+                                  destinationIndexPath: IndexPath) {
         // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
         // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
         // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-        var bms = frc.fetchedObjects as! [Bookmark]
-        bms.remove(at: bms.index(of: src)!)
+        guard var bms = frc.fetchedObjects else {
+            log.error("Bookmark's frc fetched objects is nil")
+            return
+        }
+        
+        guard let indexOfSourceBookmark = bms.index(of: src), let indexOfDestBookmark = bms.index(of: dest) else {
+            log.error("Index either source or destination bookmark is nil")
+            return
+        }
+        
+        bms.remove(at: indexOfSourceBookmark)
         if sourceIndexPath.row > destinationIndexPath.row {
             // insert before
-            bms.insert(src, at: bms.index(of: dest)!)
+            bms.insert(src, at: indexOfDestBookmark)
         } else {
-            let end = bms.index(of: dest)! + 1
+            let end = indexOfDestBookmark + 1
             bms.insert(src, at: end)
         }
         
@@ -280,7 +353,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
             DataController.save(context: frc.managedObjectContext)
         }
-
     }
     
     // TODO: Migration syncUUIDS still needs to be solved
@@ -368,7 +440,7 @@ extension Bookmark {
     class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
         assert(!Thread.isMainThread)
         
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        let fetchRequest = NSFetchRequest<Bookmark>()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context: context)
         
@@ -379,12 +451,9 @@ extension Bookmark {
         fetchRequest.predicate = predicate
         
         do {
-            if let results = try context.fetch(fetchRequest) as? [Bookmark] {
-                return results
-            }
+            return try context.fetch(fetchRequest)
         } catch {
-            let fetchError = error as NSError
-            print(fetchError)
+            log.error(error)
         }
         return [Bookmark]()
     }

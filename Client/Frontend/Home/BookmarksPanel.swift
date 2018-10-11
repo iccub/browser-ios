@@ -168,7 +168,7 @@ class BookmarkEditingViewController: FormViewController {
 
 class BookmarksPanel: SiteTableViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate? = nil
-    var bookmarksFRC: NSFetchedResultsController<NSFetchRequestResult>?
+    var bookmarksFRC: NSFetchedResultsController<Bookmark>?
 
     fileprivate let BookmarkFolderCellIdentifier = "BookmarkFolderIdentifier"
     //private let BookmarkSeparatorCellIdentifier = "BookmarkSeparatorIdentifier"
@@ -352,6 +352,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         // Using the same reorder logic as in FavoritesDataSource
         Bookmark.reorderBookmarks(frc: bookmarksFRC, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -393,7 +394,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func getLongPressUrl(forIndexPath indexPath: IndexPath) -> (URL?, [Int]?) {
-        guard let obj = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return (nil, nil) }
+        guard let obj = bookmarksFRC?.object(at: indexPath) else { return (nil, nil) }
         return (obj.url != nil ? URL(string: obj.url!) : nil, obj.isFolder ? obj.syncUUID : nil)
     }
     
@@ -401,7 +402,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     fileprivate func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
 
-        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
+        guard let item = bookmarksFRC?.object(at: indexPath) else { return }
         cell.tag = item.objectID.hashValue
 
         func configCell(image: UIImage? = nil, icon: FaviconMO? = nil, longPressForContextMenu: Bool = false) {
@@ -514,7 +515,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     @objc func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return false }
+        guard let bookmark = bookmarksFRC?.object(at: indexPath) else { return false }
         
         return !bookmark.isFavorite
     }
@@ -522,7 +523,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     @objc func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
 
-        guard let bookmark = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return }
+        guard let bookmark = bookmarksFRC?.object(at: indexPath) else { return }
 
         if !bookmark.isFolder {
             if tableView.isEditing {
@@ -557,7 +558,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     @objc func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark else { return nil }
+        guard let item = bookmarksFRC?.object(at: indexPath) else { return nil }
 
         let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.destructive, title: Strings.Delete, handler: { (action, indexPath) in
 
@@ -589,7 +590,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     fileprivate func showEditBookmarkController(_ tableView: UITableView, indexPath:IndexPath) {
-        guard let item = bookmarksFRC?.object(at: indexPath) as? Bookmark, !item.isFavorite else { return }
+        guard let item = bookmarksFRC?.object(at: indexPath), !item.isFavorite else { return }
         let nextController = BookmarkEditingViewController(bookmarksPanel: self, indexPath: indexPath, bookmark: item)
 
         nextController.completionBlock = { controller in
@@ -737,7 +738,8 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
             }
             tableView.deleteRows(at: [indexPath], with: .automatic)
         case .move:
-            break
+            guard let indexPath = indexPath, let newIndexPath = newIndexPath else { return }
+            tableView.moveRow(at: indexPath, to: newIndexPath)
         }
     }
 }

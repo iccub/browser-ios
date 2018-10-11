@@ -42,11 +42,13 @@ extension Syncable {
         return get(predicate: NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs), context: context)
     }
     
-    static func get(predicate: NSPredicate?, context: NSManagedObjectContext) -> [NSManagedObject]? {
+    static func get(predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]? = nil, 
+                    context: NSManagedObjectContext) -> [NSManagedObject]? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         
         fetchRequest.entity = Self.entity(context: context)
         fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = sortDescriptors
         
         var result: [NSManagedObject]? = nil
         context.performAndWait {

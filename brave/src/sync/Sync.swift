@@ -6,6 +6,9 @@ import Shared
 import CoreData
 import SwiftKeychainWrapper
 import SwiftyJSON
+import JavaScriptCore
+
+private let log = Logger.browserLogger
 
 /*
  module.exports.categories = {
@@ -79,13 +82,21 @@ class Sync: JSInjector {
 
     // Should not be accessed directly
     fileprivate var syncReadyLock = false
-    var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, fetchDevicesReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
+    var isSyncFullyInitialized = (syncReady: Bool, 
+                                  fetchReady: Bool, 
+                                  sendRecordsReady: Bool, 
+                                  fetchDevicesReady: Bool, 
+                                  resolveRecordsReady: Bool, 
+                                  deleteUserReady: Bool, 
+                                  deleteSiteSettingsReady: Bool, 
+                                  deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
     
     var isInSyncGroup: Bool {
         return syncSeed != nil
     }
     
     fileprivate var fetchTimer: Timer?
+    var baseSyncOrder: String?
 
     // TODO: Move to a better place
     fileprivate let prefNameId = "device-id-js-array"
@@ -120,6 +131,30 @@ class Sync: JSInjector {
         webCfg.userContentController = userController
         return webCfg
     }
+    
+    fileprivate lazy var jsContext: JSContext? = {
+        let context = JSContext()
+        
+        context?.exceptionHandler = { _, exc in
+            log.error(exc.debugDescription)
+        }
+        guard let path = Bundle.main.path(forResource: "bookmark_util", ofType: "js") else {
+            log.error("Could not load bookmark_util.js")
+            return nil
+        }
+        
+        do {
+            let scriptAsString = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+            // bookmark_util script is loaded for later use.
+            _ = context?.evaluateScript(scriptAsString)
+            
+        } catch {
+            log.error("Failed to parse script file: \(error)")
+            return nil
+        }
+        
+        return context
+    }()
     
     override init() {
         super.init()
@@ -316,16 +351,36 @@ class Sync: JSInjector {
             // Use proper variable and store in defaults
             if lastSuccessfulSync == 0 {
                 // Sync local bookmarks, then proceed with fetching
-                // Pull all local bookmarks
-                // Insane .map required for mapping obj-c class to Swift, in order to use protocol instead of class for array param
-                self.sendSyncRecords(action: .create, records: Bookmark.getAllBookmarks(context: DataController.newBackgroundContext()).map{$0}) { error in
-                    startFetching()
+                // Pull all local bookmarks and update their order with newly aquired device id.
+                
+                if let updatedBookmarks = bookmarksWithUpdatedOrder() {
+                    // Insane, .map required for mapping obj-c class to Swift,
+                    // in order to use protocol instead of class for array param.
+                    sendSyncRecords(action: .create, records: updatedBookmarks.map{ $0 }) { _ in
+                        startFetching()
+                    }
                 }
+                
             } else {
                 startFetching()
             }
         }
         return ready
+    }
+    
+    fileprivate func bookmarksWithUpdatedOrder() -> [Bookmark]? {
+        guard let deviceId = Device.currentDevice()?.deviceId?.first else { return [] }
+        let getBaseBookmarksOrderFunction = jsContext?.objectForKeyedSubscript("getBaseBookmarksOrder")
+        
+        guard let baseOrder =
+            getBaseBookmarksOrderFunction?.call(withArguments: [deviceId, "ios"]).toString() else { return nil }
+        
+        if baseOrder != "undefined" {
+            baseSyncOrder = baseOrder
+            return Bookmark.updateBookmarksWithNewSyncOrder()
+        }
+        
+        return nil
     }
     
     // Required since fetch is wrapped in extension and timer hates that.
@@ -351,6 +406,12 @@ extension Sync {
         }
         
         if !isInSyncGroup {
+            completion?(nil)
+            return
+        }
+        
+        if recordType == .bookmark && baseSyncOrder == nil {
+            log.error("Base sync order is nil.")
             completion?(nil)
             return
         }
@@ -570,9 +631,20 @@ extension Sync {
         } else if Device.currentDevice()?.deviceId == nil {
             print("Device Id expected!")
         }
+        
+
 
     }
-
+    
+    func getBookmarkOrder(previousOrder: String?, nextOrder: String?) -> String? {
+        
+        // Empty string as a parameter means next/previous bookmark doesn't exist
+        let prev = previousOrder ?? ""
+        let next = nextOrder ?? ""
+        
+        let getBookmarkOrderFunction = jsContext?.objectForKeyedSubscript("getBookmarkOrder")
+        return getBookmarkOrderFunction?.call(withArguments: [prev, next]).toString()
+    }
 }
 
 extension Sync: WKScriptMessageHandler {
@@ -599,6 +671,10 @@ extension Sync: WKScriptMessageHandler {
             // (e.g. arg2 is [Int])
             let data = JSON(parseJSON: message.body as? String ?? "")
             self.saveInitData(data)
+            // We clear current sync order after joining a new sync group.
+            // syncOrder algorithm is also used for local ordering, even if we are not connected to sync group.
+            // After joining a new sync group, new sync order with proper device id must be used.
+            Bookmark.removeSyncOrders()
         case "get-existing-objects":
             self.getExistingObjects(syncResponse)
         case "resolved-sync-records":
