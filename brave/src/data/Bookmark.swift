@@ -76,9 +76,9 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return SyncBookmark(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
 
-    public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<NSFetchRequestResult> {
+    public class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        let fetchRequest = NSFetchRequest<Bookmark>()
         
         fetchRequest.entity = Bookmark.entity(context: context)
         fetchRequest.fetchBatchSize = 20
@@ -235,16 +235,12 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         let isFavoriteKP = #keyPath(Bookmark.isFavorite)
         let parentFolderKP = #keyPath(Bookmark.parentFolder)
         
-        if let parentFolder = parent {
-            return NSPredicate(format: "%K == %@ AND %K == NO", parentFolderKP, parentFolder, isFavoriteKP)
-        } else {
-            return NSPredicate(format: "%K == nil AND %K == NO", parentFolderKP, isFavoriteKP)
-        }
+        // A bit hacky but you can't just pass 'nil' string to %@.
+        let nilArgumentForPredicate = 0
+        return NSPredicate(
+            format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
     }
     
-    // TODO: DELETE
-    // Aways uses main context
-    @discardableResult 
     public class func add(url: URL?,
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
@@ -271,12 +267,12 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         return count > 0
     }
 
-    public class func reorderBookmarks(frc: NSFetchedResultsController<NSFetchRequestResult>?, sourceIndexPath: IndexPath,
+    public class func reorderBookmarks(frc: NSFetchedResultsController<Bookmark>?, sourceIndexPath: IndexPath,
                                 destinationIndexPath: IndexPath) {
         guard let frc = frc else { return }
         
-        let dest = frc.object(at: destinationIndexPath) as! Bookmark
-        let src = frc.object(at: sourceIndexPath) as! Bookmark
+        let dest = frc.object(at: destinationIndexPath)
+        let src = frc.object(at: sourceIndexPath)
         
         if dest === src {
             return
@@ -287,26 +283,35 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
             // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
             // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
-                    var bms = frc.fetchedObjects as! [Bookmark]
-                    bms.remove(at: bms.index(of: src)!)
-                    if sourceIndexPath.row > destinationIndexPath.row {
-                        // insert before
-                        bms.insert(src, at: bms.index(of: dest)!)
-                    } else {
-                        let end = bms.index(of: dest)! + 1
-                        bms.insert(src, at: end)
-                    }
-                    
-                    for i in 0..<bms.count {
-                        bms[i].order = Int16(i)
-                    }
+            guard var bms = frc.fetchedObjects else {
+                log.error("Bookmark's frc fetched objects is nil")
+                return
+            }
             
-             // I am stumped, I can't find the notification that animation is complete for moving.
-             // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
-             // Adding a delay to let animation complete avoids this problem
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-            DataController.save(context: frc.managedObjectContext)
-        }
+            guard let indexOfSourceBookmark = bms.index(of: src), let indexOfDestBookmark = bms.index(of: dest) else {
+                log.error("Index either source or destination bookmark is nil")
+                return
+            }
+            
+            bms.remove(at: indexOfSourceBookmark)
+            if sourceIndexPath.row > destinationIndexPath.row {
+                // insert before
+                bms.insert(src, at: indexOfDestBookmark)
+            } else {
+                let end = indexOfDestBookmark + 1
+                bms.insert(src, at: end)
+            }
+            
+            for i in 0..<bms.count {
+                bms[i].order = Int16(i)
+            }
+            
+            // I am stumped, I can't find the notification that animation is complete for moving.
+            // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
+            // Adding a delay to let animation complete avoids this problem
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
+                DataController.save(context: frc.managedObjectContext)
+            }
         } else {
             let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
             
@@ -317,7 +322,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                 // Bookmark at the top has no previous bookmark.
                 if destinationIndexPath.row > 0 {
                     let index = IndexPath(row: destinationIndexPath.row - 1, section: destinationIndexPath.section)
-                    prev = (frc.object(at: index) as! Bookmark).syncOrder
+                    prev = frc.object(at: index).syncOrder
                 }
                 
                 let next = dest.syncOrder
@@ -329,7 +334,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                 // Bookmark at the bottom has no next bookmark.
                 if let objects = frc.fetchedObjects, destinationIndexPath.row + 1 < objects.count {
                     let index = IndexPath(row: destinationIndexPath.row + 1, section: destinationIndexPath.section)
-                    next = (frc.object(at: index) as! Bookmark).syncOrder
+                    next = frc.object(at: index).syncOrder
                 }
                 
                 src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
@@ -425,7 +430,7 @@ extension Bookmark {
     class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
         assert(!Thread.isMainThread)
         
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        let fetchRequest = NSFetchRequest<Bookmark>()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context: context)
         
@@ -436,12 +441,9 @@ extension Bookmark {
         fetchRequest.predicate = predicate
         
         do {
-            if let results = try context.fetch(fetchRequest) as? [Bookmark] {
-                return results
-            }
+            return try context.fetch(fetchRequest)
         } catch {
-            let fetchError = error as NSError
-            print(fetchError)
+            log.error(error)
         }
         return [Bookmark]()
     }

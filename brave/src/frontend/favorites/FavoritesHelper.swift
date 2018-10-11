@@ -12,9 +12,9 @@ struct FavoritesHelper {
     // Indicates if favorites have been initialized.
     static let initPrefsKey = "FavoritesHelperInitPrefsKey"
 
-    static func frc() -> NSFetchedResultsController<NSFetchRequestResult> {
+    static func frc() -> NSFetchedResultsController<Bookmark> {
         let context = DataController.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        let fetchRequest = NSFetchRequest<Bookmark>()
 
         fetchRequest.entity = Bookmark.entity(context: context)
         fetchRequest.fetchBatchSize = 20
