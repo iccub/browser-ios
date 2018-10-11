@@ -31,10 +31,7 @@ extension Bookmark {
         // Sync ordering starts with 1.
         var counter = 1
         
-        for bookmark in allBookmarks {
-            if bookmark.syncOrder != nil {
-                continue
-            }
+        for bookmark in allBookmarks where bookmark.syncOrder == nil {
             
             if let parent = parentFolder, let syncOrder = parent.syncOrder {
                 let order = syncOrder + ".\(counter)"
