@@ -274,16 +274,27 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         let dest = frc.object(at: destinationIndexPath)
         let src = frc.object(at: sourceIndexPath)
         
-        if dest === src {
-            return
-        }
+        if dest === src { return }
         
         // Favorites use regular ordering algorithm.
         if src.isFavorite {
             reorderFavorites(frc: frc, sourceBookmark: src, destinationBookmark: dest,
                              sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
-            return
+        } else {
+            // Regular bookmarks use syncOrder based algorithm even if they are not in sync group.
+            reorderUsingSyncOrder(frc: frc, sourceBookmark: src, destinationBookmark: dest,
+                                  sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
         }
+        
+        DataController.save(context: frc.managedObjectContext)
+        if !src.isFavorite { Sync.shared.sendSyncRecords(action: .update, records: [src]) }
+    }
+    
+    private class func reorderUsingSyncOrder(frc: NSFetchedResultsController<Bookmark>,
+                                             sourceBookmark src: Bookmark,
+                                             destinationBookmark dest: Bookmark,
+                                             sourceIndexPath: IndexPath,
+                                             destinationIndexPath: IndexPath) {
         
         let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
         
@@ -311,9 +322,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             
             src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         }
-        
-        DataController.save(context: frc.managedObjectContext)
-        Sync.shared.sendSyncRecords(action: .update, records: [src])
     }
     
     private class func reorderFavorites(frc: NSFetchedResultsController<Bookmark>,
