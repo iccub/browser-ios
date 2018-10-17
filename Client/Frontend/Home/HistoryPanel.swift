@@ -136,7 +136,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         }
     }
 
-    @objc func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    @objc func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let site = frc?.object(at: indexPath) as! History
 
         if let u = site.url, let url = URL(string: u) {
@@ -160,17 +160,17 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         guard let sections = frc?.sections else { return 0 }
         return sections.indices ~= section ? sections[section].numberOfObjects : 0
     }
-
-    func tableView(_ tableView: UITableView, canEditRowAtIndexPath indexPath: IndexPath) -> Bool {
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-
-    @objc func tableView(_ tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) {
-        if (editingStyle == UITableViewCellEditingStyle.delete) {
+    
+    @objc func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+                         forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.delete {
             if let obj = self.frc?.object(at: indexPath) as? History {
-                let context = DataController.shared.mainThreadContext
-                context.delete(obj)
-                DataController.saveContext(context: context)
+                obj.delete()
+                
             }
         }
     }

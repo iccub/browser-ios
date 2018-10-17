@@ -12,6 +12,7 @@ final class SyncBookmark: SyncRecord {
         static let isFolder = "isFolder"
         static let parentFolderObjectId = "parentFolderObjectId"
         static let site = "site"
+        static let syncOrder = "order"
     }
     
     // MARK: Properties
@@ -19,6 +20,7 @@ final class SyncBookmark: SyncRecord {
     var isFolder: Bool? = false
     var parentFolderObjectId: [Int]?
     var site: SyncSite?
+    var syncOrder: String?
     
     convenience init() {
         self.init(json: nil)
@@ -47,13 +49,14 @@ final class SyncBookmark: SyncRecord {
         site.location = bm?.url
         site.creationTime = unixCreated
         site.lastAccessedTime = unixAccessed
-        // TODO: Does this work?
-        site.favicon = bm?.domain?.favicon?.url
+        // FIXME: This sometimes crashes the app.
+        // site.favicon = bm?.domain?.favicon?.url
 
         self.isFavorite = bm?.isFavorite ?? false
         self.isFolder = bm?.isFolder
         self.parentFolderObjectId = bm?.syncParentUUID
         self.site = site
+        syncOrder = bm?.syncOrder
     }
 
     
@@ -67,6 +70,7 @@ final class SyncBookmark: SyncRecord {
         
         let bookmark = json?[objectData.rawValue]
         isFolder = bookmark?[SerializationKeys.isFolder].bool
+        syncOrder = bookmark?[SerializationKeys.syncOrder].string
         if let items = bookmark?[SerializationKeys.parentFolderObjectId].array { parentFolderObjectId = items.map { $0.intValue } }
         site = SyncSite(json: bookmark?[SerializationKeys.site])
     }
@@ -80,6 +84,7 @@ final class SyncBookmark: SyncRecord {
         // Create nested bookmark dictionary
         var bookmarkDict = [String: Any]()
         bookmarkDict[SerializationKeys.isFolder] = isFolder
+        bookmarkDict[SerializationKeys.syncOrder] = syncOrder
         if let value = parentFolderObjectId { bookmarkDict[SerializationKeys.parentFolderObjectId] = value }
         if let value = site { bookmarkDict[SerializationKeys.site] = value.dictionaryRepresentation() }
         

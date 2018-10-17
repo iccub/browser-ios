@@ -6,22 +6,22 @@ import CoreData
 import Foundation
 import Shared
 
-class Device: NSManagedObject, Syncable {
+public final class Device: NSManagedObject, Syncable, CRUD {
     
     // Check if this can be nested inside the method
-    private static var sharedCurrentDevice: Device?
+    static var sharedCurrentDevice: Device?
     
     // Assign on parent model via CD
-    @NSManaged var isSynced: Bool
+    @NSManaged public var isSynced: Bool
     
-    @NSManaged var created: Date?
-    @NSManaged var isCurrentDevice: Bool
-    @NSManaged var deviceDisplayId: String?
-    @NSManaged var syncDisplayUUID: String?
-    @NSManaged var name: String?
+    @NSManaged public var created: Date?
+    @NSManaged public var isCurrentDevice: Bool
+    @NSManaged public var deviceDisplayId: String?
+    @NSManaged public var syncDisplayUUID: String?
+    @NSManaged public var name: String?
     
     // Device is subtype of prefs 🤢
-    var recordType: SyncRecordType = .prefs
+    public var recordType: SyncRecordType = .prefs
 
     // Just a facade around the displayId, for easier access and better CD storage
     var deviceId: [Int]? {
@@ -29,17 +29,8 @@ class Device: NSManagedObject, Syncable {
         set(value) { deviceDisplayId = SyncHelpers.syncDisplay(fromUUID: value) }
     }
     
-    class func deviceSettings(profile: Profile) -> [SyncDeviceSetting]? {
-        // Building settings off of device objects
-        let deviceSettings: [SyncDeviceSetting]? = (Device.get(predicate: nil, context: DataController.shared.workerContext) as? [Device])?.map {
-            // Even if no 'real' title, still want it to show up in list
-            return SyncDeviceSetting(profile: profile, device: $0)
-        }
-        return deviceSettings
-    }
-    
     // This should be abstractable
-    func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
+    public func asDictionary(deviceId: [Int]?, action: Int?) -> [String: Any] {
         return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
     
@@ -47,23 +38,30 @@ class Device: NSManagedObject, Syncable {
         
         // No guard, let bleed through to allow 'empty' devices (e.g. local)
         let root = root as? SyncDevice
-
         let device = Device(entity: Device.entity(context: context), insertInto: context)
         
         device.created = root?.syncNativeTimestamp ?? Date()
-        device.syncUUID = root?.objectId ?? SyncCrypto.shared.uniqueSerialBytes(count: 16)
-
+        device.syncUUID = root?.objectId ?? SyncCrypto.uniqueSerialBytes(count: 16)
+        
         device.update(syncRecord: root)
         
         if save {
-            DataController.saveContext(context: context)
+            DataController.save(context: context)
         }
         
         return device
     }
     
-    class func add(save: Bool = false, context: NSManagedObjectContext) -> Device? {
-        return add(rootObject: nil, save: save, sendToSync: false, context: context) as? Device
+    public class func add(name: String?, isCurrent: Bool = false) {
+        let context = DataController.newBackgroundContext()
+        
+        let device = Device(entity: Device.entity(context: context), insertInto: context)
+        device.created = Date()
+        device.syncUUID = SyncCrypto.uniqueSerialBytes(count: 16)
+        device.name = name
+        device.isCurrentDevice = isCurrent
+        
+        DataController.save(context: context)
     }
     
     func update(syncRecord record: SyncRecord?) {
@@ -74,49 +72,29 @@ class Device: NSManagedObject, Syncable {
         // No save currently
     }
     
-    static func currentDevice() -> Device? {
-        
+    /// Returns a current device and assings it to a shared variable.
+    public static func currentDevice() -> Device? {
         if sharedCurrentDevice == nil {
-            let context = DataController.shared.workerContext
-            // Create device
-            let predicate = NSPredicate(format: "isCurrentDevice = YES")
-            // Should only ever be one current device!
-            var localDevice: Device? = get(predicate: predicate, context: context)?.first
-            
-            if localDevice == nil {
-                // Create
-                localDevice = add(context: context)
-                localDevice?.isCurrentDevice = true
-                DataController.saveContext(context: context)
-            }
-            
-            sharedCurrentDevice = localDevice
+            let predicate = NSPredicate(format: "isCurrentDevice == true")
+            sharedCurrentDevice = first(where: predicate)
         }
+        
         return sharedCurrentDevice
     }
     
-    class func deleteAll(completionOnMain: ()->()) {
-        let context = DataController.shared.workerContext
-        context.perform {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-            fetchRequest.entity = Device.entity(context: context)
-            fetchRequest.includesPropertyValues = false
-            do {
-                let results = try context.fetch(fetchRequest)
-                for result in results {
-                    context.delete(result as! NSManagedObject)
-                }
-                
-            } catch {
-                let fetchError = error as NSError
-                print(fetchError)
-            }
-
-            // Destroy handle to local device instance, otherwise it is locally retained and will throw console errors
-            sharedCurrentDevice = nil
-            
-            DataController.saveContext(context: context)
-        }
+    public class func deleteAll() {
+        sharedCurrentDevice = nil
+        Device.deleteAll(includesPropertyValues: false)
     }
     
+    class func deviceSettings(profile: Profile) -> [SyncDeviceSetting]? {
+        // Building settings off of device objects
+        
+        let deviceSettings = Device.all()?.map {
+            // Even if no 'real' title, still want it to show up in list
+            return SyncDeviceSetting(profile: profile, device: $0)
+        }
+        
+        return deviceSettings
+    }
 }

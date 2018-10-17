@@ -226,7 +226,7 @@ extension BrowserViewController: BrowserToolbarDelegate {
                 return
         }
 
-        let isBookmarked = Bookmark.contains(url: url, context: DataController.shared.mainThreadContext)
+        let isBookmarked = Bookmark.contains(url: url)
         if isBookmarked {
             self.removeBookmark(url)
         } else {

@@ -5,38 +5,56 @@ import CoreData
 import Foundation
 import FastImageCache
 import Shared
+import WebKit
+import XCGLogger
 
-typealias SavedTab = (id: String, title: String, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, history: [String], historyIndex: Int16)
+/// Properties we want to extract from Tab/TabManager and save in TabMO
+public struct SavedTab {
+    public let id: String
+    public let title: String?
+    public let url: String
+    public let isSelected: Bool
+    public let order: Int16
+    public let screenshot: UIImage?
+    public let history: [String]
+    public let historyIndex: Int16
+    
+    public init(id: String, title: String?, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, 
+                history: [String], historyIndex: Int16) {
+        self.id = id
+        self.title = title
+        self.url = url
+        self.isSelected = isSelected
+        self.order = order
+        self.screenshot = screenshot
+        self.history = history
+        self.historyIndex = historyIndex
+    }
+}
+
 private let log = Logger.browserLogger
 
-class TabMO: NSManagedObject {
+public final class TabMO: NSManagedObject, CRUD {
     
-    @NSManaged var title: String?
-    @NSManaged var url: String?
-    @NSManaged var syncUUID: String?
-    @NSManaged var order: Int16
-    @NSManaged var urlHistorySnapshot: NSArray? // array of strings for urls
-    @NSManaged var urlHistoryCurrentIndex: Int16
-    @NSManaged var screenshot: Data?
-    @NSManaged var isSelected: Bool
-    @NSManaged var isClosed: Bool
-    @NSManaged var isPrivate: Bool
+    @NSManaged public var title: String?
+    @NSManaged public var url: String?
+    @NSManaged public var syncUUID: String?
+    @NSManaged public var order: Int16
+    @NSManaged public var urlHistorySnapshot: NSArray? // array of strings for urls
+    @NSManaged public var urlHistoryCurrentIndex: Int16
+    @NSManaged public var screenshot: Data?
+    @NSManaged public var isSelected: Bool
     
-    var imageUrl: URL? {
+    public var imageUrl: URL? {
         if let objectId = self.syncUUID, let url = URL(string: "https://imagecache.mo/\(objectId).png") {
             return url
         }
         return nil
     }
-
-    override func awakeFromInsert() {
-        super.awakeFromInsert()
-    }
     
-    override func prepareForDeletion() {
+    public override func prepareForDeletion() {
         super.prepareForDeletion()
-        
-        // Remove cached image
+
         if let url = imageUrl, !PrivateBrowsing.singleton.isOn {
             ImageCache.shared.remove(url, type: .portrait)
         }
@@ -47,97 +65,54 @@ class TabMO: NSManagedObject {
         return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
     }
     
-    class func freshTab(_ context: NSManagedObjectContext = DataController.shared.mainThreadContext) -> TabMO {
+    /// Creates new tab. If you want to add urls to existing tabs use `update()` method. 
+    public class func create(uuidString: String = UUID().uuidString) -> TabMO {
+        let context = DataController.newBackgroundContext()
         let tab = TabMO(entity: TabMO.entity(context), insertInto: context)
         // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
-        tab.syncUUID = UUID().uuidString
+        tab.syncUUID = uuidString
         tab.title = Strings.New_Tab
-        tab.isPrivate = PrivateBrowsing.singleton.isOn
-        DataController.saveContext(context: context)
+        DataController.save(context: context)
         return tab
     }
 
-    @discardableResult class func add(_ tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
-        let tab: TabMO? = get(byId: tabInfo.id, context: context)
-        if tab == nil {
-            return nil
+    // Updates existing tab with new data. Usually called when user navigates to a new website for in his existing tab.
+    @discardableResult public class func update(tabData: SavedTab) -> TabMO? {
+        let context = DataController.newBackgroundContext()
+        guard let tab = get(fromId: tabData.id, context: context) else { return nil }
+        
+        if let screenshot = tabData.screenshot {
+            tab.screenshot = UIImageJPEGRepresentation(screenshot, 1)
         }
-        if let s = tabInfo.screenshot {
-            tab?.screenshot = UIImageJPEGRepresentation(s, 1)
-        }
-        tab?.url = tabInfo.url
-        tab?.order = tabInfo.order
-        tab?.title = tabInfo.title
-        tab?.urlHistorySnapshot = tabInfo.history as NSArray
-        tab?.urlHistoryCurrentIndex = tabInfo.historyIndex
-        tab?.isSelected = tabInfo.isSelected
-        return tab!
+        tab.url = tabData.url
+        tab.order = tabData.order
+        tab.title = tabData.title
+        tab.urlHistorySnapshot = tabData.history as NSArray
+        tab.urlHistoryCurrentIndex = tabData.historyIndex
+        tab.isSelected = tabData.isSelected
+        
+        DataController.save(context: context)
+        
+        return tab
     }
 
-    class func getAll() -> [TabMO] {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        let context = DataController.shared.mainThreadContext
+    public class func getAll() -> [TabMO] {
+        let sortDescriptors = [NSSortDescriptor(key: #keyPath(TabMO.order), ascending: true)]
+        return all(sortDescriptors: sortDescriptors) ?? []
+    }
+    
+    public class func get(fromId id: String?, context: NSManagedObjectContext) -> TabMO? {
+        guard let id = id else { return nil }
+        let predicate = NSPredicate(format: "\(#keyPath(TabMO.syncUUID)) == %@", id)
         
-        fetchRequest.entity = TabMO.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "isPrivate == false OR isPrivate == nil")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
-        do {
-            return try context.fetch(fetchRequest) as? [TabMO] ?? []
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return []
+        return first(where: predicate, context: context)
     }
     
     class func clearAllPrivate() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        let context = DataController.shared.mainThreadContext
-        
-        fetchRequest.entity = TabMO.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "isPrivate == true")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
-        do {
-            let results = try context.fetch(fetchRequest) as? [TabMO] ?? []
-            for tab in results {
-                DataController.remove(object: tab)
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
+        deleteAll()
     }
     
-    class func get(byId id: String?, context: NSManagedObjectContext) -> TabMO? {
-        guard let id = id else { return nil }
-        
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        fetchRequest.entity = TabMO.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "syncUUID == %@", id)
-        var result: TabMO? = nil
-        do {
-            let results = try context.fetch(fetchRequest) as? [TabMO]
-            if let item = results?.first {
-                result = item
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return result
-    }
-    
-    class func preserve(tab: Browser) {
-        if let data = savedTabData(tab: tab) {
-            let context = DataController.shared.workerContext
-            context.perform {
-                _ = TabMO.add(data, context: context)
-                DataController.saveContext(context: context)
-            }
-        }
-    }
-    
-    class func savedTabData(tab: Browser, context: NSManagedObjectContext = DataController.shared.mainThreadContext, urlOverride: String? = nil) -> SavedTab? {
+    class func savedTabData(tab: Browser, context: NSManagedObjectContext = DataController.viewContext, urlOverride: String? = nil) -> SavedTab? {
         guard let tabManager = getApp().tabManager, let webView = tab.webView, let order = tabManager.indexOfWebView(webView) else { return nil }
         
         // Ignore session restore data.
@@ -163,13 +138,13 @@ class TabMO: NSManagedObject {
             log.debug("currentItem: \(currentItemString)")
             
             /* Completely ignore forward history when passing urlOverride. When a webpage
-               hasn't fully loaded we attempt to preserve the current state of the webview.
-               urls that are currently loading aren't visible in history or forward history.
-               Our work around here is to append the currently requested URL to the end of the
-               navigation stack, and ignore forward history (as it would be replaced on full load).
-               There should be a very narrow edgecase where user who navigates back has no active
-               cache for the back url and close the browser while page is still being loaded-
-               resulting in lost forward history. */
+             hasn't fully loaded we attempt to preserve the current state of the webview.
+             urls that are currently loading aren't visible in history or forward history.
+             Our work around here is to append the currently requested URL to the end of the
+             navigation stack, and ignore forward history (as it would be replaced on full load).
+             There should be a very narrow edgecase where user who navigates back has no active
+             cache for the back url and close the browser while page is still being loaded-
+             resulting in lost forward history. */
             
             if let urlOverride = urlOverride, backListMap.count == 0 || forwardListMap.count == 0 {
                 // Navigating back or forward, lets ignore current.
@@ -189,7 +164,7 @@ class TabMO: NSManagedObject {
             
             log.debug("---stack: \(urls)")
         }
-        if let id = TabMO.get(byId: tab.tabID, context: context)?.syncUUID {
+        if let id = TabMO.get(fromId: tab.tabID, context: context)?.syncUUID {
             let title = tab.displayTitle != "" ? tab.displayTitle : urlOverride ?? ""
             if urlOverride == nil && tab.url == nil {
                 log.warning("Missing tab url, using empty string as a fallback. Should not happen.")
@@ -197,11 +172,10 @@ class TabMO: NSManagedObject {
             
             let url = tab.url?.absoluteString ?? ""
             
-            let data = SavedTab(id, title, urlOverride ?? url, tabManager.selectedTab === tab, Int16(order), nil, urls, Int16(currentPage))
+            let data = SavedTab(id: id, title: title, url: urlOverride ?? url, isSelected: tabManager.selectedTab === tab, order: Int16(order), screenshot: nil, history: urls, historyIndex: Int16(currentPage))
             return data
         }
         
         return nil
     }
 }
-

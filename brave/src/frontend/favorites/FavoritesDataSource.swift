@@ -8,7 +8,7 @@ import Shared
 private let log = Logger.browserLogger
 
 class FavoritesDataSource: NSObject, UICollectionViewDataSource {
-    var frc: NSFetchedResultsController<NSFetchRequestResult>?
+    var frc: NSFetchedResultsController<Bookmark>?
     weak var collectionView: UICollectionView?
 
     var isEditing: Bool = false {
@@ -61,7 +61,7 @@ class FavoritesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     fileprivate func configureCell(cell: ThumbnailCell, at indexPath: IndexPath) -> UICollectionViewCell {
-        guard let fav = frc?.object(at: indexPath) as? Bookmark else { return UICollectionViewCell() }
+        guard let fav = frc?.object(at: indexPath) else { return UICollectionViewCell() }
 
         cell.textLabel.text = fav.displayTitle ?? fav.url
         cell.accessibilityLabel = cell.textLabel.text

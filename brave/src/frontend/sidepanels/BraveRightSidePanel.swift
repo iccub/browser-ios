@@ -46,7 +46,7 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
 
     let ui_edgeInset = CGFloat(20)
     var ui_rightEdgeInset: CGFloat {
-        if #available(iOS 11, *), DeviceDetector.iPhoneX, BraveApp.isIPhoneLandscape() {
+        if #available(iOS 11, *), BraveApp.isIPhoneLandscape() {
             return self.view.safeAreaInsets.right
         } else {
             return 20
@@ -133,16 +133,16 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
     override func viewSafeAreaInsetsDidChange() {
         if !view.isHidden {
             updateConstraintsForPanelSections()
-            updateHorizontalConstraintsForIphoneX()
+            updateHorizontalConstraintsForSafeArea()
         }
     }
     
     override func setupConstraints() {
         super.setupConstraints()
-        updateHorizontalConstraintsForIphoneX()
+        updateHorizontalConstraintsForSafeArea()
     }
     
-    private func updateHorizontalConstraintsForIphoneX() {
+    private func updateHorizontalConstraintsForSafeArea() {
         shieldToggle.snp.updateConstraints { make in
             make.right.equalTo(headerContainer.superview!).inset(ui_rightEdgeInset)
         }
