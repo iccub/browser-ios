@@ -215,8 +215,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             }
         }
         
-        if !bk.isFavorite && bk.syncOrder == nil {
-            bk.newBookmarkSyncOrder(context: context)
+        if bk.syncOrder == nil {
+            bk.newSyncOrder(forFavorites: bk.isFavorite, context: context)
         }
         
         if save {
@@ -246,7 +246,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
                        customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
                        isFolder: Bool = false,
-                       isFavorite: Bool = false) {
+                       isFavorite: Bool = false,
+                       syncOrder: String? = nil) {
         
         let site = SyncSite()
         site.title = title
@@ -258,6 +259,7 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         bookmark.isFolder = isFolder
         bookmark.parentFolderObjectId = parentFolder?.syncUUID
         bookmark.site = site
+        bookmark.syncOrder = syncOrder
         
         add(rootObject: bookmark, save: true, sendToSync: true, parentFolder: parentFolder)
     }
@@ -274,16 +276,21 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         let dest = frc.object(at: destinationIndexPath)
         let src = frc.object(at: sourceIndexPath)
         
-        if dest === src {
-            return
-        }
+        if dest === src { return }
         
-        // Favorites use regular ordering algorithm.
-        if src.isFavorite {
-            reorderFavorites(frc: frc, sourceBookmark: src, destinationBookmark: dest,
-                             sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
-            return
-        }
+        // Note: sync order is also used for ordering favorites and non synchronized bookmarks.
+        reorderWithSyncOrder(frc: frc, sourceBookmark: src, destinationBookmark: dest,
+                              sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+        
+        DataController.save(context: frc.managedObjectContext)
+        if !src.isFavorite { Sync.shared.sendSyncRecords(action: .update, records: [src]) }
+    }
+    
+    private class func reorderWithSyncOrder(frc: NSFetchedResultsController<Bookmark>,
+                                             sourceBookmark src: Bookmark,
+                                             destinationBookmark dest: Bookmark,
+                                             sourceIndexPath: IndexPath,
+                                             destinationIndexPath: IndexPath) {
         
         let isMovingUp = sourceIndexPath.row > destinationIndexPath.row
         
@@ -311,9 +318,6 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             
             src.syncOrder = Sync.shared.getBookmarkOrder(previousOrder: prev, nextOrder: next)
         }
-        
-        DataController.save(context: frc.managedObjectContext)
-        Sync.shared.sendSyncRecords(action: .update, records: [src])
     }
     
     private class func reorderFavorites(frc: NSFetchedResultsController<Bookmark>,

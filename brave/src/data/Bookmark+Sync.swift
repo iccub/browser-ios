@@ -56,14 +56,14 @@ extension Bookmark {
         return bookmarksToSend
     }
     
-    private class func maxBookmarkSyncOrder(parent: Bookmark?, context: NSManagedObjectContext) -> String? {
-        let predicate = allBookmarksOfAGivenLevelPredicate(parent: parent)
+    private class func maxSyncOrder(parent: Bookmark?,
+                                            forFavorites: Bool,
+                                            context: NSManagedObjectContext) -> String? {
         
-        guard let allBookmarks = Bookmark.get(predicate: predicate, context: context) as? [Bookmark] else {
-            return nil
-        }
+        let predicate = forFavorites ?
+            NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parent)
         
-        if allBookmarks.isEmpty { return nil }
+        guard let allBookmarks = all(where: predicate, context: context) else { return nil }
         
         // New bookmarks are sometimes added to context before this method is called.
         // We need to filter out bookmarks with empty sync orders.
@@ -76,8 +76,10 @@ extension Bookmark {
         return highestOrderBookmark?.syncOrder
     }
     
-    func newBookmarkSyncOrder(context: NSManagedObjectContext) {
-        let lastBookmarkOrder = Bookmark.maxBookmarkSyncOrder(parent: parentFolder, context: context)
+    func newSyncOrder(forFavorites: Bool, context: NSManagedObjectContext) {
+        let lastBookmarkOrder = Bookmark.maxSyncOrder(parent: parentFolder,
+                                                              forFavorites: forFavorites,
+                                                              context: context)
         
         // The sync lib javascript method doesn't handle cases when there are no other bookmarks on a given level.
         // We need to do it locally, there are 3 cases:

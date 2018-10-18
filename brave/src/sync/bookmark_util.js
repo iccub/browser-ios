@@ -1,3 +1,10 @@
+// This is a slightly modified file from sync framework to make it work with `JavaScriptCore`
+// IMPORTANT: This file needs to be updated
+// each time `https://github.com/brave/sync/blob/staging/client/bookmarkUtil.js` is updated.
+// The only difference in this file is replacing `module.exports.` with `var` in functions.
+// Function bodies and signatures are the same as original.
+// For original source please check https://github.com/brave/sync
+
 'use strict'
 
 
