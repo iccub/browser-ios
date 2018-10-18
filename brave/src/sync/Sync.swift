@@ -156,6 +156,8 @@ class Sync: JSInjector {
         return context
     }()
     
+    private var syncFetchedHandlers = [() -> ()]()
+    
     override init() {
         super.init()
         
@@ -171,6 +173,10 @@ class Sync: JSInjector {
     func leaveSyncGroup() {
         // No, `leaving` logic should be here, any related logic should be in `syncSeed` setter
         syncSeed = nil
+    }
+    
+    func addFetchedHandler(_ handler: @escaping () -> ()) {
+        syncFetchedHandlers.append(handler)
     }
     
     /// Sets up sync to actually start pulling/pushing data. This method can only be called once
@@ -296,7 +302,7 @@ class Sync: JSInjector {
     // TODO: Abstract into classes as static members, each object type needs their own sync time stamp!
     // This includes just the last record that was fetched, used to store timestamp until full process has been completed
     //  then set into defaults
-    fileprivate var lastFetchedRecordTimestamp: Int? = 0
+    fileprivate(set) var lastFetchedRecordTimestamp: Int? = 0
     // This includes the entire process: fetching, resolving, insertion/update, and save
     fileprivate var lastSuccessfulSync: Int {
         get {
@@ -541,6 +547,8 @@ extension Sync {
             self.fetch(type: .bookmark)
             self.lastFetchWasTrimmed = false
         }
+        
+        syncFetchedHandlers.forEach { $0() }
     }
 
     func deleteSyncUser(_ data: [String: AnyObject]) {
@@ -597,6 +605,7 @@ extension Sync {
         if recordType == .bookmark {
             // Store the last record's timestamp, to know what timestamp to pass in next time if this one does not fail
             self.lastFetchedRecordTimestamp = data?.lastFetchedTimestamp
+            log.info("sync fetched last timestamp \(self.lastFetchedRecordTimestamp ?? 0)")
             self.lastFetchWasTrimmed = data?.isTruncated ?? false
         }
         
@@ -608,7 +617,7 @@ extension Sync {
     func saveInitData(_ data: JSON) {
         // Sync Seed
         if let seedJSON = data["arg1"].array {
-            let seed = seedJSON.map({ $0.int }).flatMap({ $0 })
+            let seed = seedJSON.compactMap({ $0.int })
             
             // TODO: Move to constant
             if seed.count < Sync.SeedByteLength {

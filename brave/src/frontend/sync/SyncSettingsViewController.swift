@@ -5,6 +5,9 @@ import Shared
 
 class SyncSettingsViewController: AppSettingsTableViewController {
     
+    /// Handles dismissing parent view controller.
+    var dismissHandler: (() -> ())?
+    
     private enum SyncSection: Int {
         // Raw values correspond to table sections.
         case devices, actionButtons
@@ -70,7 +73,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
             navigationController?.interactivePopGestureRecognizer?.isEnabled = false
             
             navigationItem.setHidesBackButton(true, animated: false)
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(SEL_done))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
             
             tableView.reloadData()
         }
@@ -124,8 +127,8 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         refreshControl?.endRefreshing()
     }
     
-    @objc func SEL_done() {
-        navigationController?.popToRootViewController(animated: true)
+    @objc func doneTapped() {
+        dismissHandler?()
     }
 }
 

@@ -163,10 +163,17 @@ class SyncDevicesSetting: Setting {
         
         if Sync.shared.isInSyncGroup {
             let syncSettingsView = SyncSettingsViewController(style: .grouped)
+            syncSettingsView.dismissHandler = {
+                navigationController?.popToRootViewController(animated: true)
+            }
+            
             syncSettingsView.profile = getApp().profile
             navigationController?.pushViewController(syncSettingsView, animated: true)
         } else {
             let view = SyncWelcomeViewController()
+            view.dismissHandler = {
+                view.navigationController?.popToRootViewController(animated: true)
+            }
             navigationController?.pushViewController(view, animated: true)
         }
     }

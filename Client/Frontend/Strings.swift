@@ -423,6 +423,8 @@ extension Strings {
     public static let CodeWordInputHelp = NSLocalizedString("Using existing synced device, open Brave Settings and navigate to Settings > Sync. Choose “Add Device” then “Display code words instead”", comment: "Code words input help")
     public static let CopyToClipboard = NSLocalizedString("Copy to Clipboard", comment: "Copy codewords title")
     public static let CopiedToClipboard = NSLocalizedString("Copied to Clipboard!", comment: "Copied codewords title")
+    public static let SyncBookmarksCallout = NSLocalizedString("Sync your bookmarks \racross devices", comment: "Sync your bookmarks callout")
+    public static let Syncing = NSLocalizedString("Syncing...", comment: "Syncing in progress label")
 }
 
 

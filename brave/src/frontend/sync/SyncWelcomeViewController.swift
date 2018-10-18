@@ -10,7 +10,8 @@ protocol NavigationPrevention {
 }
 
 class SyncWelcomeViewController: SyncViewController {
-
+    var dismissHandler: (() -> ())?
+    
     lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -189,6 +190,8 @@ class SyncWelcomeViewController: SyncViewController {
         let settings = SyncSettingsViewController(style: .grouped)
         settings.profile = getApp().profile
         settings.disableBackButton = true
-        self.navigationController?.pushViewController(settings, animated: true)
+        navigationController?.pushViewController(settings, animated: true)
+        
+        settings.dismissHandler = dismissHandler
     }
 }

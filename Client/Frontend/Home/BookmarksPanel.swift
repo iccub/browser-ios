@@ -180,6 +180,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     weak var addBookmarksFolderOkAction: UIAlertAction?
   
     var isEditingIndividualBookmark:Bool = false
+    
+    weak var delegate: MainSidePanelViewControllerDelegate?
 
     var currentFolder: Bookmark? = nil
 
@@ -202,6 +204,10 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         self.bookmarksFRC?.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.reloadData), name: NotificationMainThreadContextSignificantlyChanged, object: nil)
+        
+        Sync.shared.addFetchedHandler { [weak self] in
+            self?.reloadData()
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -209,8 +215,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
-        NotificationCenter.default.removeObserver(self, name: NotificationMainThreadContextSignificantlyChanged, object: nil)
+        NotificationCenter.default.removeObserver(self)
     }
 
     override func viewDidLoad() {
@@ -397,8 +402,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         guard let obj = bookmarksFRC?.object(at: indexPath) else { return (nil, nil) }
         return (obj.url != nil ? URL(string: obj.url!) : nil, obj.isFolder ? obj.syncUUID : nil)
     }
-    
-    
 
     fileprivate func configureCell(_ cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
 
@@ -499,7 +502,38 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return nil
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.regular)
+        label.textAlignment = .center
+        
+        if Sync.shared.isInSyncGroup {
+            label.textColor = BraveUX.GreyG
+            
+            if Sync.shared.lastFetchedRecordTimestamp != nil {
+                label.text = Strings.Syncing
+            }
+        } else {
+            label.textColor = BraveUX.LightBlue
+            label.numberOfLines = 2
+            label.text = Strings.SyncBookmarksCallout
+        }
+        
+        let view = UIView()
+        view.backgroundColor = BraveUX.White
+        view.layer.shadowOffset = CGSize.zero
+        view.layer.shadowColor = BraveUX.GreyD.cgColor
+        view.layer.shadowRadius = 1
+        view.layer.shadowOpacity = 1
+        
+        let headerTapGesture = UITapGestureRecognizer(target: self, action: #selector(tapSyncHeader))
+        view.addSubview(label)
+        view.addGestureRecognizer(headerTapGesture)
+        
+        label.snp.makeConstraints { make in
+            make.margins.equalTo(view)
+        }
+        
+        return view
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -507,7 +541,17 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        // Only display sync header on root
+        if currentFolder != nil {
+            return 0
+        }
+        
+        // Sync is connected but nothing is being synced.
+        if Sync.shared.isInSyncGroup && Sync.shared.lastFetchedRecordTimestamp == nil {
+            return 0
+        }
+        
+        return Sync.shared.isInSyncGroup ? 28 : 58
     }
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -599,7 +643,10 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         self.isEditingIndividualBookmark = true
         self.navigationController?.pushViewController(nextController, animated: true)
     }
-
+    
+    @objc func tapSyncHeader() {
+        delegate?.openSyncSetup()
+    }
 }
 
 private protocol BookmarkFolderTableViewHeaderDelegate {

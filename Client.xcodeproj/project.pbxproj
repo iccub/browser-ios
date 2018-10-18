@@ -1083,6 +1083,8 @@
 		0A64E22620BEF8FB00887EEE /* bookmark_util.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = bookmark_util.js; sourceTree = "<group>"; };
 		0A7C92BD201F3FDA0070BF98 /* SyncViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SyncViewController.swift; path = brave/src/frontend/sync/SyncViewController.swift; sourceTree = "<group>"; };
 		0A7D73982076BAAD00BD66E3 /* CustomHeaderData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderData.swift; sourceTree = "<group>"; };
+		0A6365D82012011700371C27 /* FavoritesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesHelper.swift; sourceTree = "<group>"; };
+		0A7C92BD201F3FDA0070BF98 /* SyncViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SyncViewController.swift; path = brave/src/frontend/sync/SyncViewController.swift; sourceTree = "<group>"; };
 		0A8053951FC59D82008D6822 /* DAU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DAU.swift; sourceTree = "<group>"; };
 		0A8053971FC59D93008D6822 /* DauTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DauTest.swift; sourceTree = "<group>"; };
 		0A82B7FF20067EFC00CE6397 /* FavoritesTileDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesTileDecorator.swift; sourceTree = "<group>"; };
