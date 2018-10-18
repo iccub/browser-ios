@@ -18,11 +18,11 @@ struct FavoritesHelper {
 
         fetchRequest.entity = Bookmark.entity(context: context)
         fetchRequest.fetchBatchSize = 20
-
-        // We always want favorites folder to be on top, in the first section.
+        
+        let syncOrderSort = NSSortDescriptor(key:"syncOrder", ascending: true)
         let orderSort = NSSortDescriptor(key:"order", ascending: true)
-        let createdSort = NSSortDescriptor(key:"created", ascending: false)
-        fetchRequest.sortDescriptors = [orderSort, createdSort]
+        let createdSort = NSSortDescriptor(key:"created", ascending: true)
+        fetchRequest.sortDescriptors = [syncOrderSort, orderSort, createdSort]
 
         fetchRequest.predicate = NSPredicate(format: "isFavorite == YES")
 
@@ -32,8 +32,11 @@ struct FavoritesHelper {
 
     // MARK: - Favorites initialization
     static func addDefaultFavorites() {
-        PreloadedFavorites.getList().forEach { fav in
-            Bookmark.add(url: fav.url, title: fav.title, isFavorite: true)
+        
+        for (position, fav) in PreloadedFavorites.getList().enumerated() {
+            let order = "\(Bookmark.baseOrder)\(position + 1)" // Sync order starts from 1
+            
+            Bookmark.add(url: fav.url, title: fav.title, isFavorite: true, syncOrder: order)
         }
     }
 
