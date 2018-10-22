@@ -158,6 +158,11 @@ class BrowserViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(leftSwipeToolbar), name: LeftSwipeToolbarNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(rightSwipeToolbar), name: RightSwipeToolbarNotification, object: nil)
+        NotificationCenter.default.addObserver(forName: .UIWindowDidBecomeKey, object: nil, queue: nil) { [weak self] _ in
+            if UIApplication.shared.keyWindow == self?.view.window {
+                self?.tabManager.selectedTab?.webView?.reload()
+            }
+        }
     }
 
     func shouldShowFooterForTraitCollection(_ previousTraitCollection: UITraitCollection) -> Bool {
