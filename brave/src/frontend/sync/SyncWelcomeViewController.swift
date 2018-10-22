@@ -187,11 +187,9 @@ class SyncWelcomeViewController: SyncViewController {
     }
     
     private func pushSettings() {
-        let settings = SyncSettingsViewController(style: .grouped)
-        settings.profile = getApp().profile
-        settings.disableBackButton = true
-        navigationController?.pushViewController(settings, animated: true)
-        
-        settings.dismissHandler = dismissHandler
+        let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
+        syncSettingsVC.dismissHandler = dismissHandler
+        syncSettingsVC.disableBackButton = true
+        navigationController?.pushViewController(syncSettingsVC, animated: true)
     }
 }

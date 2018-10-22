@@ -34,6 +34,18 @@ public final class Device: NSManagedObject, Syncable, CRUD {
         return SyncDevice(record: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
     
+    static func frc() -> NSFetchedResultsController<Device> {
+        let context = DataController.viewContext
+        let fetchRequest = NSFetchRequest<Device>()
+        fetchRequest.entity = Device.entity(context: context)
+        
+        let currentDeviceSort = NSSortDescriptor(key: "isCurrentDevice", ascending: false)
+        fetchRequest.sortDescriptors = [currentDeviceSort]
+        
+        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context,
+                                          sectionNameKeyPath: nil, cacheName: nil)
+    }
+    
     static func add(rootObject root: SyncRecord?, save: Bool, sendToSync: Bool, context: NSManagedObjectContext) -> Syncable? {
         
         // No guard, let bleed through to allow 'empty' devices (e.g. local)
