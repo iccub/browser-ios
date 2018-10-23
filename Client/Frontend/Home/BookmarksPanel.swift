@@ -502,6 +502,11 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        #if NO_SYNC
+            return nil
+        #endif
+        
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.regular)
         label.textAlignment = .center
@@ -541,6 +546,10 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        #if NO_SYNC
+            return 0
+        #endif
+        
         // Only display sync header on root
         if currentFolder != nil {
             return 0
