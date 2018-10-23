@@ -62,6 +62,13 @@ class URLProtocol: Foundation.URLProtocol {
                 (shieldState.isOnAdBlockAndTp() ?? false && AdBlocker.singleton.shouldBlock(request)) ||
                 (shieldState.isOnSafeBrowsing() ?? false && SafeBrowsing.singleton.shouldBlock(request)) ||
                 (shieldState.isOnHTTPSE() ?? false && HttpsEverywhere.singleton.tryRedirectingUrl(url) != nil)
+        
+        // Mixed content check
+        if let mainUrlScheme = request.mainDocumentURL?.scheme, let requestScheme = url.scheme {
+            if mainUrlScheme == "https" && requestScheme == "http" {
+                getApp().browserViewController.hideLockIcon()
+            }
+        }
 
         return useCustomUrlProtocol
     }

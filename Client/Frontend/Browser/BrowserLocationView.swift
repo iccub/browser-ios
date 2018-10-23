@@ -125,6 +125,15 @@ class BrowserLocationView: UIView {
             }
         }
     }
+    
+    func hideLockIcon() {
+        postAsyncToMain {
+            self.lockImageView.isHidden = true
+            self.setNeedsUpdateConstraints()
+            self.layoutIfNeeded()
+        }
+        
+    }
 
     /// Returns constant placeholder text with current URL color
     var placeholder: NSAttributedString {

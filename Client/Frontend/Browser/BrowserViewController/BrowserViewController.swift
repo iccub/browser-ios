@@ -1156,6 +1156,12 @@ class BrowserViewController: UIViewController {
     override var canBecomeFirstResponder : Bool {
         return true
     }
+    
+    func hideLockIcon() {
+        if urlBar != nil {
+            urlBar.locationView.hideLockIcon()
+        }
+    }
 
 //    override func becomeFirstResponder() -> Bool {
 //        // Make the web view the first responder so that it can show the selection menu.
