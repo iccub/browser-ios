@@ -145,8 +145,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    // Minimum of 1 section
-    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         let count = frc?.sections?.count ?? 0
         return count
     }
