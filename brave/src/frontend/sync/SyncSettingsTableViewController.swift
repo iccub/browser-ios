@@ -7,7 +7,7 @@ import Shared
 private let log = Logger.browserLogger
 
 class SyncSettingsTableViewController: UITableViewController {
-    var frc: NSFetchedResultsController<Device>?
+    private var frc: NSFetchedResultsController<Device>?
     
     private enum Sections: Int { case deviceList, buttons }
     
