@@ -20,8 +20,7 @@ if [[ $app_id == com.brave.ios.browser* ]]; then
     echo "DEVELOPMENT_TEAM=$dev_team_id" >> xcconfig/local-def.xcconfig
 
     # using comma delimiter to escape forward slashes properly
-    sed -e s,https://laptop-updates-staging.herokuapp.com,$(head -1 ~/.brave-urp-host-key), BraveInfo.plist.template |
-    sed -e s,\<string\>key\</string\>,\<string\>$(head -1 ~/.brave-api-key)\</string\>, > BraveInfo.plist
+    sed -e s,\<string\>key\</string\>,\<string\>$(head -1 ~/.brave-api-key)\</string\>, BraveInfo.plist.template > BraveInfo.plist
 else
     sed -i '' -e "s/KEYCHAIN_PLACEHOLDER/\$\(AppIdentifierPrefix\)$app_id/" Brave.entitlements
     cat BraveInfo.plist.template > BraveInfo.plist

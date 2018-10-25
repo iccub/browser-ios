@@ -6,13 +6,13 @@ import Shared
 private let log = Logger.browserLogger
 
 class UserReferralProgram {
-    private static let hostPlistKey = "URP_HOST"
     private static let apiKeyPlistKey = "API_KEY"
 
     private static let urpDateCheckPrefsKey = "urpDateCheckPrefsKey"
     private static let urpRetryCountdownPrefsKey = "urpRetryCountdownPrefsKey"
 
-    private static let stagingUrl = "https://laptop-updates-staging.herokuapp.com"
+    private let stagingUrl = "https://laptop-updates-staging.herokuapp.com"
+    private let prodUrl = "https://laptop-updates.brave.com"
 
     let service: UrpService
     let prefs: Prefs
@@ -21,16 +21,18 @@ class UserReferralProgram {
         func getPlistString(for key: String) -> String? {
             return Bundle.main.infoDictionary?[key] as? String
         }
+        
+        let host = kIsDevelomentBuild ? stagingUrl : prodUrl
 
-        guard let host = getPlistString(for: UserReferralProgram.hostPlistKey),
-            let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey), let prefs = getApp().profile?.prefs else {
+        guard let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey),
+              let prefs = getApp().profile?.prefs else {
                 log.error("Urp init error, failed to get values from Brave.plist.")
                 return nil
         }
 
         guard let urpService = UrpService(host: host, apiKey: apiKey) else { return nil }
 
-        UrpLog.log("URP init, host: \(host), api key: \(apiKey)")
+        UrpLog.log("URP init, host: \(host)")
 
         self.prefs = prefs
         self.service = urpService
