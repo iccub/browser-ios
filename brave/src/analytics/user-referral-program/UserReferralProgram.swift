@@ -11,9 +11,11 @@ class UserReferralProgram {
     private static let urpDateCheckPrefsKey = "urpDateCheckPrefsKey"
     private static let urpRetryCountdownPrefsKey = "urpRetryCountdownPrefsKey"
 
-    private let stagingUrl = "https://laptop-updates-staging.herokuapp.com"
-    private let prodUrl = "https://laptop-updates.brave.com"
-
+    struct HostUrl {
+        static let staging = "https://laptop-updates-staging.herokuapp.com"
+        static let prod = "https://laptop-updates.brave.com"
+    }
+    
     let service: UrpService
     let prefs: Prefs
 
@@ -22,7 +24,7 @@ class UserReferralProgram {
             return Bundle.main.infoDictionary?[key] as? String
         }
         
-        let host = kIsDevelomentBuild ? stagingUrl : prodUrl
+        let host = kIsDevelomentBuild ? HostUrl.staging : HostUrl.prod
 
         guard let apiKey = getPlistString(for: UserReferralProgram.apiKeyPlistKey),
               let prefs = getApp().profile?.prefs else {
