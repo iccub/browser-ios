@@ -3,6 +3,8 @@
 import UIKit
 import Shared
 
+private let log = Logger.browserLogger
+
 class SyncPairWordsViewController: SyncViewController {
     
     var syncHandler: (([Int]?) -> ())?
@@ -120,11 +122,13 @@ class SyncPairWordsViewController: SyncViewController {
     }
     
     @objc func SEL_done() {
-        checkCodes()
+        doIfConnected {
+            checkCodes()
+        }
     }
     
-    func checkCodes() {
-        debugPrint("check codes")
+    private func checkCodes() {
+        log.debug("check codes")
         
         func alert(title: String? = nil, message: String? = nil) {
             if Sync.shared.isInSyncGroup {

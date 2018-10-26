@@ -425,6 +425,8 @@ extension Strings {
     public static let CopiedToClipboard = NSLocalizedString("Copied to Clipboard!", comment: "Copied codewords title")
     public static let SyncBookmarksCallout = NSLocalizedString("Sync your bookmarks \racross devices", comment: "Sync your bookmarks callout")
     public static let Syncing = NSLocalizedString("Syncing...", comment: "Syncing in progress label")
+    public static let SyncNoConnectionTitle = NSLocalizedString("Can't connect to sync", comment: "No internet connection alert title.")
+    public static let SyncNoConnectionBody = NSLocalizedString("Check your internet connection and try again.", comment: "No internet connection alert body.")
 }
 
 
