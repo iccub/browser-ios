@@ -96,13 +96,23 @@ class Sync: JSInjector {
     }
     
     fileprivate var fetchTimer: Timer?
-    var baseSyncOrder: String?
+    
+    var baseSyncOrder: String? {
+        get {
+            return UserDefaults.standard.string(forKey: prefBaseOrder)
+        }
+        set(value) {
+            UserDefaults.standard.set(value, forKey: prefBaseOrder)
+            UserDefaults.standard.synchronize()
+        }
+    }
 
     // TODO: Move to a better place
     fileprivate let prefNameId = "device-id-js-array"
     fileprivate let prefNameName = "sync-device-name"
     fileprivate let prefNameSeed = "seed-js-array"
     fileprivate let prefFetchTimestamp = "sync-fetch-timestamp"
+    fileprivate let prefBaseOrder = "sync-base-order"
     
 //    #if DEBUG
     fileprivate let isDebug = true
