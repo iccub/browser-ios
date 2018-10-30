@@ -507,21 +507,15 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             return nil
         #endif
         
+        if Sync.shared.isInSyncGroup { return nil }
+        
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: UIFont.Weight.regular)
         label.textAlignment = .center
         
-        if Sync.shared.isInSyncGroup {
-            label.textColor = BraveUX.GreyG
-            
-            if Sync.shared.lastFetchedRecordTimestamp != nil {
-                label.text = Strings.Syncing
-            }
-        } else {
-            label.textColor = BraveUX.LightBlue
-            label.numberOfLines = 2
-            label.text = Strings.SyncBookmarksCallout
-        }
+        label.textColor = BraveUX.LightBlue
+        label.numberOfLines = 2
+        label.text = Strings.SyncBookmarksCallout
         
         let view = UIView()
         view.backgroundColor = BraveUX.White
