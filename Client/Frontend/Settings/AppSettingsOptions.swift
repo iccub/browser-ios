@@ -162,13 +162,12 @@ class SyncDevicesSetting: Setting {
     override func onClick(_ navigationController: UINavigationController?) {
         
         if Sync.shared.isInSyncGroup {
-            let syncSettingsView = SyncSettingsViewController(style: .grouped)
-            syncSettingsView.dismissHandler = {
+            let syncSettingsVC = SyncSettingsTableViewController(style: .grouped)
+            syncSettingsVC.dismissHandler = {
                 navigationController?.popToRootViewController(animated: true)
             }
             
-            syncSettingsView.profile = getApp().profile
-            navigationController?.pushViewController(syncSettingsView, animated: true)
+            navigationController?.pushViewController(syncSettingsVC, animated: true)
         } else {
             let view = SyncWelcomeViewController()
             view.dismissHandler = {
