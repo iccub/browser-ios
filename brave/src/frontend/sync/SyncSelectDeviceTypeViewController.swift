@@ -141,7 +141,9 @@ class SyncSelectDeviceTypeViewController: SyncViewController {
     }
 
     @objc func addDevice(sender: SyncDeviceTypeButton) {
-        syncInitHandler?(sender.label.text ?? "", sender.type)
+        doIfConnected {
+            self.syncInitHandler?(sender.label.text ?? "", sender.type)
+        }
     }
 }
 

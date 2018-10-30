@@ -41,6 +41,11 @@ class SyncPairCameraViewController: SyncViewController {
         cameraView.layer.masksToBounds = true
         cameraView.scanCallback = { data in
             
+            if !DeviceInfo.hasConnectivity() {
+                self.showNoConnectionAlert()
+                return
+            }
+            
             // TODO: Check data against sync api
 
             // TODO: Functional, but needs some cleanup
