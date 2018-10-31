@@ -148,8 +148,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             DataController.save(context: context)
         }
         
-        if !isFavorite {
-            Sync.shared.sendSyncRecords(action: .update, records: [self])
+        if !isFavorite && sendToSync {
+            Sync.shared.sendSyncRecords(action: .update, records: [bookmarkToUpdate])
         }
     }
 
