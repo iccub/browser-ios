@@ -104,7 +104,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
         // No auto-save, must be handled by caller if desired
     }
     
-    public func update(customTitle: String?, url: String?, newSyncOrder: String? = nil, save: Bool = false) {
+    public func update(customTitle: String?, url: String?, newSyncOrder: String? = nil, save: Bool = false,
+                       sendToSync: Bool = false) {
         var contextToUpdate: NSManagedObjectContext?
         
         // Syncable.update() doesn't save to CD at the moment, we need to use managedObjectContext here.
@@ -147,8 +148,8 @@ public final class Bookmark: NSManagedObject, WebsitePresentable, Syncable, CRUD
             DataController.save(context: context)
         }
         
-        if !isFavorite {
-            Sync.shared.sendSyncRecords(action: .update, records: [self])
+        if !isFavorite && sendToSync {
+            Sync.shared.sendSyncRecords(action: .update, records: [bookmarkToUpdate])
         }
     }
 
