@@ -183,7 +183,9 @@ struct DAU {
         let daily = dSecs >= SECONDS_IN_A_DAY
         
         let weeksMonday = prefs.stringForKey(DAU.lastPingFirstMondayKey)
-        let weekly = (todayComponents.weeksMonday != weeksMonday) || weeksMonday == nil
+        // There is no lastPingFirstMondayKey preference set at first launch, meaning the week param should be set to true.
+        let isFirstLaunchWeeksMonday = weeksMonday == nil
+        let weekly = todayComponents.weeksMonday != weeksMonday || isFirstLaunchWeeksMonday
         
         let monthly = month != _month || year != _year
         
