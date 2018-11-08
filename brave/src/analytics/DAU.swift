@@ -178,16 +178,12 @@ struct DAU {
         let _month = stat[1]
         let _year = stat[2]
         let SECONDS_IN_A_DAY = 86400
-        let SECONDS_IN_A_WEEK = 7 * 86400
         
         // On first launch, the user is all three of these
         let daily = dSecs >= SECONDS_IN_A_DAY
         
-        // Old implementation fallback, for users that have not upgraded yet.
-        var weekly = dSecs >= SECONDS_IN_A_WEEK
-        if let weeksMonday = prefs.stringForKey(DAU.lastPingFirstMondayKey) {
-            weekly = todayComponents.weeksMonday != weeksMonday
-        }
+        let weeksMonday = prefs.stringForKey(DAU.lastPingFirstMondayKey)
+        let weekly = (todayComponents.weeksMonday != weeksMonday) || weeksMonday == nil
         
         let monthly = month != _month || year != _year
         
