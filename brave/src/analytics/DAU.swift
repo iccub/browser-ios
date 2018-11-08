@@ -9,6 +9,7 @@ private let log = Logger.browserLogger
 // Unit tests for DAU are located in brave/tests_src/unit/DauTest.swift.
 struct DAU {
     public static let preferencesKey = "dau_stat"
+    public static let lastPingFirstMondayKey = "lastPingFirstMondayKey"
     public static let weekOfInstallationKeyPrefKey = "week_of_installation"
     
     /// Default installation date for legacy woi version.
@@ -19,8 +20,12 @@ struct DAU {
     private let baseUrl = "https://laptop-updates.brave.com/1/usage/ios?platform=ios"
     
     private let today: Date
+    
+    /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
+    fileprivate static var calendar: NSCalendar { return Calendar(identifier: .gregorian) as NSCalendar }
+    
     private var todayComponents: DateComponents {
-        return (Calendar.current as NSCalendar).components([.day, .month , .year, .weekday], from: today)
+        return DAU.calendar.components([.day, .month , .year, .weekday], from: today)
     }
     
     init(prefs: Prefs, date: Date? = nil) {
@@ -91,8 +96,15 @@ struct DAU {
             UrpLog.log("DAU ping with added ref, params: \(params)")
         }
         
+        // This preference is used to calculate wheter user used the app in this month and/or day.
         let secsMonthYear = [Int(today.timeIntervalSince1970), todayComponents.month, todayComponents.year]
         prefs.setObject(secsMonthYear, forKey: DAU.preferencesKey)
+        
+        // Using `secsMonthYear` with week component for weekly usage check is not robust enough and fails on edge cases.
+        // To calculate weekly usage we store first monday of week to and then compare it with the
+        // current first monday of week to see if a user used the app on new week.
+        let lastPingFirstMonday = todayComponents.weeksMonday
+        prefs.setObject(lastPingFirstMonday, forKey: DAU.lastPingFirstMondayKey)
         
         return params
     }
@@ -145,7 +157,7 @@ struct DAU {
             return "&daily=\(daily)&weekly=\(weekly)&monthly=\(monthly)"
         }
         
-        if isFirstLaunch || kIsDevelomentBuild {
+        if isFirstLaunch {
             return dauParams(true, true, true)
         }
         
@@ -170,8 +182,15 @@ struct DAU {
         
         // On first launch, the user is all three of these
         let daily = dSecs >= SECONDS_IN_A_DAY
-        let weekly = dSecs >= SECONDS_IN_A_WEEK
+        
+        // Old implementation fallback, for users that have not upgraded yet.
+        var weekly = dSecs >= SECONDS_IN_A_WEEK
+        if let weeksMonday = prefs.stringForKey(DAU.lastPingFirstMondayKey) {
+            weekly = todayComponents.weeksMonday != weeksMonday
+        }
+        
         let monthly = month != _month || year != _year
+        
         log.debug("Dau stat params, daily: \(daily), weekly: \(weekly), monthly:\(monthly), dSecs: \(dSecs)")
         if (!daily && !weekly && !monthly) {
             // No changes, no ping
@@ -199,7 +218,7 @@ extension DateComponents {
             return ""
         }
         
-        guard let today = Calendar.current.date(from: self) else {
+        guard let today = DAU.calendar.date(from: self) else {
             log.error("Cannot create date from date components")
             return ""
         }
@@ -210,7 +229,7 @@ extension DateComponents {
         let dayDifference = isSunday ? sundayToMondayDayDifference : weekday - 2 // -2 because monday is second weekday
         
         let monday = Date(timeInterval: -TimeInterval(dayDifference * dayInSeconds), since: today)
-        let mondayComponents = (Calendar.current as NSCalendar).components([.day, .month , .year], from: monday)
+        let mondayComponents = DAU.calendar.components([.day, .month , .year], from: monday)
         
         guard let mYear = mondayComponents.year, let mMonth = mondayComponents.month, let mDay = mondayComponents.day else {
             log.error("First monday of the week components are nil")

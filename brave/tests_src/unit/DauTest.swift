@@ -92,6 +92,49 @@ class DauTest: XCTestCase {
                        "&channel=beta&version=\(appVersion)&daily=true&weekly=true&monthly=true&first=false&woi=\(woiPrefs)")
     }
     
+    // Tests dau pings at various points of time
+    func testLongUseCase() {
+        var woiPrefs: String {
+            return prefs.stringForKey(DAU.weekOfInstallationKeyPrefKey)!
+        }
+        
+        func paramsToCheck(daily: Bool, weekly: Bool, monthly: Bool, first: Bool = false) -> String{
+            let daily = "daily=\(daily.description)"
+            let weekly = "weekly=\(weekly.description)"
+            let monthly = "monthly=\(monthly.description)"
+            let first = "first=\(first.description)"
+            
+            return "&channel=beta&version=\(appVersion)&\(daily)&\(weekly)&\(monthly)&\(first)&woi=\(woiPrefs)"
+        }
+        
+        func pingWithDateAndCompare(dateString: String, daily: Bool, weekly: Bool, monthly: Bool, first: Bool = false) {
+            let date = dateFrom(string: dateString)
+            let params = DAU(prefs: prefs, date: date)
+            let firstLaunchParams = params.paramsAndPrefsSetup()
+            
+            // All dau stats equal false means no ping is send to server
+            if daily == false && weekly == false && monthly == false {
+                XCTAssertNil(firstLaunchParams)
+            } else {
+                XCTAssertEqual(firstLaunchParams!, paramsToCheck(daily: daily, weekly: weekly,
+                                                                 monthly: monthly, first: first))
+            }
+        }
+        
+        pingWithDateAndCompare(dateString: "2018-03-04", daily: true, weekly: true, monthly: true, first: true)
+        pingWithDateAndCompare(dateString: "2018-03-05", daily: true, weekly: true, monthly: false)
+        pingWithDateAndCompare(dateString: "2018-03-07", daily: true, weekly: false, monthly: false)
+        pingWithDateAndCompare(dateString: "2018-03-11", daily: true, weekly: false, monthly: false)
+        pingWithDateAndCompare(dateString: "2018-03-13", daily: true, weekly: true, monthly: false)
+        pingWithDateAndCompare(dateString: "2018-03-29", daily: true, weekly: true, monthly: false)
+        pingWithDateAndCompare(dateString: "2018-04-29", daily: true, weekly: true, monthly: true)
+        pingWithDateAndCompare(dateString: "2019-04-29", daily: true, weekly: true, monthly: true)
+        pingWithDateAndCompare(dateString: "2019-04-29", daily: false, weekly: false, monthly: false)
+        pingWithDateAndCompare(dateString: "2019-04-29", daily: false, weekly: false, monthly: false)
+        pingWithDateAndCompare(dateString: "2019-05-05", daily: true, weekly: false, monthly: true)
+        pingWithDateAndCompare(dateString: "2019-05-06", daily: true, weekly: true, monthly: false)
+    }
+    
     func testArbitraryWoiDate() {
         let date = dateFrom(string: "2017-11-22")
         
@@ -150,7 +193,7 @@ class DauTest: XCTestCase {
         
         let date = dateFormatter.date(from: dateString)!
         
-        return (Calendar.current as NSCalendar).components([.day, .month , .year, .weekday], from: date)
+        return (Calendar(identifier: .gregorian) as NSCalendar).components([.day, .month , .year, .weekday], from: date)
     }
     
     private func dateFrom(string: String) -> Date {
