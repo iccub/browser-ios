@@ -9,6 +9,7 @@ private let log = Logger.browserLogger
 
 public class DataController: NSObject {
     public static var shared: DataController = DataController()
+    private let databaseName = "Brave.sqlite"
     
     private lazy var container: NSPersistentContainer = {
         let modelName = "Model"
@@ -21,12 +22,7 @@ public class DataController: NSObject {
         
         let container = NSPersistentContainer(name: modelName, managedObjectModel: mom)
         
-        if AppConstants.IsRunningTest {
-            let description = NSPersistentStoreDescription()
-            description.type = NSInMemoryStoreType
-            
-            container.persistentStoreDescriptions = [description]
-        }
+        addPersistentStore(for: container)
         
         // Dev note: This completion handler might be misleading: the persistent store is loaded synchronously by default.
         container.loadPersistentStores(completionHandler: { _, error in
@@ -38,6 +34,31 @@ public class DataController: NSObject {
         container.viewContext.automaticallyMergesChangesFromParent = true
         return container
     }()
+    
+    private func addPersistentStore(for container: NSPersistentContainer) {
+        if AppConstants.IsRunningTest {
+            let description = NSPersistentStoreDescription()
+            description.type = NSInMemoryStoreType
+            
+            container.persistentStoreDescriptions = [description]
+            return
+        }
+        
+        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        guard let docURL = urls.last else {
+            log.error("Could not load url at document directory")
+            fatalError()
+        }
+        let storeURL = docURL.appendingPathComponent(databaseName)
+        
+        let storeDescription = NSPersistentStoreDescription(url: storeURL)
+        
+        // This makes the database file encrypted until device is unlocked.
+        let completeProtection = FileProtectionType.complete as NSObject
+        storeDescription.setOption(completeProtection, forKey: NSPersistentStoreFileProtectionKey)
+        
+        container.persistentStoreDescriptions = [storeDescription]
+    }
     
     private var viewContext: NSManagedObjectContext {
         return container.viewContext
